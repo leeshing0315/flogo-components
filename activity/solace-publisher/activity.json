@@ -2,7 +2,7 @@
   "name": "solace-publisher",
   "version": "0.0.1",
   "type": "flogo:activity",
-  "ref": "gitlab.cargosmart.com/ciot/ciot-flogo-contrib/activity/solace-publisher",
+  "ref": "github.com/leeshing0315/flogo-components/tree/master/activity/solace-publisher",
   "description": "Publish Message to Solace by using AMQP",
   "author": "Max Li",
   "title": "Solace Publisher",
