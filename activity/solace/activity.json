@@ -5,6 +5,7 @@
   "description": "activity description",
   "ref": "github.com/leeshing0315/flogo-components/activity/solace",
   "author": "Max Li <leeshing0315@126.com>",
+  "title": "Solace Publisher",
   "inputs":[
     {
       "name": "hostIP",
