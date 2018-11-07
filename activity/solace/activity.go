@@ -1,4 +1,4 @@
-package SolacePublisher
+package solace
 
 import (
 	"context"

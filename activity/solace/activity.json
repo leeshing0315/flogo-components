@@ -1,11 +1,10 @@
 {
-  "name": "solace-publisher",
+  "name": "solace",
   "version": "0.0.1",
   "type": "flogo:activity",
-  "ref": "github.com/leeshing0315/flogo-components/activity/solace-publisher",
-  "description": "Publish Message to Solace by using AMQP",
-  "author": "Max Li",
-  "title": "Solace Publisher",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/solace",
+  "author": "Max Li <leeshing0315@126.com>",
   "inputs":[
     {
       "name": "hostIP",
