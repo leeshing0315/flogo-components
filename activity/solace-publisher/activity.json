@@ -1,0 +1,36 @@
+{
+  "name": "solace-publisher",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "ref": "gitlab.cargosmart.com/ciot/ciot-flogo-contrib/activity/solace-publisher",
+  "description": "Publish Message to Solace by using AMQP",
+  "author": "Max Li",
+  "title": "Solace Publisher",
+  "inputs":[
+    {
+      "name": "hostIP",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "vpnName",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "topicName",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "data",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "publishSuccess",
+      "type": "string"
+    }
+  ]
+}
