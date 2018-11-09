@@ -5,6 +5,7 @@
   "description": "activity description",
   "ref": "github.com/leeshing0315/flogo-components/activity/mongodb-pool",
   "author": "Max Li <leeshing0315@126.com>",
+  "title": "MongoDB pool",
   "inputs":[
     {
       "name": "uri",
