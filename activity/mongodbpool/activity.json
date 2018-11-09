@@ -1,9 +1,9 @@
 {
-  "name": "mongodb-pool",
+  "name": "mongodbpool",
   "version": "0.0.1",
   "type": "flogo:activity",
   "description": "activity description",
-  "ref": "github.com/leeshing0315/flogo-components/activity/mongodb-pool",
+  "ref": "github.com/leeshing0315/flogo-components/activity/mongodbpool",
   "author": "Max Li <leeshing0315@126.com>",
   "title": "MongoDB pool",
   "inputs":[
