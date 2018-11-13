@@ -1,0 +1,39 @@
+{
+  "name": "tcpreceiver",
+  "version": "0.0.1",
+  "type": "flogo:trigger",
+  "ref": "github.com/leeshing0315/trigger/tcpreceiver",
+  "description": "receive SMU TCP data",
+  "author": "Max Li <leeshing0315@126.com>",
+  "title": "TCP Receiver",
+  "settings":[
+    {
+      "name": "port",
+      "type": "string",
+      "value": "8033",
+      "required": "true"
+    }
+  ],
+  "output": [
+    {
+      "name": "output",
+      "type": "string"
+    },
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "status",
+      "type": "string"
+    }
+  ],
+  "handler": {
+    "settings": [
+      {
+        "name": "handler_setting",
+        "type": "string"
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "packetreceiver",
+  "version": "0.0.1",
+  "type": "flogo:trigger",
+  "ref": "github.com/leeshing0315/trigger/packetreceiver",
+  "description": "receive SMU TCP data on the IP packet level",
+  "author": "Max Li <leeshing0315@126.com>",
+  "title": "Packet Receiver",
+  "settings":[
+    {
+      "name": "setting",
+      "type": "string",
+      "value": "default"
+    }
+  ],
+  "output": [
+    {
+      "name": "output",
+      "type": "string"
+    }
+  ],
+  "handler": {
+    "settings": [
+      {
+        "name": "handler_setting",
+        "type": "string"
+      }
+    ]
+  }
+}
