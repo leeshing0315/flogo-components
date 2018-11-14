@@ -13,7 +13,7 @@ type BinPacket struct {
 	Sequence          []byte
 	DataSegmentLength []byte
 	DataSegment       []byte
-	CRC16Check        byte
+	CRC16Check        []byte
 }
 
 // Socket TCP client
@@ -57,7 +57,10 @@ func (server *ServerSocket) Listen() error {
 	defer listener.Close()
 
 	for {
-		conn, _ := listener.Accept()
+		conn, err := listener.Accept()
+		if err != nil {
+			return err
+		}
 		socket := &Socket{
 			Conn:         conn,
 			ServerSocket: server,
@@ -70,20 +73,46 @@ func (s *Socket) execute() {
 	s.ServerSocket.OnOpen(s)
 	reader := bufio.NewReader(s.Conn)
 	for {
-		command, _ := reader.ReadByte()
+		command, err := reader.ReadByte()
+		if err != nil {
+			s.ServerSocket.OnError(s, err)
+			s.Conn.Close()
+			return
+		}
 
 		sequence := make([]byte, 2)
-		reader.Read(sequence)
+		_, err = reader.Read(sequence)
+		if err != nil {
+			s.ServerSocket.OnError(s, err)
+			s.Conn.Close()
+			return
+		}
 
 		dataSegmentLength := make([]byte, 2)
-		reader.Read(dataSegmentLength)
+		_, err = reader.Read(dataSegmentLength)
+		if err != nil {
+			s.ServerSocket.OnError(s, err)
+			s.Conn.Close()
+			return
+		}
 
 		dataSegment := make([]byte, binary.BigEndian.Uint16(dataSegmentLength))
-		s.Conn.Read(dataSegment)
+		_, err = s.Conn.Read(dataSegment)
+		if err != nil {
+			s.ServerSocket.OnError(s, err)
+			s.Conn.Close()
+			return
+		}
 
-		crc16Check, _ := reader.ReadByte()
+		crc16Check := make([]byte, 2)
+		_, err = reader.Read(crc16Check)
+		if err != nil {
+			s.ServerSocket.OnError(s, err)
+			s.Conn.Close()
+			return
+		}
 
-		err := s.ServerSocket.OnMessage(s, &BinPacket{
+		err = s.ServerSocket.OnMessage(s, &BinPacket{
 			Command:           command,
 			Sequence:          sequence,
 			DataSegmentLength: dataSegmentLength,
@@ -92,6 +121,8 @@ func (s *Socket) execute() {
 		})
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.Conn.Close()
+			return
 		}
 	}
 }

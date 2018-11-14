@@ -62,9 +62,9 @@ func (t *MyTrigger) Start() error {
 		return nil
 	}
 
-	serverSocket.Listen()
+	err := serverSocket.Listen()
 
-	return nil
+	return err
 }
 
 // Stop implements trigger.Trigger.Start
