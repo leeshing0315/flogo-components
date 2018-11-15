@@ -59,7 +59,8 @@ func (t *MyTrigger) Start() error {
 
 	serverSocket.OnMessage = func(s *Socket, packet *BinPacket) error {
 		log.Println(packet)
-		return nil
+		err := handlePacket(s, packet)
+		return err
 	}
 
 	err := serverSocket.Listen()

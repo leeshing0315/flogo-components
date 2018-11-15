@@ -18,6 +18,7 @@ type BinPacket struct {
 
 // Socket TCP client
 type Socket struct {
+	Type         byte
 	Pin          string
 	TerminalNum  string
 	HardwareVer  string
