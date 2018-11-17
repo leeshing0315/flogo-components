@@ -71,12 +71,19 @@ func (server *ServerSocket) Listen() error {
 }
 
 func (s *Socket) execute() {
-	s.ServerSocket.OnOpen(s)
+	err := s.ServerSocket.OnOpen(s)
+	if err != nil {
+		s.ServerSocket.OnError(s, err)
+		s.ServerSocket.OnClose(s)
+		s.Conn.Close()
+		return
+	}
 	reader := bufio.NewReader(s.Conn)
 	for {
 		command, err := reader.ReadByte()
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.ServerSocket.OnClose(s)
 			s.Conn.Close()
 			return
 		}
@@ -85,6 +92,7 @@ func (s *Socket) execute() {
 		_, err = reader.Read(sequence)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.ServerSocket.OnClose(s)
 			s.Conn.Close()
 			return
 		}
@@ -93,6 +101,7 @@ func (s *Socket) execute() {
 		_, err = reader.Read(dataSegmentLength)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.ServerSocket.OnClose(s)
 			s.Conn.Close()
 			return
 		}
@@ -101,6 +110,7 @@ func (s *Socket) execute() {
 		_, err = s.Conn.Read(dataSegment)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.ServerSocket.OnClose(s)
 			s.Conn.Close()
 			return
 		}
@@ -109,6 +119,7 @@ func (s *Socket) execute() {
 		_, err = reader.Read(crc16Check)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.ServerSocket.OnClose(s)
 			s.Conn.Close()
 			return
 		}
@@ -122,6 +133,7 @@ func (s *Socket) execute() {
 		})
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
+			s.ServerSocket.OnClose(s)
 			s.Conn.Close()
 			return
 		}

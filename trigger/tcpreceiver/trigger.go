@@ -45,12 +45,12 @@ func (t *MyTrigger) Start() error {
 	serverSocket := NewServerSocket(url)
 
 	serverSocket.OnOpen = func(s *Socket) error {
-		log.Println(s)
+		log.Printf("***** Client " + s.Conn.RemoteAddr().String() + " Connected *****")
 		return nil
 	}
 
 	serverSocket.OnClose = func(s *Socket) {
-		log.Println(s)
+		log.Printf("***** Client " + s.Conn.RemoteAddr().String() + " Closed *****")
 	}
 
 	serverSocket.OnError = func(s *Socket, err error) {

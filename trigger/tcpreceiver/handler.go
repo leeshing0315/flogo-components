@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"errors"
+	"log"
 
 	"github.com/sigurn/crc16"
 )
@@ -20,6 +21,8 @@ func handlePacket(socket *Socket, packet *BinPacket) error {
 }
 
 func handleTest(socket *Socket, packet *BinPacket) error {
+	log.Println("***** Client " + socket.Conn.RemoteAddr().String() + " send Command 0x31 *****")
+
 	writer := bufio.NewWriter(socket.Conn)
 	content := make([]byte, 7)
 
@@ -40,6 +43,8 @@ func handleTest(socket *Socket, packet *BinPacket) error {
 }
 
 func handleLogin(socket *Socket, packet *BinPacket) error {
+	log.Println("***** Client " + socket.Conn.RemoteAddr().String() + " send Command 0x32 *****")
+
 	var data = packet.DataSegment
 
 	var cursor int
