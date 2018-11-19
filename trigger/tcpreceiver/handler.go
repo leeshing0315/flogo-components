@@ -50,15 +50,15 @@ func handleLogin(socket *Socket, packet *BinPacket) error {
 	var cursor int
 	socket.Type = data[cursor]
 	cursor++
-	pinLen := int(binary.BigEndian.Uint32(data[cursor : cursor+1]))
+	pinLen := int(data[cursor : cursor+1][0])
 	cursor++
 	socket.Pin = string(data[cursor : cursor+pinLen])
 	cursor += pinLen
-	terminalNumLen := int(binary.BigEndian.Uint32(data[cursor : cursor+1]))
+	terminalNumLen := int(data[cursor : cursor+1][0])
 	cursor++
 	socket.TerminalNum = string(data[cursor : cursor+terminalNumLen])
 	cursor += terminalNumLen
-	hardwareVerLen := int(binary.BigEndian.Uint32(data[cursor : cursor+1]))
+	hardwareVerLen := int(data[cursor : cursor+1][0])
 	cursor++
 	socket.HardwareVer = string(data[cursor : cursor+hardwareVerLen])
 
@@ -74,7 +74,7 @@ func handleLogin(socket *Socket, packet *BinPacket) error {
 
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:5], myTable)
-	binary.BigEndian.PutUint16(content[5:7], checksum)
+	binary.LittleEndian.PutUint16(content[5:7], checksum)
 
 	writer.Write(content)
 	writer.Flush()

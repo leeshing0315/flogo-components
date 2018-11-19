@@ -58,7 +58,7 @@ func (t *MyTrigger) Start() error {
 	}
 
 	serverSocket.OnMessage = func(s *Socket, packet *BinPacket) error {
-		log.Println(packet)
+		log.Println(s.Conn.RemoteAddr().String(), packet)
 		err := handlePacket(s, packet)
 		return err
 	}
