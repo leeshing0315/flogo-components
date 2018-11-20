@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/binary"
 	"log"
+	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
 	"github.com/sigurn/crc16"
@@ -70,6 +71,7 @@ func (t *MyTrigger) Start() error {
 		triggerData["command"] = packet.Command
 		triggerData["packet"] = packet
 		triggerData["ip"] = s.Conn.RemoteAddr().String()
+		triggerData["eventTime"] = time.Now().Format("2006-01-02 15:04:05.000000")
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
 			results, _ := handler.Handle(context.Background(), triggerData)

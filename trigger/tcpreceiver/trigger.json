@@ -16,15 +16,11 @@
   ],
   "output": [
     {
-      "name": "output",
-      "type": "string"
-    },
-    {
       "name": "eventTime",
       "type": "string"
     },
     {
-      "name": "status",
+      "name": "ip",
       "type": "string"
     },
     {
@@ -34,10 +30,6 @@
     {
       "name": "packet",
       "type": "any"
-    },
-    {
-      "name": "ip",
-      "type": "string"
     }
   ],
   "reply": [
