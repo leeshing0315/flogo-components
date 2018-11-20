@@ -1,9 +1,13 @@
 package tcpreceiver
 
 import (
+	"bufio"
+	"context"
+	"encoding/binary"
 	"log"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
+	"github.com/sigurn/crc16"
 )
 
 // MyTriggerFactory My Trigger factory
@@ -26,10 +30,12 @@ type MyTrigger struct {
 	metadata     *trigger.Metadata
 	config       *trigger.Config
 	serverSocket *ServerSocket
+	handlers     []*trigger.Handler
 }
 
 // Initialize implements trigger.Init.Initialize
 func (t *MyTrigger) Initialize(ctx trigger.InitContext) error {
+	t.handlers = ctx.GetHandlers()
 	return nil
 }
 
@@ -59,13 +65,40 @@ func (t *MyTrigger) Start() error {
 
 	serverSocket.OnMessage = func(s *Socket, packet *BinPacket) error {
 		log.Println(s.Conn.RemoteAddr().String(), packet)
-		err := handlePacket(s, packet)
-		return err
+
+		triggerData := map[string]interface{}{}
+		triggerData["command"] = packet.Command
+		triggerData["packet"] = packet
+		triggerData["ip"] = s.Conn.RemoteAddr().String()
+		writer := bufio.NewWriter(s.Conn)
+		for _, handler := range t.handlers {
+			results, _ := handler.Handle(context.Background(), triggerData)
+			if len(results) != 0 {
+				dataAttr, ok := results["packet"]
+				if ok {
+					packet := dataAttr.Value().(*BinPacket)
+
+					content := make([]byte, len(packet.DataSegment)+7)
+					content[0] = packet.Command
+					copy(content[1:3], packet.Sequence)
+					copy(content[3:5], packet.DataSegmentLength)
+					copy(content[5:5+len(packet.DataSegment)], packet.DataSegment)
+
+					myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+					checksum := crc16.Checksum(content[0:len(content)-2], myTable)
+					binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+
+					writer.Write(content)
+					writer.Flush()
+				}
+			}
+		}
+		return nil
+		// err := handlePacket(s, packet)
+		// return err
 	}
-
-	err := serverSocket.Listen()
-
-	return err
+	go t.serverSocket.Listen()
+	return nil
 }
 
 // Stop implements trigger.Trigger.Start

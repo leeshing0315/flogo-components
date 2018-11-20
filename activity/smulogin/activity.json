@@ -1,0 +1,25 @@
+{
+  "name": "smulogin",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "Dedicated Activity for SMU Login",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smulogin",
+  "author": "Max Li <leeshing0315@126.com>",
+  "title": "SMU Login",
+  "inputs":[
+    {
+      "name": "packet",
+      "type": "any"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output",
+      "type": "string"
+    }
+  ]
+}

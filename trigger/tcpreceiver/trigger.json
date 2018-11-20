@@ -26,6 +26,24 @@
     {
       "name": "status",
       "type": "string"
+    },
+    {
+      "name": "command",
+      "type": "byte"
+    },
+    {
+      "name": "packet",
+      "type": "any"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    }
+  ],
+  "reply": [
+    {
+      "name": "packet",
+      "type": "any"
     }
   ],
   "handler": {
