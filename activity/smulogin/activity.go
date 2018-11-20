@@ -24,8 +24,8 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	packet, _ := ctx.GetInput("packet").(tcpreceiver.BinPacket)
-	ip, _ := ctx.GetInput("ip").(tcpreceiver.BinPacket)
+	packet, _ := ctx.GetInput("packet").(*tcpreceiver.BinPacket)
+	// ip, _ := ctx.GetInput("ip").(string)
 
 	result := &BinPacket{
 		Command:  packet.Command,
