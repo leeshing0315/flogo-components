@@ -50,6 +50,7 @@ func (t *MyTrigger) Start() error {
 	port := t.config.GetSetting("port")
 	url := "0.0.0.0:" + port
 	serverSocket := NewServerSocket(url)
+	t.serverSocket = serverSocket
 
 	serverSocket.OnOpen = func(s *Socket) error {
 		log.Printf("***** Client " + s.Conn.RemoteAddr().String() + " Connected *****")
