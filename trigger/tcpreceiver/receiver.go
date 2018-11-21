@@ -80,15 +80,6 @@ func (s *Socket) execute() {
 	}
 	reader := bufio.NewReader(s.Conn)
 	for {
-		proxy := make([]byte, 5)
-		_, err := reader.Read(proxy)
-		if err != nil {
-			s.ServerSocket.OnError(s, err)
-			s.ServerSocket.OnClose(s)
-			s.Conn.Close()
-			return
-		}
-
 		command, err := reader.ReadByte()
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
