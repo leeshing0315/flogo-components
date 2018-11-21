@@ -2,7 +2,7 @@ package smulogin
 
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/leeshing0315/trigger/tcpreceiver"
+	"github.com/leeshing0315/flogo-components/trigger/tcpreceiver"
 )
 
 // MyActivity is a stub for your Activity implementation
