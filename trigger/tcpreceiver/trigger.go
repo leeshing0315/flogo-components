@@ -68,7 +68,7 @@ func (t *MyTrigger) Start() error {
 		log.Println(s.Conn.RemoteAddr().String(), packet)
 
 		triggerData := map[string]interface{}{}
-		triggerData["command"] = packet.Command
+		triggerData["command"] = int(packet.Command)
 		triggerData["packet"] = packet
 		triggerData["ip"] = s.Conn.RemoteAddr().String()
 		triggerData["eventTime"] = time.Now().Format("2006-01-02 15:04:05.000000")
