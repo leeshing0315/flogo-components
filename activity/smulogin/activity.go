@@ -51,7 +51,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	result.DataSegmentLength = make([]byte, 2)
 
-	ctx.SetOutput("packet", &result)
+	context.SetOutput("packet", &result)
 
 	return true, nil
 }
