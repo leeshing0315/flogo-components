@@ -2,7 +2,7 @@
   "name": "tcpreceiver",
   "version": "0.0.1",
   "type": "flogo:trigger",
-  "ref": "github.com/leeshing0315/trigger/tcpreceiver",
+  "ref": "github.com/leeshing0315/flogo-components/trigger/tcpreceiver",
   "description": "receive SMU TCP data",
   "author": "Max Li <leeshing0315@126.com>",
   "title": "TCP Receiver",
