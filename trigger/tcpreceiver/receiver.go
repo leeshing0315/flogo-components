@@ -116,7 +116,7 @@ func (s *Socket) execute() {
 		}
 
 		dataSegment := make([]byte, binary.BigEndian.Uint16(dataSegmentLength))
-		_, err = s.Conn.Read(dataSegment)
+		_, err = reader.Read(dataSegment)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
 			s.ServerSocket.OnClose(s)
