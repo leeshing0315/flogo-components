@@ -85,7 +85,7 @@ func (t *MyTrigger) Start() error {
 					content[0] = packet.Command
 					copy(content[1:3], packet.Sequence)
 					binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
-					copy(content[5:5+len(packet.DataSegment)], dataSegment)
+					copy(content[5:5+len(dataSegment)], dataSegment)
 
 					myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 					checksum := crc16.Checksum(content[0:len(content)-2], myTable)
