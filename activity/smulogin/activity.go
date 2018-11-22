@@ -36,7 +36,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 func parseDataSegment(data []byte) {
 	var cursor int
-	println("SMU Type: " + string(data[cursor]))
+	println("SMU Type: " + string(int(data[cursor])))
 	cursor++
 	pinLen := int(data[cursor : cursor+1][0])
 	cursor++
