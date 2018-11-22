@@ -69,23 +69,23 @@ func (t *MyTrigger) Start() error {
 		log.Println(s.Conn.RemoteAddr().String(), packet)
 
 		triggerData := map[string]interface{}{}
-		triggerData["command"] = int(packet.Command)
-		triggerData["packet"] = packet
-		triggerData["ip"] = s.Conn.RemoteAddr().String()
 		triggerData["eventTime"] = time.Now().Format("2006-01-02 15:04:05.000000")
+		triggerData["ip"] = s.Conn.RemoteAddr().String()
+		triggerData["command"] = int(packet.Command)
+		triggerData["reqDataSegment"] = packet.DataSegment
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
 			results, _ := handler.Handle(context.Background(), triggerData)
 			if len(results) != 0 {
-				dataAttr, ok := results["packet"]
+				dataAttr, ok := results["resDataSegment"]
 				if ok {
-					packet := dataAttr.Value().(*BinPacket)
+					dataSegment := dataAttr.Value().([]byte)
 
-					content := make([]byte, len(packet.DataSegment)+7)
+					content := make([]byte, len(dataSegment)+7)
 					content[0] = packet.Command
 					copy(content[1:3], packet.Sequence)
-					copy(content[3:5], packet.DataSegmentLength)
-					copy(content[5:5+len(packet.DataSegment)], packet.DataSegment)
+					binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
+					copy(content[5:5+len(packet.DataSegment)], dataSegment)
 
 					myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 					checksum := crc16.Checksum(content[0:len(content)-2], myTable)

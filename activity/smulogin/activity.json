@@ -8,18 +8,22 @@
   "title": "SMU Login",
   "inputs":[
     {
-      "name": "packet",
-      "type": "any"
+      "name": "eventTime",
+      "type": "string"
     },
     {
       "name": "ip",
       "type": "string"
+    },
+    {
+      "name": "reqDataSegment",
+      "type": "array"
     }
   ],
   "outputs": [
     {
-      "name": "output",
-      "type": "any"
+      "name": "resDataSegment",
+      "type": "array"
     }
   ]
 }

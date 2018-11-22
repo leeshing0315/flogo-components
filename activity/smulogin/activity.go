@@ -2,7 +2,6 @@ package smulogin
 
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/leeshing0315/flogo-components/trigger/tcpreceiver"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -24,16 +23,18 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	packet, _ := context.GetInput("packet").(*tcpreceiver.BinPacket)
-	// ip, _ := ctx.GetInput("ip").(string)
+	// eventTime, _ := context.GetInput("eventTime").(string)
+	// ip, _ := context.GetInput("ip").(string)
+	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
-	result := &tcpreceiver.BinPacket{
-		Command:  packet.Command,
-		Sequence: packet.Sequence,
-	}
+	parseDataSegment(reqDataSegment)
 
-	var data = packet.DataSegment
+	context.SetOutput("resDataSegment", []byte{})
 
+	return true, nil
+}
+
+func parseDataSegment(data []byte) {
 	var cursor int
 	println("SMU Type: " + string(data[cursor]))
 	cursor++
@@ -48,10 +49,4 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	hardwareVerLen := int(data[cursor : cursor+1][0])
 	cursor++
 	println("HardwareVer: " + string(data[cursor:cursor+hardwareVerLen]))
-
-	result.DataSegmentLength = make([]byte, 2)
-
-	context.SetOutput("packet", &result)
-
-	return true, nil
 }

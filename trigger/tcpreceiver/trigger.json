@@ -28,14 +28,14 @@
       "type": "integer"
     },
     {
-      "name": "packet",
-      "type": "any"
+      "name": "reqDataSegment",
+      "type": "array"
     }
   ],
   "reply": [
     {
-      "name": "packet",
-      "type": "any"
+      "name": "resDataSegment",
+      "type": "array"
     }
   ],
   "handler": {
