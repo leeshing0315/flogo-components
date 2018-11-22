@@ -1,6 +1,8 @@
 package smulogin
 
 import (
+	"strconv"
+
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
 
@@ -36,7 +38,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 func parseDataSegment(data []byte) {
 	var cursor int
-	println("SMU Type: " + string(int(data[cursor])))
+	println("SMU Type: " + "0x" + strconv.FormatUint(uint64(data[cursor]), 16))
 	cursor++
 	pinLen := int(data[cursor : cursor+1][0])
 	cursor++
