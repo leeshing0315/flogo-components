@@ -44,8 +44,8 @@ func handleData(data []byte) string {
 }
 
 func handleLocationBasicInformation(data []byte, gpsEvent *entity.GpsEvent, resultMap map[string]string) {
-	handleTriggerEvent(data, gpsEvent, resultMap)
-	handleStatus(data, gpsEvent, resultMap)
+	handleTriggerEvent(data[0:2], gpsEvent, resultMap)
+	handleStatus(data[2:4], gpsEvent, resultMap)
 }
 
 func handleTriggerEvent(data []byte, gpsEvent *entity.GpsEvent, resultMap map[string]string) {
@@ -116,4 +116,10 @@ func handleTriggerEvent(data []byte, gpsEvent *entity.GpsEvent, resultMap map[st
 }
 
 func handleStatus(data []byte, gpsEvent *entity.GpsEvent, resultMap map[string]string) {
+	positioning := data[0] & positioningMask
+	if positioning == positioningMask {
+		resultMap["是否定位"] = "1"
+	} else {
+		resultMap["是否定位"] = "0"
+	}
 }
