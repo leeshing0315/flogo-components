@@ -17,10 +17,20 @@ const (
 	coldBoxOperationModeChangeMask byte = 0x01 // 0000 0001
 	powerSupplyStatusChangeMask    byte = 0x80 // 1000 0000
 
-	positioningMask                    byte = 0x80 // 1000 0000
-	latitudeNorthSouthMask             byte = 0x40 // 0100 0000
-	longitudeEastWestMask              byte = 0x20 // 0010 0000
-	useGpsSatellitesForPositioningMask byte = 0x10 // 0001 0000
+	positioningMask                      byte = 0x40 // 0100 0000
+	latitudeNorthSouthMask               byte = 0x20 // 0010 0000
+	longitudeEastWestMask                byte = 0x10 // 0001 0000
+	useGpsSatellitesForPositioningMask   byte = 0x08 // 0000 1000
+	useBeidouSatelliteForPositioningMask byte = 0x04 // 0000 0100
+	supplyByBatteryOrPowerMask           byte = 0x02 // 0000 0010
+	inThePolygonAreaMask                 byte = 0x01 // 0000 0001
+	positioningModuleStatusMask          byte = 0x80 // 1000 0000
+	serialCommunicationStatusMask        byte = 0x40 // 0100 0000
+	communicationModuleStatusMask        byte = 0x20 // 0010 0000
+	powerSupplyStatusMask                byte = 0x10 // 0001 0000
+	batteryChargingStatusMask            byte = 0x08 // 0000 1000
+	clockModuleStatusMask                byte = 0x04 // 0000 0100
+	timedUploadDataMask                  byte = 0x01 // 0000 0001
 )
 
 func handleData(data []byte) string {
@@ -35,6 +45,7 @@ func handleData(data []byte) string {
 
 func handleLocationBasicInformation(data []byte, gpsEvent *entity.GpsEvent, resultMap map[string]string) {
 	handleTriggerEvent(data, gpsEvent, resultMap)
+	handleStatus(data, gpsEvent, resultMap)
 }
 
 func handleTriggerEvent(data []byte, gpsEvent *entity.GpsEvent, resultMap map[string]string) {
@@ -102,4 +113,7 @@ func handleTriggerEvent(data []byte, gpsEvent *entity.GpsEvent, resultMap map[st
 	} else {
 		resultMap["供电状态变化"] = "0"
 	}
+}
+
+func handleStatus(data []byte, gpsEvent *entity.GpsEvent, resultMap map[string]string) {
 }
