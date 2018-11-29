@@ -1,0 +1,32 @@
+{
+  "name": "smusingledata",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "inputs":[
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    },
+    {
+      "name": "reqDataSegment",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "resDataSegment",
+      "type": "array"
+    },
+    {
+      "name": "output",
+      "type": "string"
+    }
+  ]
+}
