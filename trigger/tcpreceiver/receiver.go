@@ -5,6 +5,11 @@ import (
 	"encoding/binary"
 	"log"
 	"net"
+	"strings"
+)
+
+const (
+	ASCII_CR byte = 13
 )
 
 // BinPacket the orignal TCP packet
@@ -18,12 +23,13 @@ type BinPacket struct {
 
 // Socket TCP client
 type Socket struct {
-	Type         byte
-	Pin          string
-	TerminalNum  string
-	HardwareVer  string
-	Conn         net.Conn
-	ServerSocket *ServerSocket
+	Type          byte
+	Pin           string
+	TerminalNum   string
+	HardwareVer   string
+	Conn          net.Conn
+	ServerSocket  *ServerSocket
+	RemoteAddrStr string
 }
 
 // ServerSocket TCP server
@@ -79,8 +85,17 @@ func (s *Socket) execute() {
 		return
 	}
 	reader := bufio.NewReader(s.Conn)
+
+	err = handleIpInfo(s, reader)
+	if err != nil {
+		s.ServerSocket.OnError(s, err)
+		s.ServerSocket.OnClose(s)
+		s.Conn.Close()
+		return
+	}
+
 	for {
-		command, err := reader.ReadByte()
+		binPacket, err := parseByProtocol(s, reader)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
 			s.ServerSocket.OnClose(s)
@@ -88,49 +103,7 @@ func (s *Socket) execute() {
 			return
 		}
 
-		sequence := make([]byte, 2)
-		_, err = reader.Read(sequence)
-		if err != nil {
-			s.ServerSocket.OnError(s, err)
-			s.ServerSocket.OnClose(s)
-			s.Conn.Close()
-			return
-		}
-
-		dataSegmentLength := make([]byte, 2)
-		_, err = reader.Read(dataSegmentLength)
-		if err != nil {
-			s.ServerSocket.OnError(s, err)
-			s.ServerSocket.OnClose(s)
-			s.Conn.Close()
-			return
-		}
-
-		dataSegment := make([]byte, binary.BigEndian.Uint16(dataSegmentLength))
-		_, err = reader.Read(dataSegment)
-		if err != nil {
-			s.ServerSocket.OnError(s, err)
-			s.ServerSocket.OnClose(s)
-			s.Conn.Close()
-			return
-		}
-
-		crc16Check := make([]byte, 2)
-		_, err = reader.Read(crc16Check)
-		if err != nil {
-			s.ServerSocket.OnError(s, err)
-			s.ServerSocket.OnClose(s)
-			s.Conn.Close()
-			return
-		}
-
-		err = s.ServerSocket.OnMessage(s, &BinPacket{
-			Command:           command,
-			Sequence:          sequence,
-			DataSegmentLength: dataSegmentLength,
-			DataSegment:       dataSegment,
-			CRC16Check:        crc16Check,
-		})
+		err = s.ServerSocket.OnMessage(s, binPacket)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
 			s.ServerSocket.OnClose(s)
@@ -138,4 +111,61 @@ func (s *Socket) execute() {
 			return
 		}
 	}
+}
+
+func handleIpInfo(s *Socket, reader *bufio.Reader) error {
+	// PROXY TCP4 <Device IP> <Nginx IP> <Nginx Port> <Local Port> <CR> <LF>
+	head, err := reader.ReadBytes(ASCII_CR)
+	if err != nil {
+		return err
+	}
+	ipInfo := head[0 : len(head)-1]
+	_, err = reader.ReadByte()
+	if err != nil {
+		return err
+	}
+
+	ipInfos := strings.Split(string(ipInfo), " ")
+	s.RemoteAddrStr = ipInfos[2]
+
+	return nil
+}
+
+func parseByProtocol(s *Socket, reader *bufio.Reader) (*BinPacket, error) {
+	command, err := reader.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+
+	sequence := make([]byte, 2)
+	_, err = reader.Read(sequence)
+	if err != nil {
+		return nil, err
+	}
+
+	dataSegmentLength := make([]byte, 2)
+	_, err = reader.Read(dataSegmentLength)
+	if err != nil {
+		return nil, err
+	}
+
+	dataSegment := make([]byte, binary.BigEndian.Uint16(dataSegmentLength))
+	_, err = reader.Read(dataSegment)
+	if err != nil {
+		return nil, err
+	}
+
+	crc16Check := make([]byte, 2)
+	_, err = reader.Read(crc16Check)
+	if err != nil {
+		return nil, err
+	}
+
+	return &BinPacket{
+		Command:           command,
+		Sequence:          sequence,
+		DataSegmentLength: dataSegmentLength,
+		DataSegment:       dataSegment,
+		CRC16Check:        crc16Check,
+	}, nil
 }
