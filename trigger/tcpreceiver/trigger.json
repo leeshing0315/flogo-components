@@ -28,6 +28,10 @@
       "type": "integer"
     },
     {
+      "name": "seqNo",
+      "type": "integer"
+    },
+    {
       "name": "reqDataSegment",
       "type": "array"
     }

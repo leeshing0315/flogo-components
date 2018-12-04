@@ -72,6 +72,7 @@ func (t *MyTrigger) Start() error {
 		triggerData["eventTime"] = time.Now().Format("2006-01-02 15:04:05.000000")
 		triggerData["ip"] = s.Conn.RemoteAddr().String()
 		triggerData["command"] = int(packet.Command)
+		triggerData["seqNo"] = int(binary.BigEndian.Uint32(packet.Sequence))
 		triggerData["reqDataSegment"] = packet.DataSegment
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
