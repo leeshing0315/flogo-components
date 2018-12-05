@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "type": "flogo:activity",
   "description": "activity description",
-  "ref": "github.com/yourusername/yourrepository",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smusingledata",
   "author": "Your Name <you.name@example.org>",
+  "title": "SMU SingleData",
   "inputs":[
     {
       "name": "eventTime",
@@ -13,6 +14,10 @@
     {
       "name": "ip",
       "type": "string"
+    },
+    {
+      "name": "seqNo",
+      "type": "integer"
     },
     {
       "name": "reqDataSegment",

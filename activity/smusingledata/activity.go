@@ -23,12 +23,13 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
+	seqNo, _ := context.GetInput("reqDataSegment").(int)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
-	message := handleData(reqDataSegment)
+	gpsEvent, deviceError, operationModeChange, cntrNum, devid := handleData(seqNo, reqDataSegment)
 
 	context.SetOutput("resDataSegment", []byte{})
-	context.SetOutput("output", message)
+	context.SetOutput("output", "")
 
 	return true, nil
 }
