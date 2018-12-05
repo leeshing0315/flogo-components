@@ -17,3 +17,9 @@ func BigEndianInt12(b []byte) int16 {
 	signedNumber >>= 4
 	return signedNumber
 }
+
+func BigEndianFromBit0ToBit6(b byte) int64 {
+	b <<= 1
+	b >>= 2
+	return int64(b)
+}
