@@ -185,6 +185,7 @@ func ParseToSinglePacket(data []byte) *SinglePacket {
 	singlePacket := &SinglePacket{}
 
 	handleLocationBasicInformation(data[0:23], singlePacket)
+	handleAdditionalInformationItems(data[23:], singlePacket)
 
 	return singlePacket
 }
@@ -507,16 +508,53 @@ func isValid(validState []byte, number int) bool {
 }
 
 func handleDebugTextItem(item []byte, singlePacket *SinglePacket) {
+	dataSegment := item[2:]
+	debugTextItem := DebugTextItem{}
+
+	debugTextItem.debugText = string(dataSegment)
+
+	singlePacket.DebugTextItem = debugTextItem
 }
 
 func handleNumberOfSatellitesItem(item []byte, singlePacket *SinglePacket) {
+	dataSegment := item[2:]
+	numberOfSatellitesItem := NumberOfSatellitesItem{}
+
+	numberOfSatellitesItem.GpsSatelliteNumber = strconv.FormatUint(uint64(dataSegment[0]), 10)
+	numberOfSatellitesItem.BeidouSatelliteNumber = strconv.FormatUint(uint64(dataSegment[1]), 10)
+
+	singlePacket.NumberOfSatellitesItem = numberOfSatellitesItem
 }
 
 func handleOpModeItem(item []byte, singlePacket *SinglePacket) {
+	dataSegment := item[2:]
+	opModeItem := OpModeItem{}
+
+	opModeItem.OpMode = opModeMapping[dataSegment[0]]
+
+	singlePacket.OpModeItem = opModeItem
 }
 
 func handleFaultCodeItem(item []byte, singlePacket *SinglePacket) {
+	dataSegmentLen := item[1]
+	dataSegment := item[2:]
+	faultCodeItem := FaultCodeItem{}
+
+	faultCodes := make([]string, dataSegmentLen)
+	for _, faultCode := range dataSegment {
+		faultCodes = append(faultCodes, faultCodeMapping[faultCode])
+	}
+	faultCodeItem.FaultCode = strings.Join(faultCodes, "|")
+
+	singlePacket.FaultCodeItem = faultCodeItem
 }
 
 func handleColdBoxTimeItem(item []byte, singlePacket *SinglePacket) {
+	dataSegment := item[2:]
+	coldBoxTimeItem := ColdBoxTimeItem{}
+
+	coldBoxTimeItem.CntrTime = util.ParseDateStrFromBCD6(dataSegment[0:6])
+	coldBoxTimeItem.CollectColdBoxTime = util.ParseDateStrFromBCD6(dataSegment[6:12])
+
+	singlePacket.ColdBoxTimeItem = coldBoxTimeItem
 }
