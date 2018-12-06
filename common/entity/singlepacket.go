@@ -321,9 +321,9 @@ func handleDate(data []byte, singlePacket *SinglePacket) {
 }
 
 func handleRemainingInfo(data []byte, singlePacket *SinglePacket) {
-	singlePacket.Lat = strconv.FormatFloat(float64(binary.BigEndian.Uint32(data[10:14]))/math.Pow10(6), 'f', -1, 64)
-	singlePacket.Lng = strconv.FormatFloat(float64(binary.BigEndian.Uint32(data[14:18]))/math.Pow10(6), 'f', -1, 64)
-	singlePacket.Speed = strconv.FormatFloat(float64(binary.BigEndian.Uint16(data[18:20]))/10, 'f', -1, 64)
+	singlePacket.Lat = strconv.FormatFloat(float64(binary.BigEndian.Uint32(data[10:14]))/math.Pow10(6), 'f', 6, 64)
+	singlePacket.Lng = strconv.FormatFloat(float64(binary.BigEndian.Uint32(data[14:18]))/math.Pow10(6), 'f', 6, 64)
+	singlePacket.Speed = strconv.FormatFloat(float64(binary.BigEndian.Uint16(data[18:20]))/10, 'f', 1, 64)
 	singlePacket.Direction = strconv.FormatUint(uint64(binary.BigEndian.Uint16(data[20:22])), 10)
 	singlePacket.BatLevel = strconv.FormatUint(uint64(data[22]), 10)
 }
@@ -370,7 +370,7 @@ func handleLoginItem(item []byte, singlePacket *SinglePacket) {
 	loginItem.Pin = string(dataSegment[0:15])
 	loginItem.DeviceID = string(dataSegment[15:21])
 	loginItem.ContainerNumber = string(dataSegment[21:32])
-	loginItem.ReeferType = string(dataSegment[33])
+	loginItem.ReeferType = string(dataSegment[32])
 
 	singlePacket.LoginItem = loginItem
 }
@@ -392,19 +392,19 @@ func handleInfoItem(item []byte, singlePacket *SinglePacket) {
 
 	// SET_TEM: 2byte 多字节时，注意低位在右，参与计算的区间：b2-b13，乘以0.0625，其中LSB：b2，MSB：b13，单位是C。
 	infoItem.SetTemValid = isValid(validState, 1)
-	infoItem.SetTem = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[6:8]))*0.0625, 'f', -1, 64)
+	infoItem.SetTem = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[6:8]))*0.0625, 'f', 1, 64)
 
 	// SUP_TEM: 2byte 参与计算的区间：b2-b13，乘以0.0625，其中LSB：b2，MSB：b13，单位是C。
 	infoItem.SupTemValid = isValid(validState, 2)
-	infoItem.SupTem = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[8:10]))*0.0625, 'f', -1, 64)
+	infoItem.SupTem = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[8:10]))*0.0625, 'f', 1, 64)
 
 	// RET_TEM: 2byte 参与计算的区间：b2-b13，乘以0.0625，其中LSB：b2，MSB：b13，单位是C。
 	infoItem.RetTemValid = isValid(validState, 3)
-	infoItem.RetTem = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[10:12]))*0.0625, 'f', -1, 64)
+	infoItem.RetTem = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[10:12]))*0.0625, 'f', 1, 64)
 
 	// HUM: 1byte 参与计算的区间：b0-b7，除以2.54，其中LSB：b0，MSB：b7，单位是%RH，范围0~100%。
 	infoItem.HumValid = isValid(validState, 4)
-	infoItem.Hum = strconv.FormatFloat(float64(dataSegment[12])/2.54, 'f', -1, 64)
+	infoItem.Hum = strconv.FormatFloat(intervalFloat64(float64(dataSegment[12])/2.54, 0, 100), 'f', 1, 64)
 
 	// HPT: 1byte 参与计算的区间：b0-b7，乘以10，单位是Kpa，如果是FF则为无效值，范围0~2500Kpa。
 	infoItem.HptValid = isValid(validState, 5)
@@ -415,19 +415,19 @@ func handleInfoItem(item []byte, singlePacket *SinglePacket) {
 	// USDA1: 1byte 参与计算的区间：b0-b7，乘以0.5，然后再减去5.0，单位是C，如果是FF则为无效值，范围-5.0~+20.0。
 	infoItem.Usda1Valid = isValid(validState, 6)
 	if dataSegment[14] != 0xFF {
-		infoItem.Usda1 = strconv.FormatFloat(float64(dataSegment[14])*0.5-5.0, 'f', -1, 64)
+		infoItem.Usda1 = strconv.FormatFloat(intervalFloat64(float64(dataSegment[14])*0.5-5.0, -5, 20), 'f', 1, 64)
 	}
 
 	// USDA2: 1byte 参与计算的区间：b0-b7，乘以0.5，然后再减去5.0，单位是C，如果是FF则为无效值，范围-5.0~+20.0。
 	infoItem.Usda2Valid = isValid(validState, 7)
 	if dataSegment[15] != 0xFF {
-		infoItem.Usda2 = strconv.FormatFloat(float64(dataSegment[15])*0.5-5.0, 'f', -1, 64)
+		infoItem.Usda2 = strconv.FormatFloat(intervalFloat64(float64(dataSegment[15])*0.5-5.0, -5, 20), 'f', 1, 64)
 	}
 
 	// USDA3: 1byte 参与计算的区间：b0-b7，乘以0.5，然后再减去5.0，单位是C，如果是FF则为无效值，范围-5.0~+20.0。
 	infoItem.Usda3Valid = isValid(validState, 8)
 	if dataSegment[16] != 0xFF {
-		infoItem.Usda3 = strconv.FormatFloat(float64(dataSegment[16])*0.5-5.0, 'f', -1, 64)
+		infoItem.Usda3 = strconv.FormatFloat(intervalFloat64(float64(dataSegment[16])*0.5-5.0, -5, 20), 'f', 1, 64)
 	}
 
 	// CTLTYPE: 1byte 这个是冷机软件版本，直接记录，如25H、26H等。
@@ -440,51 +440,51 @@ func handleInfoItem(item []byte, singlePacket *SinglePacket) {
 
 	// PT: 2byte 参与计算的区间：b0-b15，乘以0.1，单位是V，范围20~654。
 	infoItem.PtValid = isValid(validState, 11)
-	infoItem.Pt = strconv.FormatFloat(float64(binary.BigEndian.Uint16(dataSegment[19:21]))*0.1, 'f', -1, 64)
+	infoItem.Pt = strconv.FormatFloat(intervalFloat64(float64(binary.BigEndian.Uint16(dataSegment[19:21]))*0.1, 20, 654), 'f', 1, 64)
 
 	// CT1: 2byte 参与计算的区间：b0-b15，乘以0.01，单位是A，范围-1.11~54。
 	infoItem.Ct1Valid = isValid(validState, 12)
-	infoItem.Ct1 = strconv.FormatFloat(float64(int16(binary.BigEndian.Uint16(dataSegment[21:23])))*0.01, 'f', -1, 64)
+	infoItem.Ct1 = strconv.FormatFloat(intervalFloat64(float64(int16(binary.BigEndian.Uint16(dataSegment[21:23])))*0.01, -1.11, 54), 'f', 1, 64)
 
 	// CT2: 2byte 参与计算的区间：b0-b15，乘以0.01，单位是A，范围-1.01~50.96。
 	infoItem.Ct2Valid = isValid(validState, 13)
-	infoItem.Ct2 = strconv.FormatFloat(float64(int16(binary.BigEndian.Uint16(dataSegment[23:25])))*0.01, 'f', -1, 64)
+	infoItem.Ct2 = strconv.FormatFloat(intervalFloat64(float64(int16(binary.BigEndian.Uint16(dataSegment[23:25])))*0.01, -1.01, 50.96), 'f', 1, 64)
 
 	// AMBS: 2byte 参与计算的区间：b2-b13，乘以0.0625，其中LSB：b2，MSB：b13，单位是C。
 	infoItem.AmbsValid = isValid(validState, 14)
-	infoItem.Ambs = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[25:27]))*0.0625, 'f', -1, 64)
+	infoItem.Ambs = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[25:27]))*0.0625, 'f', 1, 64)
 
 	// EIS: 2byte 参与计算的区间：b0-b15，乘以0.1，单位是C，范围-57~100。
 	infoItem.EisValid = isValid(validState, 15)
-	infoItem.Eis = strconv.FormatFloat(float64(int16(binary.BigEndian.Uint16(dataSegment[27:29])))*0.1, 'f', -1, 64)
+	infoItem.Eis = strconv.FormatFloat(intervalFloat64(float64(int16(binary.BigEndian.Uint16(dataSegment[27:29])))*0.1, -57, 100), 'f', 1, 64)
 
 	// EOS: 2byte 参与计算的区间：b2-b13，乘以0.0625，其中LSB：b2，MSB：b13，单位是C。
 	infoItem.EosValid = isValid(validState, 16)
-	infoItem.Eos = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[29:31]))*0.0625, 'f', -1, 64)
+	infoItem.Eos = strconv.FormatFloat(float64(util.BigEndianInt12(dataSegment[29:31]))*0.0625, 'f', 1, 64)
 
 	// DCHS: 2byte 参与计算的区间：b0-b15，乘以0.1，单位是C，范围3~187。
 	infoItem.DchsValid = isValid(validState, 17)
-	infoItem.Dchs = strconv.FormatFloat(float64(binary.BigEndian.Uint16(dataSegment[31:33]))*0.1, 'f', -1, 64)
+	infoItem.Dchs = strconv.FormatFloat(intervalFloat64(float64(binary.BigEndian.Uint16(dataSegment[31:33]))*0.1, 3, 187), 'f', 1, 64)
 
 	// SGS: 2byte 参与计算的区间：b0-b15，乘以0.1，单位是C，范围-57~100。
 	infoItem.SgsValid = isValid(validState, 18)
-	infoItem.Sgs = strconv.FormatFloat(float64(int16(binary.BigEndian.Uint16(dataSegment[33:35])))*0.1, 'f', -1, 64)
+	infoItem.Sgs = strconv.FormatFloat(intervalFloat64(float64(int16(binary.BigEndian.Uint16(dataSegment[33:35])))*0.1, -57, 100), 'f', 1, 64)
 
 	// SMV: 2byte 参与计算的区间：b0-b15，除以328，单位是PLS，范围0~500。
 	infoItem.SmvValid = isValid(validState, 19)
-	infoItem.Smv = strconv.FormatFloat(float64(binary.BigEndian.Uint16(dataSegment[35:37]))/328, 'f', -1, 64)
+	infoItem.Smv = strconv.FormatFloat(intervalFloat64(float64(binary.BigEndian.Uint16(dataSegment[35:37]))/328, 0, 500), 'f', 1, 64)
 
 	// EV: 2byte 参与计算的区间：b0-b15，单位是%，范围0~100。
 	infoItem.EvValid = isValid(validState, 20)
-	infoItem.Ev = strconv.FormatFloat(float64(binary.BigEndian.Uint16(dataSegment[37:39])), 'f', -1, 64)
+	infoItem.Ev = strconv.FormatInt(int64(binary.BigEndian.Uint16(dataSegment[37:39])), 10)
 
 	// DSS: 2byte 参与计算的区间：b0-b15，乘以0.1，单位是C，范围-57~100。
 	infoItem.DssValid = isValid(validState, 21)
-	infoItem.Dss = strconv.FormatFloat(float64(int16(binary.BigEndian.Uint16(dataSegment[39:41])))*0.1, 'f', -1, 64)
+	infoItem.Dss = strconv.FormatFloat(intervalFloat64(float64(int16(binary.BigEndian.Uint16(dataSegment[39:41])))*0.1, -57, 100), 'f', 1, 64)
 
 	// DRS: 2byte 参与计算的区间：b0-b15，乘以0.1，单位是C，范围-57~100。
 	infoItem.DrsValid = isValid(validState, 22)
-	infoItem.Drs = strconv.FormatFloat(float64(int16(binary.BigEndian.Uint16(dataSegment[41:43])))*0.1, 'f', -1, 64)
+	infoItem.Drs = strconv.FormatFloat(intervalFloat64(float64(int16(binary.BigEndian.Uint16(dataSegment[41:43])))*0.1, -57, 100), 'f', 1, 64)
 
 	// HS: 1byte 参与计算的区间：b0-b6，其中LSB：b0，MSB：b6，单位是%RH，范围是30~95。
 	infoItem.HsValid = isValid(validState, 23)
@@ -557,4 +557,13 @@ func handleColdBoxTimeItem(item []byte, singlePacket *SinglePacket) {
 	coldBoxTimeItem.CollectColdBoxTime = util.ParseDateStrFromBCD6(dataSegment[6:12])
 
 	singlePacket.ColdBoxTimeItem = coldBoxTimeItem
+}
+
+func intervalFloat64(number float64, min float64, max float64) float64 {
+	if number < min {
+		return min
+	} else if number > max {
+		return max
+	}
+	return number
 }

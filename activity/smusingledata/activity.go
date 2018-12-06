@@ -2,6 +2,7 @@ package smusingledata
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/leeshing0315/flogo-components/common/entity"
@@ -26,11 +27,19 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	seqNo, _ := context.GetInput("seqNo").(string)
+	seqNo := strconv.FormatUint(uint64(context.GetInput("seqNo").(int)), 10)
 	cntrNum, _ := context.GetInput("cntrNum").(string)
+	// devId, _ := context.GetInput("devId").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
 	singlePacket := entity.ParseToSinglePacket(reqDataSegment)
+	if singlePacket.LoginItem.ContainerNumber != "" {
+		cntrNum = singlePacket.LoginItem.ContainerNumber
+	}
+	// if singlePacket.LoginItem.DeviceID != "" {
+	// 	devId = singlePacket.LoginItem.DeviceID
+	// }
+
 	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum)
 	opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
 
@@ -39,6 +48,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	gpsEventStr, _ := json.Marshal(gpsEvent)
 	opModeChangeStr, _ := json.Marshal(opModeChange)
 
+	context.SetOutput("cntrNum", cntrNum)
+	// context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
 	context.SetOutput("gpsEvent", gpsEventStr)
 	context.SetOutput("opModeChange", opModeChangeStr)
