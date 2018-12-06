@@ -43,8 +43,6 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum)
 	opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
 
-	println(singlePacket)
-
 	gpsEventStr, _ := json.Marshal(gpsEvent)
 	opModeChangeStr, _ := json.Marshal(opModeChange)
 

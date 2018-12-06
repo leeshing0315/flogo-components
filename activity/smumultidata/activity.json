@@ -1,0 +1,60 @@
+{
+  "name": "smumultidata",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "inputs":[
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    },
+    {
+      "name": "seqNo",
+      "type": "integer"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devid",
+      "type": "string"
+    },
+    {
+      "name": "reqDataSegment",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "resDataSegment",
+      "type": "array"
+    },
+    {
+      "name": "gpsEvents",
+      "type": "array"
+    },
+    {
+      "name": "opModeChanges",
+      "type": "array"
+    },
+    {
+      "name": "deviceErrors",
+      "type": "array"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devId",
+      "type": "string"
+    }
+  ]
+}
