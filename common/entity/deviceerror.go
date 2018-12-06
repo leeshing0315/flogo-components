@@ -1,11 +1,11 @@
 package entity
 
 type DeviceError struct {
-	seqno     string
-	devid     string
-	faulttype string
-	status    string
-	logtime   string
-	revtime   string
-	tableName string // default: "Tbldevicefault"
+	Seqno     string
+	Devid     string
+	Faulttype string
+	Status    string
+	Logtime   string
+	Revtime   string
+	TableName string // default: "Tbldevicefault"
 }
