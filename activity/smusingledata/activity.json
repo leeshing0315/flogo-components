@@ -30,7 +30,15 @@
       "type": "array"
     },
     {
-      "name": "output",
+      "name": "gpsEvent",
+      "type": "string"
+    },
+    {
+      "name": "opModeChange",
+      "type": "string"
+    },
+    {
+      "name": "deviceError",
       "type": "string"
     }
   ]

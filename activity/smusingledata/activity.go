@@ -1,7 +1,10 @@
 package smusingledata
 
 import (
+	"encoding/json"
+
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/leeshing0315/flogo-components/common/entity"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -23,13 +26,22 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	seqNo, _ := context.GetInput("reqDataSegment").(int)
+	seqNo, _ := context.GetInput("seqNo").(string)
+	cntrNum, _ := context.GetInput("cntrNum").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
-	gpsEvent, deviceError, operationModeChange, cntrNum, devid := handleData(seqNo, reqDataSegment)
+	singlePacket := entity.ParseToSinglePacket(reqDataSegment)
+	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum)
+	opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
+
+	println(singlePacket)
+
+	gpsEventStr, _ := json.Marshal(gpsEvent)
+	opModeChangeStr, _ := json.Marshal(opModeChange)
 
 	context.SetOutput("resDataSegment", []byte{})
-	context.SetOutput("output", "")
+	context.SetOutput("gpsEvent", gpsEventStr)
+	context.SetOutput("opModeChange", opModeChangeStr)
 
 	return true, nil
 }
