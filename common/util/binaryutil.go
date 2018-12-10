@@ -34,3 +34,11 @@ func FromStrToUint32(str string) []byte {
 	binary.BigEndian.PutUint32(b, uint32(value))
 	return b
 }
+
+func FromDecStrToHexStr(str string) []byte {
+	value, err := strconv.ParseUint(str, 10, 16)
+	if err != nil {
+		return nil
+	}
+	return []byte(strconv.FormatUint(value, 16))
+}
