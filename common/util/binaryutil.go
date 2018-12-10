@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/binary"
+	"strconv"
 )
 
 const symbolicBitMask byte = 0x20 // 0010 0000
@@ -22,4 +23,14 @@ func BigEndianFromBit0ToBit6(b byte) int64 {
 	b <<= 1
 	b >>= 2
 	return int64(b)
+}
+
+func FromStrToUint32(str string) []byte {
+	value, err := strconv.ParseUint(str, 10, 32)
+	if err != nil {
+		return nil
+	}
+	b := make([]byte, 4)
+	binary.BigEndian.PutUint32(b, uint32(value))
+	return b
 }
