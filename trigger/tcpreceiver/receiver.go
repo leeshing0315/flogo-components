@@ -23,13 +23,14 @@ type BinPacket struct {
 
 // Socket TCP client
 type Socket struct {
-	Type          byte
-	Pin           string
-	TerminalNum   string
-	HardwareVer   string
-	Conn          net.Conn
-	ServerSocket  *ServerSocket
-	RemoteAddrStr string
+	Type           byte
+	Pin            string
+	TerminalNum    string
+	HardwareVer    string
+	Conn           net.Conn
+	ServerSocket   *ServerSocket
+	RemoteAddrStr  string
+	SendCommandSeq uint16
 }
 
 // ServerSocket TCP server

@@ -79,21 +79,20 @@ func (t *MyTrigger) Start() error {
 			results, _ := handler.Handle(context.Background(), triggerData)
 			if len(results) != 0 {
 				dataAttr, ok := results["resDataSegment"]
+				readAttr, _ := results["readCommandSegment"]
 				if ok {
 					dataSegment := dataAttr.Value().([]byte)
+					err := writeToDevice(packet, writer, dataSegment)
+					if err != nil {
+						return err
+					}
 
-					content := make([]byte, len(dataSegment)+7)
-					content[0] = packet.Command
-					copy(content[1:3], packet.Sequence)
-					binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
-					copy(content[5:5+len(dataSegment)], dataSegment)
-
-					myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
-					checksum := crc16.Checksum(content[0:len(content)-2], myTable)
-					binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
-
-					writer.Write(content)
-					writer.Flush()
+					readCommand := readAttr.Value().([]byte)
+					err = sendCommandToDevice(s.SendCommandSeq, writer, readCommand)
+					if err != nil {
+						return err
+					}
+					s.SendCommandSeq++
 				}
 			}
 		}
@@ -108,5 +107,49 @@ func (t *MyTrigger) Start() error {
 // Stop implements trigger.Trigger.Start
 func (t *MyTrigger) Stop() error {
 	// stop the trigger
+	return nil
+}
+
+func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) error {
+	content := make([]byte, len(dataSegment)+7)
+	content[0] = packet.Command
+	copy(content[1:3], packet.Sequence)
+	binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
+	copy(content[5:5+len(dataSegment)], dataSegment)
+
+	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
+	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+
+	_, err := writer.Write(content)
+	if err != nil {
+		return err
+	}
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func sendCommandToDevice(seqNo uint16, writer *bufio.Writer, dataSegment []byte) error {
+	content := make([]byte, len(dataSegment)+7)
+	content[0] = 0x34
+	binary.BigEndian.PutUint16(content[1:3], seqNo)
+	binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
+	copy(content[5:5+len(dataSegment)], dataSegment)
+
+	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
+	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+
+	_, err := writer.Write(content)
+	if err != nil {
+		return err
+	}
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
 	return nil
 }
