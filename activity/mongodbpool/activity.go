@@ -2,6 +2,7 @@ package mongodbpool
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -94,7 +95,11 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	switch strings.ToUpper(method) {
 	case methodGet:
-		result := coll.FindOne(context.Background(), bson.NewDocument(bson.EC.String(keyName, keyValue)))
+		document, buildErr := buildDocument(keyName, keyValue)
+		if buildErr != nil {
+			return false, buildErr
+		}
+		result := coll.FindOne(context.Background(), document)
 		val := make(map[string]interface{})
 		err := result.Decode(val)
 		if err != nil {
@@ -105,11 +110,13 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		ctx.SetOutput(ovOutput, val)
 	case methodDelete:
+		document, buildErr := buildDocument(keyName, keyValue)
+		if buildErr != nil {
+			return false, buildErr
+		}
 		result, err := coll.DeleteMany(
 			context.Background(),
-			bson.NewDocument(
-				bson.EC.String(keyName, keyValue),
-			),
+			document,
 		)
 		if err != nil {
 			return false, err
@@ -130,11 +137,13 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		ctx.SetOutput(ovOutput, result.InsertedID)
 	case methodReplace:
+		document, buildErr := buildDocument(keyName, keyValue)
+		if buildErr != nil {
+			return false, buildErr
+		}
 		result, err := coll.ReplaceOne(
 			context.Background(),
-			bson.NewDocument(
-				bson.EC.String(keyName, keyValue),
-			),
+			document,
 			value,
 		)
 		if err != nil {
@@ -146,11 +155,13 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		ctx.SetOutput(ovCount, result.ModifiedCount)
 
 	case methodUpdate:
+		document, buildErr := buildDocument(keyName, keyValue)
+		if buildErr != nil {
+			return false, buildErr
+		}
 		result, err := coll.UpdateOne(
 			context.Background(),
-			bson.NewDocument(
-				bson.EC.String(keyName, keyValue),
-			),
+			document,
 			bson.NewDocument(
 				bson.EC.Interface("$set", value),
 			),
@@ -168,4 +179,25 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	return true, nil
+}
+
+func buildDocument(keyName string, keyValue string) (*bson.Document, error) {
+	names := strings.Split(keyName, ",")
+	values := strings.Split(keyValue, ",")
+
+	namesLen := len(names)
+	valuesLen := len(values)
+	if namesLen != valuesLen {
+		return nil, errors.New("KeyValueLenNotMatch")
+	}
+
+	if namesLen > 1 {
+		elems := make([]*bson.Element, namesLen)
+		for i := 0; i < namesLen; i++ {
+			elems[i] = bson.EC.String(names[i], values[i])
+		}
+		return bson.NewDocument(elems...), nil
+	} else {
+		return bson.NewDocument(bson.EC.String(keyName, keyValue)), nil
+	}
 }
