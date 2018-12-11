@@ -1,7 +1,5 @@
 package entity
 
-import "time"
-
 // GpsEvent entity gpsEvent
 type GpsEvent struct {
 	ID string `json:"id"`
@@ -72,12 +70,12 @@ type GpsEventAddress struct {
 	country     string
 }
 
-func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrNum string) *GpsEvent {
+func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrNum string, nowDateStr string) *GpsEvent {
 	gpsEvent := &GpsEvent{}
 
 	gpsEvent.Seqno = seqNo
 	gpsEvent.CntrNum = cntrNum
-	gpsEvent.RevTime = time.Now().Format("2018-12-03T09:29:21+08:00")
+	gpsEvent.RevTime = nowDateStr
 	gpsEvent.CltTime = singlePacket.Date
 	gpsEvent.LocateTime = singlePacket.Date
 	gpsEvent.EleState = ReturnValueByCondition(singlePacket.PowerSupplyStatus, "1", "0")

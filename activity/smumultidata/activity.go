@@ -32,6 +32,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	cntrNum, _ := context.GetInput("cntrNum").(string)
 	// devId, _ := context.GetInput("devId").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
+	eventTime, _ := context.GetInput("eventTime").(string)
 
 	gpsEventStrs := []string{}
 	opModeChangeStrs := []string{}
@@ -46,7 +47,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 		// 	devId = singlePacket.LoginItem.DeviceID
 		// }
 
-		gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum)
+		gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
 		opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
 
 		gpsEventBytes, _ := json.Marshal(gpsEvent)

@@ -5,6 +5,7 @@
   "description": "activity description",
   "ref": "github.com/yourusername/yourrepository",
   "author": "Your Name <you.name@example.org>",
+  "title": "SMU MultiData",
   "inputs":[
     {
       "name": "eventTime",

@@ -31,6 +31,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	cntrNum, _ := context.GetInput("cntrNum").(string)
 	// devId, _ := context.GetInput("devId").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
+	eventTime := context.GetInput("eventTime").(string)
 
 	singlePacket := entity.ParseToSinglePacket(reqDataSegment)
 	if singlePacket.LoginItem.ContainerNumber != "" {
@@ -40,7 +41,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// 	devId = singlePacket.LoginItem.DeviceID
 	// }
 
-	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum)
+	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
 	opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
 
 	gpsEventStr, _ := json.Marshal(gpsEvent)
