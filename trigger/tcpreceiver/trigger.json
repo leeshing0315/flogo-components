@@ -34,12 +34,44 @@
     {
       "name": "reqDataSegment",
       "type": "array"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devId",
+      "type": "string"
     }
   ],
   "reply": [
     {
       "name": "resDataSegment",
       "type": "array"
+    },
+    {
+      "name": "setCommandSegment",
+      "type": "array"
+    },
+    {
+      "name": "readCommandSegment",
+      "type": "array"
+    },
+    {
+      "name": "setCommandSeqNo",
+      "type": "string"
+    },
+    {
+      "name": "readCommandSeqNo",
+      "type": "string"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devId",
+      "type": "string"
     }
   ],
   "handler": {

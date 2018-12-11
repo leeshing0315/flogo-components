@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/binary"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
@@ -74,25 +75,55 @@ func (t *MyTrigger) Start() error {
 		triggerData["command"] = int(packet.Command)
 		triggerData["seqNo"] = int(binary.BigEndian.Uint32(packet.Sequence))
 		triggerData["reqDataSegment"] = packet.DataSegment
+		triggerData["cntrNum"] = s.CntrNum
+		triggerData["devId"] = s.DevId
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
 			results, _ := handler.Handle(context.Background(), triggerData)
 			if len(results) != 0 {
 				dataAttr, ok := results["resDataSegment"]
-				readAttr, _ := results["readCommandSegment"]
-				if ok {
+				setCommandAttr, _ := results["setCommandSegment"]
+				readCommandAttr, _ := results["readCommandSegment"]
+				cntrNumAttr, _ := results["cntrNum"]
+				devIdAttr, _ := results["devId"]
+
+				cntrNum := cntrNumAttr.Value().(string)
+				if cntrNum != "" {
+					s.CntrNum = cntrNum
+				}
+				devId := devIdAttr.Value().(string)
+				if devId != "" {
+					s.DevId = devId
+				}
+
+				if ok && packet.Command != 0x34 {
 					dataSegment := dataAttr.Value().([]byte)
 					err := writeToDevice(packet, writer, dataSegment)
 					if err != nil {
 						return err
 					}
 
-					readCommand := readAttr.Value().([]byte)
-					err = sendCommandToDevice(s.SendCommandSeq, writer, readCommand)
-					if err != nil {
-						return err
+					setCommand := setCommandAttr.Value().([]byte)
+					if len(setCommand) != 0 {
+						commandSeqAttr, _ := results["setCommandSeqNo"]
+						commandSeqNo := commandSeqAttr.Value().(string)
+						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
+						err := sendCommandToDevice(uint16(commandSeqNoUint), writer, setCommand)
+						if err != nil {
+							return err
+						}
 					}
-					s.SendCommandSeq++
+
+					readCommand := readCommandAttr.Value().([]byte)
+					if len(readCommand) != 0 {
+						commandSeqAttr, _ := results["readCommandSeqNo"]
+						commandSeqNo := commandSeqAttr.Value().(string)
+						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
+						err := sendCommandToDevice(uint16(commandSeqNoUint), writer, readCommand)
+						if err != nil {
+							return err
+						}
+					}
 				}
 			}
 		}
