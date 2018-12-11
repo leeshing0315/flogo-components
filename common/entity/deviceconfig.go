@@ -11,4 +11,5 @@ type DeviceConfig struct {
 	ServerIpAndPort                string `json:"serverIpAndPort"`
 	SleepMode                      string `json:"sleepMode"`
 	ReadDeviceConfig               string `json:"readDeviceConfig"`
+	SeqNo                          string `json:"seqNo"`
 }
