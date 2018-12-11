@@ -128,8 +128,6 @@ func (t *MyTrigger) Start() error {
 			}
 		}
 		return nil
-		// err := handlePacket(s, packet)
-		// return err
 	}
 	go t.serverSocket.Listen()
 	return nil
