@@ -39,15 +39,15 @@
     },
     {
       "name": "gpsEvents",
-      "type": "array"
+      "type": "string"
     },
     {
       "name": "opModeChanges",
-      "type": "array"
+      "type": "string"
     },
     {
       "name": "deviceErrors",
-      "type": "array"
+      "type": "string"
     },
     {
       "name": "cntrNum",

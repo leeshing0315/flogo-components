@@ -127,6 +127,9 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		ctx.SetOutput(ovCount, result.DeletedCount)
 	case methodInsert:
+		if value.(string) == "" {
+			break
+		}
 		if strings.HasPrefix(value.(string), "[") {
 			var valueArray []string
 			err = json.Unmarshal(value.([]byte), &valueArray)

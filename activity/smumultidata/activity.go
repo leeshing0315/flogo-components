@@ -59,8 +59,14 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("cntrNum", cntrNum)
 	// context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
-	context.SetOutput("gpsEvents", gpsEventStrs)
-	context.SetOutput("opModeChanges", opModeChangeStrs)
+	if len(gpsEventStrs) > 0 {
+		gpsEventsOutput, _ := json.Marshal(gpsEventStrs)
+		context.SetOutput("gpsEvents", gpsEventsOutput)
+	}
+	if len(opModeChangeStrs) > 0 {
+		opModeChangesOutput, _ := json.Marshal(opModeChangeStrs)
+		context.SetOutput("opModeChanges", opModeChangesOutput)
+	}
 
 	return true, nil
 }
