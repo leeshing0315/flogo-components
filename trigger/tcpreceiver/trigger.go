@@ -73,7 +73,7 @@ func (t *MyTrigger) Start() error {
 		triggerData["eventTime"] = time.Now().Format("2006-01-02T15:04:05+08:00")
 		triggerData["ip"] = s.Conn.RemoteAddr().String()
 		triggerData["command"] = int(packet.Command)
-		triggerData["seqNo"] = int(binary.BigEndian.Uint32(packet.Sequence))
+		triggerData["seqNo"] = int(binary.BigEndian.Uint16(packet.Sequence))
 		triggerData["reqDataSegment"] = packet.DataSegment
 		triggerData["cntrNum"] = s.CntrNum
 		triggerData["devId"] = s.DevId
