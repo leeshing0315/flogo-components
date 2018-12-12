@@ -186,9 +186,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		result, err := coll.UpdateOne(
 			context.Background(),
 			document,
-			bson.NewDocument(
-				bson.EC.Interface("$set", value),
-			),
+			bson.M{"$set": value},
 		)
 		if err != nil {
 			return false, err
@@ -205,7 +203,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 	return true, nil
 }
 
-func buildDocument(keyName string, keyValue string) (*bson.Document, error) {
+func buildDocument(keyName string, keyValue string) (interface{}, error) {
 	names := strings.Split(keyName, ",")
 	values := strings.Split(keyValue, ",")
 
@@ -215,13 +213,11 @@ func buildDocument(keyName string, keyValue string) (*bson.Document, error) {
 		return nil, errors.New("KeyValueLenNotMatch")
 	}
 
-	if namesLen > 1 {
-		elems := make([]*bson.Element, namesLen)
-		for i := 0; i < namesLen; i++ {
-			elems[i] = bson.EC.String(names[i], values[i])
-		}
-		return bson.NewDocument(elems...), nil
-	} else {
-		return bson.NewDocument(bson.EC.String(keyName, keyValue)), nil
+	result := bson.M{}
+
+	for i := 0; i < namesLen; i++ {
+		result[names[i]] = values[i]
 	}
+
+	return result, nil
 }
