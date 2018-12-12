@@ -2,6 +2,7 @@ package mongodbpool
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -126,16 +127,36 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		ctx.SetOutput(ovCount, result.DeletedCount)
 	case methodInsert:
-		result, err := coll.InsertOne(
-			context.Background(),
-			value,
-		)
-		if err != nil {
-			return false, err
+		if strings.HasPrefix(value.(string), "[") {
+			var valueArray []string
+			err = json.Unmarshal(value.([]byte), &valueArray)
+			if err != nil {
+				return false, err
+			}
+			var insertedIDArray []string
+			for _, val := range valueArray {
+				result, err := coll.InsertOne(
+					context.Background(),
+					val,
+				)
+				if err != nil {
+					return false, err
+				}
+				activityLog.Debugf("Insert Results $#v", result)
+				insertedIDArray = append(insertedIDArray, result.InsertedID.(string))
+			}
+			ctx.SetOutput(ovOutput, strings.Join(insertedIDArray, ","))
+		} else {
+			result, err := coll.InsertOne(
+				context.Background(),
+				value,
+			)
+			if err != nil {
+				return false, err
+			}
+			activityLog.Debugf("Insert Results $#v", result)
+			ctx.SetOutput(ovOutput, result.InsertedID)
 		}
-		activityLog.Debugf("Insert Results $#v", result)
-
-		ctx.SetOutput(ovOutput, result.InsertedID)
 	case methodReplace:
 		document, buildErr := buildDocument(keyName, keyValue)
 		if buildErr != nil {
