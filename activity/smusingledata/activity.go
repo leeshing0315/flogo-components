@@ -50,8 +50,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("cntrNum", cntrNum)
 	// context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
-	context.SetOutput("gpsEvent", gpsEventStr)
-	context.SetOutput("opModeChange", opModeChangeStr)
+	context.SetOutput("gpsEvent", string(gpsEventStr))
+	context.SetOutput("opModeChange", string(opModeChangeStr))
 
 	return true, nil
 }
