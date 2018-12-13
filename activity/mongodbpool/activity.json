@@ -44,7 +44,7 @@
     },
     {
       "name": "data",
-      "type": "object"
+      "type": "string"
     }
   ],
   "outputs": [

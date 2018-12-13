@@ -132,15 +132,20 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		}
 		if strings.HasPrefix(value.(string), "[") {
 			var valueArray []string
-			err = json.Unmarshal(value.([]byte), &valueArray)
+			err = json.Unmarshal([]byte(value.(string)), &valueArray)
 			if err != nil {
 				return false, err
 			}
 			var insertedIDArray []string
 			for _, val := range valueArray {
+				var valueMap map[string]interface{}
+				err = json.Unmarshal([]byte(val), &valueMap)
+				if err != nil {
+					return false, err
+				}
 				result, err := coll.InsertOne(
 					context.Background(),
-					val,
+					valueMap,
 				)
 				if err != nil {
 					return false, err
@@ -150,9 +155,14 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			}
 			ctx.SetOutput(ovOutput, strings.Join(insertedIDArray, ","))
 		} else {
+			var valueMap map[string]interface{}
+			err = json.Unmarshal([]byte(value.(string)), &valueMap)
+			if err != nil {
+				return false, err
+			}
 			result, err := coll.InsertOne(
 				context.Background(),
-				value,
+				valueMap,
 			)
 			if err != nil {
 				return false, err
