@@ -11,6 +11,7 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
@@ -151,7 +152,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 					return false, err
 				}
 				activityLog.Debugf("Insert Results $#v", result)
-				insertedIDArray = append(insertedIDArray, result.InsertedID.(string))
+				insertedIDArray = append(insertedIDArray, result.InsertedID.(primitive.ObjectID).String())
 			}
 			ctx.SetOutput(ovOutput, strings.Join(insertedIDArray, ","))
 		} else {
@@ -175,10 +176,15 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		if buildErr != nil {
 			return false, buildErr
 		}
+		var valueMap map[string]interface{}
+		err = json.Unmarshal([]byte(value.(string)), &valueMap)
+		if err != nil {
+			return false, err
+		}
 		result, err := coll.ReplaceOne(
 			context.Background(),
 			document,
-			value,
+			valueMap,
 		)
 		if err != nil {
 			return false, err
@@ -193,10 +199,15 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		if buildErr != nil {
 			return false, buildErr
 		}
+		var valueMap map[string]interface{}
+		err = json.Unmarshal([]byte(value.(string)), &valueMap)
+		if err != nil {
+			return false, err
+		}
 		result, err := coll.UpdateOne(
 			context.Background(),
 			document,
-			bson.M{"$set": value},
+			bson.M{"$set": valueMap},
 		)
 		if err != nil {
 			return false, err
