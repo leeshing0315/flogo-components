@@ -128,7 +128,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		ctx.SetOutput(ovCount, result.DeletedCount)
 	case methodInsert:
-		if value.(string) == "" {
+		if value == nil || value.(string) == "" {
 			break
 		}
 		if strings.HasPrefix(value.(string), "[") {
@@ -172,6 +172,9 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			ctx.SetOutput(ovOutput, result.InsertedID)
 		}
 	case methodReplace:
+		if value == nil || value.(string) == "" {
+			break
+		}
 		document, buildErr := buildDocument(keyName, keyValue)
 		if buildErr != nil {
 			return false, buildErr
@@ -195,6 +198,9 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		ctx.SetOutput(ovCount, result.ModifiedCount)
 
 	case methodUpdate:
+		if value == nil || value.(string) == "" {
+			break
+		}
 		document, buildErr := buildDocument(keyName, keyValue)
 		if buildErr != nil {
 			return false, buildErr
