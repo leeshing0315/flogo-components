@@ -12,7 +12,7 @@ type DeviceError struct {
 	TableName string // default: "Tbldevicefault"
 }
 
-func GenDeviceErrorFromSinglePacket(singlePacket *SinglePacket, seqNo string, devId string) []*DeviceError {
+func GenDeviceErrorsFromSinglePacket(singlePacket *SinglePacket, seqNo string, devId string) []*DeviceError {
 	deviceErrors := make([]*DeviceError, 6)
 
 	positioningModuleFailure := genCommonDeviceError(singlePacket, seqNo, devId)
