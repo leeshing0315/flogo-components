@@ -1,0 +1,37 @@
+{
+  "name": "sendcommand",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU SendCommand",
+  "inputs":[
+    {
+      "name": "setDeviceConfig",
+      "type": "string"
+    },
+    {
+      "name": "readDeviceConfig",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "setCommandSegment",
+      "type": "array"
+    },
+    {
+      "name": "setCommandSeqNo",
+      "type": "string"
+    },
+    {
+      "name": "readCommandSegment",
+      "type": "array"
+    },
+    {
+      "name": "readCommandSeqNo",
+      "type": "string"
+    }
+  ]
+}

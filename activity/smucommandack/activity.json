@@ -1,0 +1,57 @@
+{
+  "name": "smucommandack",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU CommandACK",
+  "inputs":[
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    },
+    {
+      "name": "seqNo",
+      "type": "integer"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devid",
+      "type": "string"
+    },
+    {
+      "name": "reqDataSegment",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "collectionName",
+      "type": "string"
+    },
+    {
+      "name": "method",
+      "type": "string"
+    },
+    {
+      "name": "keyName",
+      "type": "string"
+    },
+    {
+      "name": "keyValue",
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "type": "string"
+    }
+  ]
+}
