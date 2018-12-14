@@ -29,7 +29,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	seqNo := strconv.FormatUint(uint64(context.GetInput("seqNo").(int)), 10)
 	cntrNum, _ := context.GetInput("cntrNum").(string)
-	// devId, _ := context.GetInput("devId").(string)
+	devId, _ := context.GetInput("devId").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 	eventTime := context.GetInput("eventTime").(string)
 
@@ -37,21 +37,27 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	if singlePacket.LoginItem.ContainerNumber != "" {
 		cntrNum = singlePacket.LoginItem.ContainerNumber
 	}
-	// if singlePacket.LoginItem.DeviceID != "" {
-	// 	devId = singlePacket.LoginItem.DeviceID
-	// }
-
-	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
-	opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
-
-	gpsEventStr, _ := json.Marshal(gpsEvent)
-	opModeChangeStr, _ := json.Marshal(opModeChange)
+	if singlePacket.LoginItem.DeviceID != "" {
+		devId = singlePacket.LoginItem.DeviceID
+	}
 
 	context.SetOutput("cntrNum", cntrNum)
-	// context.SetOutput("devId", devId)
+	context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
-	context.SetOutput("gpsEvent", string(gpsEventStr))
-	context.SetOutput("opModeChange", string(opModeChangeStr))
+
+	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
+	gpsEventBytes, _ := json.Marshal(gpsEvent)
+	context.SetOutput("gpsEvent", string(gpsEventBytes))
+
+	opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
+	if opModeChange != nil {
+		opModeChangeBytes, _ := json.Marshal(opModeChange)
+		context.SetOutput("opModeChange", string(opModeChangeBytes))
+	}
+
+	deviceErrors := entity.GenDeviceErrorsFromSinglePacket(singlePacket, seqNo, devId)
+	deviceErrorsBytes, _ := json.Marshal(deviceErrors)
+	context.SetOutput("deviceError", string(deviceErrorsBytes))
 
 	return true, nil
 }

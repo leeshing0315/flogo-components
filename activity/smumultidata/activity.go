@@ -30,12 +30,13 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	seqNo := strconv.FormatUint(uint64(context.GetInput("seqNo").(int)), 10)
 	cntrNum, _ := context.GetInput("cntrNum").(string)
-	// devId, _ := context.GetInput("devId").(string)
+	devId, _ := context.GetInput("devId").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 	eventTime, _ := context.GetInput("eventTime").(string)
 
 	gpsEventStrs := []string{}
 	opModeChangeStrs := []string{}
+	deviceErrorsStrs := []string{}
 
 	packets := splitPackets(reqDataSegment)
 	for _, dateSegment := range packets {
@@ -43,21 +44,29 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 		if singlePacket.LoginItem.ContainerNumber != "" {
 			cntrNum = singlePacket.LoginItem.ContainerNumber
 		}
-		// if singlePacket.LoginItem.DeviceID != "" {
-		// 	devId = singlePacket.LoginItem.DeviceID
-		// }
+		if singlePacket.LoginItem.DeviceID != "" {
+			devId = singlePacket.LoginItem.DeviceID
+		}
 
 		gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
-		opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
-
 		gpsEventBytes, _ := json.Marshal(gpsEvent)
 		gpsEventStrs = append(gpsEventStrs, string(gpsEventBytes))
-		opModeChangeBytes, _ := json.Marshal(opModeChange)
-		opModeChangeStrs = append(opModeChangeStrs, string(opModeChangeBytes))
+
+		opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
+		if opModeChange != nil {
+			opModeChangeBytes, _ := json.Marshal(opModeChange)
+			opModeChangeStrs = append(opModeChangeStrs, string(opModeChangeBytes))
+		}
+
+		deviceErrors := entity.GenDeviceErrorsFromSinglePacket(singlePacket, seqNo, devId)
+		for _, val := range deviceErrors {
+			deviceErrorBytes, _ := json.Marshal(val)
+			deviceErrorsStrs = append(deviceErrorsStrs, string(deviceErrorBytes))
+		}
 	}
 
 	context.SetOutput("cntrNum", cntrNum)
-	// context.SetOutput("devId", devId)
+	context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
 	if len(gpsEventStrs) > 0 {
 		gpsEventsOutput, _ := json.Marshal(gpsEventStrs)
@@ -66,6 +75,10 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	if len(opModeChangeStrs) > 0 {
 		opModeChangesOutput, _ := json.Marshal(opModeChangeStrs)
 		context.SetOutput("opModeChanges", string(opModeChangesOutput))
+	}
+	if len(deviceErrorsStrs) > 0 {
+		deviceErrorsOutput, _ := json.Marshal(deviceErrorsStrs)
+		context.SetOutput("deviceErrors", string(deviceErrorsOutput))
 	}
 
 	return true, nil
