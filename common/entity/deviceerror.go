@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type DeviceError struct {
 	Seqno     string
@@ -12,38 +15,44 @@ type DeviceError struct {
 	TableName string // default: "Tbldevicefault"
 }
 
-func GenDeviceErrorsFromSinglePacket(singlePacket *SinglePacket, seqNo string, devId string) []*DeviceError {
-	deviceErrors := make([]*DeviceError, 6)
+func GenDeviceErrorsFromSinglePacket(singlePacket *SinglePacket, seqNo string, devId string) []string {
+	deviceErrors := make([]string, 6)
 
 	positioningModuleFailure := genCommonDeviceError(singlePacket, seqNo, devId)
 	positioningModuleFailure.Faulttype = "1"
 	positioningModuleFailure.Status = ternaryOperator(singlePacket.PositioningModuleFailure, "1", "0")
-	deviceErrors[0] = positioningModuleFailure
+	positioningModuleFailureStr, _ := json.Marshal(positioningModuleFailure)
+	deviceErrors[0] = positioningModuleFailureStr
 
 	serialCommunicationFailure := genCommonDeviceError(singlePacket, seqNo, devId)
 	serialCommunicationFailure.Faulttype = "2"
 	serialCommunicationFailure.Status = ternaryOperator(singlePacket.SerialCommunicationFailure, "1", "0")
-	deviceErrors[1] = serialCommunicationFailure
+	serialCommunicationFailureStr, _ := json.Marshal(serialCommunicationFailure)
+	deviceErrors[1] = serialCommunicationFailureStr
 
 	communicationModuleFailure := genCommonDeviceError(singlePacket, seqNo, devId)
 	communicationModuleFailure.Faulttype = "3"
 	communicationModuleFailure.Status = ternaryOperator(singlePacket.CommunicationModuleFailure, "1", "0")
-	deviceErrors[2] = communicationModuleFailure
+	communicationModuleFailureStr, _ := json.Marshal(communicationModuleFailure)
+	deviceErrors[2] = communicationModuleFailureStr
 
 	powerSupplyFailure := genCommonDeviceError(singlePacket, seqNo, devId)
 	powerSupplyFailure.Faulttype = "4"
 	powerSupplyFailure.Status = ternaryOperator(singlePacket.PowerSupplyFailure, "1", "0")
-	deviceErrors[3] = powerSupplyFailure
+	powerSupplyFailureStr, _ := json.Marshal(powerSupplyFailure)
+	deviceErrors[3] = powerSupplyFailureStr
 
 	batteryChargingFailure := genCommonDeviceError(singlePacket, seqNo, devId)
 	batteryChargingFailure.Faulttype = "5"
 	batteryChargingFailure.Status = ternaryOperator(singlePacket.BatteryChargingFailure, "1", "0")
-	deviceErrors[4] = batteryChargingFailure
+	batteryChargingFailureStr, _ := json.Marshal(batteryChargingFailure)
+	deviceErrors[4] = batteryChargingFailureStr
 
 	clockModuleFailure := genCommonDeviceError(singlePacket, seqNo, devId)
 	clockModuleFailure.Faulttype = "6"
 	clockModuleFailure.Status = ternaryOperator(singlePacket.ClockModuleFailure, "1", "0")
-	deviceErrors[5] = clockModuleFailure
+	clockModuleFailureStr, _ := json.Marshal(clockModuleFailure)
+	deviceErrors[5] = clockModuleFailureStr
 
 	return deviceErrors
 }

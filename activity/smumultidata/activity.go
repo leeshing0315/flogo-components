@@ -60,8 +60,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 		deviceErrors := entity.GenDeviceErrorsFromSinglePacket(singlePacket, seqNo, devId)
 		for _, val := range deviceErrors {
-			deviceErrorBytes, _ := json.Marshal(val)
-			deviceErrorsStrs = append(deviceErrorsStrs, string(deviceErrorBytes))
+			deviceErrorsStrs = append(deviceErrorsStrs, val)
 		}
 	}
 
