@@ -1,11 +1,11 @@
-package sendcommand
+package smusendcommand
 
 import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/TIBCOSoftware/flogo-contrib/action/flow/test"
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/TIBCOSoftware/flogo-contrib/action/flow/test"
 )
 
 var activityMetadata *activity.Metadata
@@ -14,7 +14,7 @@ func getActivityMetadata() *activity.Metadata {
 
 	if activityMetadata == nil {
 		jsonMetadataBytes, err := ioutil.ReadFile("activity.json")
-		if err != nil {
+		if err != nil{
 			panic("No Json Metadata found for activity.json path")
 		}
 
@@ -48,8 +48,7 @@ func TestEval(t *testing.T) {
 	tc := test.NewTestActivityContext(getActivityMetadata())
 
 	//setup attrs
-	var deviceConfigStr string = "{\"cntrNum\": \"CNTR1234\",\"devid\": \"DEVID\",\"status\": \"SENDING\",\"updateTime\": \"ABC\",\"powerOnCommunicationFrequency\": \"15\",\"powerOffCommunicationFrequency\": \"20\",\"collectFrequency\": \"5\",\"serverIpAndPort\": \"127.0.0.1:12345\",\"sleepMode\": \"ON\",\"readDeviceConfig\": \"ON\"}"
-	tc.SetInput("deviceConfig", deviceConfigStr)
+
 	act.Eval(tc)
 
 	//check result attr

@@ -1,18 +1,14 @@
 {
-  "name": "sendcommand",
+  "name": "smusendcommand",
   "version": "0.0.1",
   "type": "flogo:activity",
   "description": "activity description",
-  "ref": "github.com/leeshing0315/flogo-components/activity/sendcommand",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smusendcommand",
   "author": "Your Name <you.name@example.org>",
   "title": "SMU SendCommand",
   "inputs":[
     {
-      "name": "setDeviceConfig",
-      "type": "string"
-    },
-    {
-      "name": "readDeviceConfig",
+      "name": "commands",
       "type": "string"
     }
   ],
