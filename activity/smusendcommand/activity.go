@@ -26,7 +26,7 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	deviceCommand := &entity.DeviceCommand{}
+	deviceCommand := &entity.DeviceConfigCmd{}
 	commands := context.GetInput("commands")
 
 	var commandArr []deviceCommand
@@ -42,7 +42,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			context.SetOutput("readCommandSeqNo", command.seqNum)
 
 		} else if commandType == "WRITE" {
-			setCommand, err := entity.getSetConfigCommand(command)
+			setCommand, err := entity.GenSetConfigCommand(command)
 			context.SetOutput("setCommandSegment", setCommand)
 			context.SetOutput("setCommandSeqNo", command.seqNum)
 		}

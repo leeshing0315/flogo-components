@@ -6,8 +6,8 @@ import (
 	"github.com/leeshing0315/flogo-components/common/util"
 )
 
-// DeviceCommand entity
-type DeviceCommand struct {
+// DeviceConfigCmd entity
+type DeviceConfigCmd struct {
 	CntrNum      string       `json:"cntrNum"`
 	DeviceID     string       `json:"devid"`
 	SeqNo        string       `json:"seqNo"`
@@ -28,7 +28,8 @@ type CommandValue struct {
 	SleepMode         string `json:"sleepMode"`
 }
 
-func getSetConfigCommand(command *DeviceCommand) (setConfigCommand []byte, err error) {
+// GenSetConfigCommand fot generating Command for setting config
+func GenSetConfigCommand(command *DeviceConfigCmd) (setConfigCommand []byte, err error) {
 
 	commandValue := command.CommandValue
 
