@@ -20,6 +20,7 @@ var activityLog = logger.GetLogger("activity-flogo-mongodb-pool")
 
 const (
 	methodGet     = "GET"
+	methodGetMany = "GETMANY"
 	methodDelete  = "DELETE"
 	methodInsert  = "INSERT"
 	methodReplace = "REPLACE"
@@ -111,6 +112,33 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		activityLog.Debugf("Get Results $#v", result)
 
 		ctx.SetOutput(ovOutput, val)
+	case methodGetMany:
+		condition, buildErr := buildDocument(keyName, keyValue)
+		if buildErr != nil {
+			return false, buildErr
+		}
+		cur, queryErr := coll.Find(context.Background(), condition)
+		if queryErr != nil {
+			return false, queryErr
+		}
+		defer cur.Close(context.Background())
+		var count = 0
+		result := []map[string]interface{}{}
+		for cur.Next(context.Background()) {
+			elem := make(map[string]interface{})
+			if decodeErr := cur.Decode(elem); decodeErr != nil {
+				return false, decodeErr
+			}
+			result = append(result, elem)
+			count++
+		}
+		if err := cur.Err(); err != nil {
+			return false, err
+		}
+		activityLog.Debugf("Get Multiple Results $#v", result)
+
+		ctx.SetOutput(ovCount, count)
+		ctx.SetOutput(ovOutput, result)
 	case methodDelete:
 		document, buildErr := buildDocument(keyName, keyValue)
 		if buildErr != nil {
