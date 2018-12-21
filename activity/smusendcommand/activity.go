@@ -27,15 +27,15 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
 	commands := context.GetInput("commands")
-	commandsStr := commands.(string)
-	if len(commandsStr) == 0 || commandsStr == "{}" {
+	commandNum := context.GetInput("commandNum")
+	if commandNum == 0 {
 		context.SetOutput("readCommandSegment", make([]byte, 0))
 		context.SetOutput("readCommandSeqNo", "")
 		context.SetOutput("setCommandSegment", make([]byte, 0))
 		context.SetOutput("setCommandSeqNo", "")
 	} else {
 		var commandArr []entity.DeviceConfigCmd
-		err = json.Unmarshal([]byte(commandsStr), &commandArr)
+		err = json.Unmarshal([]byte(commands.(string)), &commandArr)
 		if err != nil {
 			return false, err
 		}
