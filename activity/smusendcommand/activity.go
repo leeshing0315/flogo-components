@@ -28,7 +28,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	commands := context.GetInput("commands")
 	commandNum := context.GetInput("commandNum")
-	if commandNum == 0 {
+	if int(commandNum.(float64)) == 0 {
 		context.SetOutput("readCommandSegment", make([]byte, 0))
 		context.SetOutput("readCommandSeqNo", "")
 		context.SetOutput("setCommandSegment", make([]byte, 0))
