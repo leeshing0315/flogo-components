@@ -135,10 +135,14 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		if err := cur.Err(); err != nil {
 			return false, err
 		}
-		activityLog.Debugf("Get Multiple Results $#v", result)
-
 		ctx.SetOutput(ovCount, count)
-		ctx.SetOutput(ovOutput, result)
+		if count == 0 {
+			activityLog.Debugf("No Document can be found")
+			ctx.SetOutput(ovOutput, make(map[string]interface{}))
+		} else {
+			activityLog.Debugf("Get Multiple Results $#v", result)
+			ctx.SetOutput(ovOutput, result)
+		}
 	case methodDelete:
 		document, buildErr := buildDocument(keyName, keyValue)
 		if buildErr != nil {

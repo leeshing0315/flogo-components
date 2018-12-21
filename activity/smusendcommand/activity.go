@@ -27,26 +27,33 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
 	commands := context.GetInput("commands")
+	commandsStr := commands.(string)
+	if len(commandsStr) == 0 || commandsStr == "{}" {
+		context.SetOutput("readCommandSegment", make([]byte, 0))
+		context.SetOutput("readCommandSeqNo", "")
+		context.SetOutput("setCommandSegment", make([]byte, 0))
+		context.SetOutput("setCommandSeqNo", "")
+	} else {
+		var commandArr []entity.DeviceConfigCmd
+		err = json.Unmarshal([]byte(commandsStr), &commandArr)
+		if err != nil {
+			return false, err
+		}
 
-	var commandArr []entity.DeviceConfigCmd
-	err = json.Unmarshal([]byte(commands.(string)), &commandArr)
-	if err != nil {
-		return false, err
-	}
+		for _, command := range commandArr {
+			commandType := command.CommandType
+			if commandType == "READ" {
+				context.SetOutput("readCommandSegment", []byte{0x32, 0x41, 0x34, 0x43, 0x33, 0x32})
+				context.SetOutput("readCommandSeqNo", command.SeqNo)
 
-	for _, command := range commandArr {
-		commandType := command.CommandType
-		if commandType == "READ" {
-			context.SetOutput("readCommandSegment", []byte{0x32, 0x41, 0x34, 0x43, 0x33, 0x32})
-			context.SetOutput("readCommandSeqNo", command.SeqNo)
-
-		} else if commandType == "WRITE" {
-			setCommand, err := entity.GenSetConfigCommand(&command)
-			if err != nil {
-				return false, err
+			} else if commandType == "WRITE" {
+				setCommand, err := entity.GenSetConfigCommand(&command)
+				if err != nil {
+					return false, err
+				}
+				context.SetOutput("setCommandSegment", setCommand)
+				context.SetOutput("setCommandSeqNo", command.SeqNo)
 			}
-			context.SetOutput("setCommandSegment", setCommand)
-			context.SetOutput("setCommandSeqNo", command.SeqNo)
 		}
 	}
 
