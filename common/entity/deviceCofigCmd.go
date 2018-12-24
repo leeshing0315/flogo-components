@@ -8,53 +8,40 @@ import (
 
 // DeviceConfigCmd entity
 type DeviceConfigCmd struct {
-	CntrNum      string       `json:"cntrNum"`
-	DeviceID     string       `json:"devid"`
-	SeqNo        string       `json:"seqNo"`
-	CommandValue CommandValue `json:"commandValue"`
-	CommandType  string       `json:"commandType"`
-	Status       string       `json:"status"`
-	CreatedBy    string       `json:"createdBy"`
-	UpdateBy     string       `json:"updateBy"`
-	LastUpdated  string       `json:"lastUpdated"`
-}
-
-// CommandValue entity
-type CommandValue struct {
-	PowerOnFrequency  string `json:"powerOnFrequency"`
-	PowerOffFrequency string `json:"powerOffFrequency"`
-	CollectFrequency  string `json:"collectFrequency"`
-	ServerIPAndPort   string `json:"serverIPAddress"`
-	SleepMode         string `json:"sleepMode"`
+	DeviceID       string `json:"devid"`
+	Seqno          string `json:"seqno"`
+	Subcmd         string `json:"subcmd"`
+	Value          string `json:"value"`
+	SendFlag       string `json:"sendflag"`
+	SendTime       string `json:"sendtime"`
+	LastUpdateTime string `json:"lastupdatetime"`
 }
 
 // GenSetConfigCommand fot generating Command for setting config
-func GenSetConfigCommand(command *DeviceConfigCmd) (setConfigCommand []byte, err error) {
-
-	commandValue := command.CommandValue
+func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err error) {
 
 	powerOnFrequency := make([]byte, 5)
-	if commandValue.PowerOnFrequency != "" {
+	if val, found := cmdVal["1"]; found {
 		powerOnFrequency[0] = 1
-		copy(powerOnFrequency[1:], util.FromStrToUint32(commandValue.PowerOnFrequency))
+		copy(powerOnFrequency[1:], util.FromStrToUint32(val))
 	}
 
 	powerOffFrequency := make([]byte, 5)
-	if commandValue.PowerOffFrequency != "" {
+	if val, found := cmdVal["2"]; found {
 		powerOffFrequency[0] = 1
-		copy(powerOffFrequency[1:], util.FromStrToUint32(commandValue.PowerOffFrequency))
+		copy(powerOffFrequency[1:], util.FromStrToUint32(val))
 	}
 
 	collectFrequency := make([]byte, 5)
-	if commandValue.CollectFrequency != "" {
+	if val, found := cmdVal["3"]; found {
 		collectFrequency[0] = 1
-		copy(collectFrequency[1:], util.FromStrToUint32(commandValue.CollectFrequency))
+		copy(collectFrequency[1:], util.FromStrToUint32(val))
 	}
 
 	serverIPAndPort := make([]byte, 13)
-	if commandValue.ServerIPAndPort != "" {
+	if val, found := cmdVal["4"]; found {
 		serverIPAndPort[0] = 1
-		array := strings.Split(commandValue.ServerIPAndPort, ":")
+		array := strings.Split(val, ":")
 		serverIPStr := array[0]
 		portStr := array[1]
 		ipSegmentStrs := strings.Split(serverIPStr, ".")
@@ -67,13 +54,9 @@ func GenSetConfigCommand(command *DeviceConfigCmd) (setConfigCommand []byte, err
 	}
 
 	sleepMode := make([]byte, 2)
-	if commandValue.SleepMode != "" {
+	if val, found := cmdVal["5"]; found {
 		sleepMode[0] = 1
-		if commandValue.SleepMode == "ON" {
-			sleepMode[1] = 1
-		} else if commandValue.SleepMode == "OFF" {
-			sleepMode[1] = 0
-		}
+		copy(sleepMode[1:], util.FromStrToUint32(val))
 	}
 
 	content := make([]byte, 36)

@@ -40,21 +40,23 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			return false, err
 		}
 
+		cmdVal := make(map[string]string)
+
 		for _, command := range commandArr {
-			commandType := command.CommandType
-			if commandType == "READ" {
+			if command.Subcmd == "FF" {
 				context.SetOutput("readCommandSegment", []byte{0x32, 0x41, 0x34, 0x43, 0x33, 0x32})
 				context.SetOutput("readCommandSeqNo", command.SeqNo)
 
-			} else if commandType == "WRITE" {
-				setCommand, err := entity.GenSetConfigCommand(&command)
-				if err != nil {
-					return false, err
-				}
-				context.SetOutput("setCommandSegment", setCommand)
-				context.SetOutput("setCommandSeqNo", command.SeqNo)
+			} else {
+				cmdVal[command.Subcmd] = command.Value
 			}
 		}
+		setCommand, err := entity.GenSetConfigCommand(&cmdVal)
+		if err != nil {
+			return false, err
+		}
+		context.SetOutput("setCommandSegment", setCommand)
+		context.SetOutput("setCommandSeqNo", command.SeqNo)
 	}
 
 	return true, nil
