@@ -19,12 +19,13 @@ import (
 var activityLog = logger.GetLogger("activity-flogo-mongodb-pool")
 
 const (
-	methodGet     = "GET"
-	methodGetMany = "GETMANY"
-	methodDelete  = "DELETE"
-	methodInsert  = "INSERT"
-	methodReplace = "REPLACE"
-	methodUpdate  = "UPDATE"
+	methodGet        = "GET"
+	methodGetMany    = "GETMANY"
+	methodDelete     = "DELETE"
+	methodInsert     = "INSERT"
+	methodReplace    = "REPLACE"
+	methodUpdate     = "UPDATE"
+	methodUpdateMany = "UPDATEMANY"
 
 	ivConnectionURI = "uri"
 	ivDbName        = "dbName"
@@ -243,6 +244,31 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			return false, err
 		}
 		result, err := coll.UpdateOne(
+			context.Background(),
+			document,
+			bson.M{"$set": valueMap},
+		)
+		if err != nil {
+			return false, err
+		}
+
+		activityLog.Debugf("Update Results $#v", result)
+		ctx.SetOutput(ovOutput, result.UpsertedID)
+		ctx.SetOutput(ovCount, result.ModifiedCount)
+	case methodUpdateMany:
+		if value == nil || value.(string) == "" {
+			break
+		}
+		document, buildErr := buildDocument(keyName, keyValue)
+		if buildErr != nil {
+			return false, buildErr
+		}
+		var valueMap map[string]interface{}
+		err = json.Unmarshal([]byte(value.(string)), &valueMap)
+		if err != nil {
+			return false, err
+		}
+		result, err := coll.UpdateMany(
 			context.Background(),
 			document,
 			bson.M{"$set": valueMap},
