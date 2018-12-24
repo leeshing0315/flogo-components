@@ -9,7 +9,7 @@ import (
 // DeviceConfigCmd entity
 type DeviceConfigCmd struct {
 	DeviceID       string `json:"devid"`
-	Seqno          string `json:"seqno"`
+	SeqNo          string `json:"seqno"`
 	Subcmd         string `json:"subcmd"`
 	Value          string `json:"value"`
 	SendFlag       string `json:"sendflag"`

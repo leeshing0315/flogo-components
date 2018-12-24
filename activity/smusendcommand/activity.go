@@ -49,14 +49,14 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 			} else {
 				cmdVal[command.Subcmd] = command.Value
+				context.SetOutput("setCommandSeqNo", command.SeqNo)
 			}
 		}
-		setCommand, err := entity.GenSetConfigCommand(&cmdVal)
+		setCommand, err := entity.GenSetConfigCommand(cmdVal)
 		if err != nil {
 			return false, err
 		}
 		context.SetOutput("setCommandSegment", setCommand)
-		context.SetOutput("setCommandSeqNo", command.SeqNo)
 	}
 
 	return true, nil
