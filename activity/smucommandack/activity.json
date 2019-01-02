@@ -5,27 +5,11 @@
   "description": "activity description",
   "ref": "github.com/leeshing0315/flogo-components/activity/smucommandack",
   "author": "Your Name <you.name@example.org>",
-  "title": "SMU CommandACK",
+  "title": "SMUConfigCmdAck",
   "inputs":[
-    {
-      "name": "eventTime",
-      "type": "string"
-    },
-    {
-      "name": "ip",
-      "type": "string"
-    },
     {
       "name": "seqNo",
       "type": "integer"
-    },
-    {
-      "name": "cntrNum",
-      "type": "string"
-    },
-    {
-      "name": "devid",
-      "type": "string"
     },
     {
       "name": "reqDataSegment",
@@ -34,23 +18,7 @@
   ],
   "outputs": [
     {
-      "name": "collectionName",
-      "type": "string"
-    },
-    {
-      "name": "method",
-      "type": "string"
-    },
-    {
-      "name": "keyName",
-      "type": "string"
-    },
-    {
-      "name": "keyValue",
-      "type": "string"
-    },
-    {
-      "name": "value",
+      "name": "updateVal",
       "type": "string"
     }
   ]
