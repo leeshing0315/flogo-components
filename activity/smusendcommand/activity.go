@@ -2,6 +2,7 @@ package smusendcommand
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/leeshing0315/flogo-components/common/entity"
@@ -57,6 +58,14 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			return false, err
 		}
 		context.SetOutput("setCommandSegment", setCommand)
+
+		valueMap := make(map[string]string)
+		now := time.Now().Format("2006-01-02 15:04:05")
+		valueMap["sendtime"] = now
+		valueMap["lastupdatetime"] = now
+
+		jsonBytes, _ := json.Marshal(valueMap)
+		context.SetOutput("updateMongoVal", string(jsonBytes))
 	}
 
 	return true, nil
