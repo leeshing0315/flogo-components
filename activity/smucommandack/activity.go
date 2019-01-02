@@ -3,6 +3,7 @@ package smucommandack
 import (
 	"encoding/json"
 	"strings"
+	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
@@ -26,28 +27,24 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	eventTime := context.GetInput("eventTime").(string)
 	reqDataSegment := context.GetInput("reqDataSegment").([]byte)
-	cntrNum := context.GetInput("cntrNum").(string)
 	devid := context.GetInput("devid").(string)
 	seqNo := context.GetInput("seqNo").(string)
 
-	context.SetOutput("keyName", strings.Join([]string{"cntrNum", "devid", "seqNo"}, ","))
-	context.SetOutput("keyValue", strings.Join([]string{cntrNum, devid, seqNo}, ","))
+	context.SetOutput("keyName", strings.Join([]string{"devid", "seqNo"}, ","))
+	context.SetOutput("keyValue", strings.Join([]string{devid, seqNo}, ","))
+
+	valueMap := make(map[string]string)
+	valueMap["sendflag"] = "2"
+	valueMap["lastupdatetime"] = time.Now().Format("2006-01-02 15:04:05")
 
 	if len(reqDataSegment) > 1 {
-		context.SetOutput("collectionName", "deviceConfig")
-		context.SetOutput("method", "INSERT")
-	} else {
-		context.SetOutput("collectionName", "deviceCommand")
-		context.SetOutput("method", "UPDATE")
-
-		valueMap := make(map[string]string)
-		valueMap["status"] = "Received"
-		valueMap["updateTime"] = eventTime
-		jsonBytes, _ := json.Marshal(valueMap)
-		context.SetOutput("value", string(jsonBytes))
+		// read config
+		valueMap["value"] = string(reqDataSegment)
 	}
+
+	jsonBytes, _ := json.Marshal(valueMap)
+	context.SetOutput("updateVal", string(jsonBytes))
 
 	return true, nil
 }

@@ -14,9 +14,25 @@
     {
       "name": "reqDataSegment",
       "type": "array"
+    },
+    {
+      "name": "devid",
+      "type": "string"
+    },
+    {
+      "name": "seqNo",
+      "type": "string"
     }
   ],
   "outputs": [
+    {
+      "name": "keyName",
+      "type": "string"
+    },
+    {
+      "name": "keyValue",
+      "type": "string"
+    },
     {
       "name": "updateVal",
       "type": "string"
