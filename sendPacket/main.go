@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/binary"
 	"net"
+
+	"github.com/sigurn/crc16"
 )
 
 func main() {
@@ -92,11 +94,10 @@ func sendMultiPacket(conn net.Conn) {
 
 func testSendCmd(conn net.Conn) {
 	// send login packet (first send devid)
-	n, err := conn.Write([]byte{80, 32, 84, 32, 73, 32, 73, 32, 80, 32, 80, 32, 13, 10,
+	_, err := conn.Write([]byte{80, 32, 84, 32, 73, 32, 73, 32, 80, 32, 80, 32, 13, 10,
 		50, 12, 207, 0, 27, 2, 15, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56,
 		6, 67, 48, 51, 54, 50, 53, // C03625
-		8, 72, 83, 49, 56, 49, 49, 48, 56, 17, 112})
-	println(n)
+		8, 72, 83, 49, 56, 49, 49, 48, 56, 171, 17})
 	if err != nil {
 		println(err.Error())
 		return
@@ -105,8 +106,7 @@ func testSendCmd(conn net.Conn) {
 	conn.Read(loginAckBuffer)
 
 	// send data packet
-	n, err = conn.Write([]byte{54, 12, 208, 0, 108, 0, 0, 0, 114, 24, 17, 33, 23, 67, 81, 1, 215, 31, 42, 7, 68, 30, 6, 0, 1, 0, 40, 100, 4, 2, 15, 10, 1, 33, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56, 67, 48, 48, 48, 48, 49, 83, 77, 85, 84, 48, 48, 48, 48, 48, 48, 49, 68, 2, 44, 68, 1, 255, 255, 255, 64, 195, 87, 254, 143, 254, 131, 255, 111, 255, 255, 255, 38, 6, 15, 210, 1, 182, 1, 142, 194, 183, 255, 195, 254, 99, 4, 63, 0, 208, 1, 72, 0, 0, 255, 193, 255, 195, 80, 246, 254})
-	println(n)
+	_, err = conn.Write([]byte{54, 12, 208, 0, 108, 0, 0, 0, 114, 24, 17, 33, 23, 67, 81, 1, 215, 31, 42, 7, 68, 30, 6, 0, 1, 0, 40, 100, 4, 2, 15, 10, 1, 33, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56, 67, 48, 48, 48, 48, 49, 83, 77, 85, 84, 48, 48, 48, 48, 48, 48, 49, 68, 2, 44, 68, 1, 255, 255, 255, 64, 195, 87, 254, 143, 254, 131, 255, 111, 255, 255, 255, 38, 6, 15, 210, 1, 182, 1, 142, 194, 183, 255, 195, 254, 99, 4, 63, 0, 208, 1, 72, 0, 0, 255, 193, 255, 195, 80, 140, 233})
 	if err != nil {
 		println(err.Error())
 		return
@@ -115,15 +115,20 @@ func testSendCmd(conn net.Conn) {
 	conn.Read(dataAckBuffer)
 
 	// receive cmd
-	setBuffer, err := parseByProtocol(conn)
+	setCmdBuffer, err := parseByProtocol(conn)
 	if err != nil {
 		println(err.Error())
 		return
 	}
-	println(setBuffer)
 
 	// send cmd ack packet
-	n, err = conn.Write([]byte{54, 12, 209, 0, 0, 1, 1})
+	cmdAck := []byte{52, 12, 209, 0, 0, 1, 1}
+	cmdAck[1] = setCmdBuffer[1]
+	cmdAck[2] = setCmdBuffer[2]
+	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum := crc16.Checksum(cmdAck[:5], myTable)
+	binary.LittleEndian.PutUint16(cmdAck[5:], checksum)
+	_, err = conn.Write(cmdAck)
 	if err != nil {
 		println(err.Error())
 		return

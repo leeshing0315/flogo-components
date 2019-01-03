@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "CRC16",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${fileDirname}/crc.go",
+            "env": {},
+            "args": []
+        },
+        {
             "name": "Launch",
             "type": "go",
             "request": "launch",
