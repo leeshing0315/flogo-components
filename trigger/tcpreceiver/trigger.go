@@ -104,25 +104,29 @@ func (t *MyTrigger) Start() error {
 						return err
 					}
 
-					setCommand := setCommandAttr.Value().([]byte)
-					if len(setCommand) != 0 {
-						commandSeqAttr, _ := results["setCommandSeqNo"]
-						commandSeqNo := commandSeqAttr.Value().(string)
-						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(uint16(commandSeqNoUint), writer, setCommand)
-						if err != nil {
-							return err
+					if setCommandAttr.Value() != nil {
+						setCommand := setCommandAttr.Value().([]byte)
+						if len(setCommand) != 0 {
+							commandSeqAttr, _ := results["setCommandSeqNo"]
+							commandSeqNo := commandSeqAttr.Value().(string)
+							commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
+							err := sendCommandToDevice(uint16(commandSeqNoUint), writer, setCommand)
+							if err != nil {
+								return err
+							}
 						}
 					}
 
-					readCommand := readCommandAttr.Value().([]byte)
-					if len(readCommand) != 0 {
-						commandSeqAttr, _ := results["readCommandSeqNo"]
-						commandSeqNo := commandSeqAttr.Value().(string)
-						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(uint16(commandSeqNoUint), writer, readCommand)
-						if err != nil {
-							return err
+					if readCommandAttr.Value() != nil {
+						readCommand := readCommandAttr.Value().([]byte)
+						if len(readCommand) != 0 {
+							commandSeqAttr, _ := results["readCommandSeqNo"]
+							commandSeqNo := commandSeqAttr.Value().(string)
+							commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
+							err := sendCommandToDevice(uint16(commandSeqNoUint), writer, readCommand)
+							if err != nil {
+								return err
+							}
 						}
 					}
 				}
