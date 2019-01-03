@@ -24,6 +24,10 @@
     {
       "name": "resDataSegment",
       "type": "array"
+    },
+    {
+      "name": "devid",
+      "type": "string"
     }
   ]
 }

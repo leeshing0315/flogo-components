@@ -29,14 +29,15 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// ip, _ := context.GetInput("ip").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
-	parseDataSegment(reqDataSegment)
+	devid := parseDataSegment(reqDataSegment)
 
 	context.SetOutput("resDataSegment", []byte{})
+	context.SetOutput("devid", devid)
 
 	return true, nil
 }
 
-func parseDataSegment(data []byte) {
+func parseDataSegment(data []byte) (devid string) {
 	var cursor int
 	println("SMU Type: " + "0x" + strconv.FormatUint(uint64(data[cursor]), 16))
 	cursor++
@@ -46,9 +47,12 @@ func parseDataSegment(data []byte) {
 	cursor += pinLen
 	terminalNumLen := int(data[cursor : cursor+1][0])
 	cursor++
-	println("TerminalNum: " + string(data[cursor:cursor+terminalNumLen]))
+	devid = string(data[cursor : cursor+terminalNumLen])
+	println("TerminalNum: " + devid)
 	cursor += terminalNumLen
 	hardwareVerLen := int(data[cursor : cursor+1][0])
 	cursor++
 	println("HardwareVer: " + string(data[cursor:cursor+hardwareVerLen]))
+
+	return devid
 }
