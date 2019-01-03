@@ -29,7 +29,6 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	commands := context.GetInput("commands")
 	commandNum := context.GetInput("commandNum")
-	println(commands.(string))
 
 	readCommandSegment := make([]byte, 0)
 	readCommandSeqNo := ""
@@ -63,11 +62,6 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			setCommandSegment = setCommand
 		}
 
-		context.SetOutput("readCommandSegment", readCommandSegment)
-		context.SetOutput("readCommandSeqNo", readCommandSeqNo)
-		context.SetOutput("setCommandSegment", setCommandSegment)
-		context.SetOutput("setCommandSeqNo", setCommandSeqNo)
-
 		valueMap := make(map[string]string)
 		valueMap["sendflag"] = "1"
 		now := time.Now().Format("2006-01-02 15:04:05")
@@ -76,4 +70,11 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 		jsonBytes, _ := json.Marshal(valueMap)
 		context.SetOutput("updateMongoVal", string(jsonBytes))
+	}
+	context.SetOutput("readCommandSegment", readCommandSegment)
+	context.SetOutput("readCommandSeqNo", readCommandSeqNo)
+	context.SetOutput("setCommandSegment", setCommandSegment)
+	context.SetOutput("setCommandSeqNo", setCommandSeqNo)
+
+	return true, nil
 }
