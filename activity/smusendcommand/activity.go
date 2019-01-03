@@ -29,35 +29,44 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	commands := context.GetInput("commands")
 	commandNum := context.GetInput("commandNum")
-	if int(commandNum.(float64)) == 0 {
-		context.SetOutput("readCommandSegment", make([]byte, 0))
-		context.SetOutput("readCommandSeqNo", "")
-		context.SetOutput("setCommandSegment", make([]byte, 0))
-		context.SetOutput("setCommandSeqNo", "")
-	} else {
+	println(commands.(string))
+
+	readCommandSegment := make([]byte, 0)
+	readCommandSeqNo := ""
+	setCommandSegment := make([]byte, 0)
+	setCommandSeqNo := ""
+
+	if int(commandNum.(float64)) > 0 {
 		var commandArr []entity.DeviceConfigCmd
 		err = json.Unmarshal([]byte(commands.(string)), &commandArr)
 		if err != nil {
 			return false, err
 		}
 
-		cmdVal := make(map[string]string)
+		setCmdVal := make(map[string]string)
 
 		for _, command := range commandArr {
 			if command.Subcmd == "FF" {
-				context.SetOutput("readCommandSegment", []byte{0x32, 0x41, 0x34, 0x43, 0x33, 0x32})
-				context.SetOutput("readCommandSeqNo", command.SeqNo)
+				readCommandSegment = []byte{0x32, 0x41, 0x34, 0x43, 0x33, 0x32}
+				readCommandSeqNo = command.SeqNo
 
 			} else {
-				cmdVal[command.Subcmd] = command.Value
-				context.SetOutput("setCommandSeqNo", command.SeqNo)
+				setCmdVal[command.Subcmd] = command.Value
+				setCommandSeqNo = command.SeqNo
 			}
 		}
-		setCommand, err := entity.GenSetConfigCommand(cmdVal)
-		if err != nil {
-			return false, err
+		if len(setCmdVal) > 0 {
+			setCommand, err := entity.GenSetConfigCommand(setCmdVal)
+			if err != nil {
+				return false, err
+			}
+			setCommandSegment = setCommand
 		}
-		context.SetOutput("setCommandSegment", setCommand)
+
+		context.SetOutput("readCommandSegment", readCommandSegment)
+		context.SetOutput("readCommandSeqNo", readCommandSeqNo)
+		context.SetOutput("setCommandSegment", setCommandSegment)
+		context.SetOutput("setCommandSeqNo", setCommandSeqNo)
 
 		valueMap := make(map[string]string)
 		valueMap["sendflag"] = "1"
@@ -67,7 +76,4 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 		jsonBytes, _ := json.Marshal(valueMap)
 		context.SetOutput("updateMongoVal", string(jsonBytes))
-	}
-
-	return true, nil
 }
