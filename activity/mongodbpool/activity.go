@@ -127,7 +127,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		result := []map[string]interface{}{}
 		for cur.Next(context.Background()) {
 			elem := make(map[string]interface{})
-			if decodeErr := cur.Decode(elem); decodeErr != nil {
+			if decodeErr := cur.Decode(&elem); decodeErr != nil {
 				return false, decodeErr
 			}
 			result = append(result, elem)
