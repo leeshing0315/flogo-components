@@ -2,6 +2,7 @@ package smucommandack
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"time"
 
@@ -29,9 +30,9 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	reqDataSegment := context.GetInput("reqDataSegment").([]byte)
 	devid := context.GetInput("devid").(string)
-	seqNo := context.GetInput("seqNo").(string)
+	seqNo := strconv.FormatUint(uint64(context.GetInput("seqNo").(int)), 10)
 
-	context.SetOutput("keyName", strings.Join([]string{"devid", "seqNo"}, ","))
+	context.SetOutput("keyName", strings.Join([]string{"devid", "seqno"}, ","))
 	context.SetOutput("keyValue", strings.Join([]string{devid, seqNo}, ","))
 
 	valueMap := make(map[string]string)
