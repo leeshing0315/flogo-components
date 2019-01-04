@@ -6,13 +6,13 @@ import (
 )
 
 type DeviceError struct {
-	Seqno     string
-	Devid     string
-	Faulttype string
-	Status    string
-	Logtime   string
-	Revtime   string
-	TableName string // default: "Tbldevicefault"
+	Seqno     string `json:"seqno"`
+	Devid     string `json:"devid"`
+	Faulttype string `json:"faulttype"`
+	Status    string `json:"devid"`
+	Logtime   string `json:"devid"`
+	Revtime   string `json:"devid"`
+	TableName string `json:"devid"` // default: "Tbldevicefault"
 }
 
 func GenDeviceErrorsFromSinglePacket(singlePacket *SinglePacket, seqNo string, devId string) []string {
