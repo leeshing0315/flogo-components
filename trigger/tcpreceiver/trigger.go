@@ -71,7 +71,8 @@ func (t *MyTrigger) Start() error {
 
 		triggerData := map[string]interface{}{}
 		triggerData["emptyByteArray"] = []byte{}
-		triggerData["eventTime"] = time.Now().Format("2006-01-02T15:04:05+08:00")
+		loc, _ := time.LoadLocation("Asia/Hong_Kong")
+		triggerData["eventTime"] = time.Now().In(loc).Format("2006-01-02T15:04:05+08:00")
 		triggerData["ip"] = s.RemoteAddrStr
 		triggerData["command"] = int(packet.Command)
 		triggerData["seqNo"] = int(binary.BigEndian.Uint16(packet.Sequence))
