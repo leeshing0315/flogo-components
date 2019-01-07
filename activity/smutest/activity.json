@@ -5,6 +5,7 @@
   "description": "activity description",
   "ref": "github.com/leeshing0315/flogo-components/activity/smutest",
   "author": "Your Name <you.name@example.org>",
+  "title": "SMU Test",
   "inputs":[
     {
       "name": "eventTime",
