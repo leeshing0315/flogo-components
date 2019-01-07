@@ -1,0 +1,24 @@
+{
+  "name": "smutest",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smutest",
+  "author": "Your Name <you.name@example.org>",
+  "inputs":[
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "resDataSegment",
+      "type": "array"
+    }
+  ]
+}
