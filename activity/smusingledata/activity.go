@@ -29,7 +29,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	seqNo := strconv.FormatUint(uint64(context.GetInput("seqNo").(int)), 10)
 	cntrNum, _ := context.GetInput("cntrNum").(string)
-	devId, _ := context.GetInput("devId").(string)
+	devId, _ := context.GetInput("devid").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 	eventTime := context.GetInput("eventTime").(string)
 
