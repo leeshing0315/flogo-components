@@ -1,9 +1,9 @@
 package entity
 
 type SimcardPin struct {
-	pinno     string
-	simno     string
-	regtype   string
-	regtime   string
-	tableName string // default: 'TblPin2SimNo'
+	Pinno     string `json:"pinno"`
+	Simno     string `json:"simno"`
+	Regtype   string `json:"regtype"`
+	Regtime   string `json:"regtime"`
+	TableName string `json:"tableName"` // default: 'TblPin2SimNo'
 }
