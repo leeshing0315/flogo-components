@@ -23,19 +23,19 @@ func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err
 	powerOnFrequency := make([]byte, 5)
 	if val, found := cmdVal["1"]; found {
 		powerOnFrequency[0] = 1
-		copy(powerOnFrequency[1:], util.FromStrToUint32(val))
+		copy(powerOnFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	powerOffFrequency := make([]byte, 5)
 	if val, found := cmdVal["2"]; found {
 		powerOffFrequency[0] = 1
-		copy(powerOffFrequency[1:], util.FromStrToUint32(val))
+		copy(powerOffFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	collectFrequency := make([]byte, 5)
 	if val, found := cmdVal["3"]; found {
 		collectFrequency[0] = 1
-		copy(collectFrequency[1:], util.FromStrToUint32(val))
+		copy(collectFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	serverIPAndPort := make([]byte, 13)
@@ -47,10 +47,10 @@ func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err
 		ipSegmentStrs := strings.Split(serverIPStr, ".")
 		i := 1
 		for _, ipSegmentStr := range ipSegmentStrs {
-			copy(serverIPAndPort[i:i+2], util.FromDecStrToHexStr(ipSegmentStr))
+			copy(serverIPAndPort[i:i+2], util.GetEndBytes(util.FromDecStrToHexStr(ipSegmentStr), 2))
 			i += 2
 		}
-		copy(serverIPAndPort[i:i+2], util.FromDecStrToHexStr(portStr))
+		copy(serverIPAndPort[i:i+4], util.GetEndBytes(util.FromDecStrToHexStr(portStr), 4))
 	}
 
 	sleepMode := make([]byte, 2)
