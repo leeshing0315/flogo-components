@@ -29,30 +29,30 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// ip, _ := context.GetInput("ip").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
-	devid := parseDataSegment(reqDataSegment)
+	pin := parseDataSegment(reqDataSegment)
 
 	context.SetOutput("resDataSegment", []byte{})
-	context.SetOutput("devid", devid)
+	context.SetOutput("pin", pin)
 
 	return true, nil
 }
 
-func parseDataSegment(data []byte) (devid string) {
+func parseDataSegment(data []byte) (pin string) {
 	var cursor int
 	println("SMU Type: " + "0x" + strconv.FormatUint(uint64(data[cursor]), 16))
 	cursor++
 	pinLen := int(data[cursor : cursor+1][0])
 	cursor++
-	println("Pin: " + string(data[cursor:cursor+pinLen]))
+	pin = string(data[cursor : cursor+pinLen])
+	println("Pin: " + pin)
 	cursor += pinLen
 	terminalNumLen := int(data[cursor : cursor+1][0])
 	cursor++
-	devid = string(data[cursor : cursor+terminalNumLen])
-	println("TerminalNum: " + devid)
+	println("TerminalNum: " + string(data[cursor:cursor+terminalNumLen]))
 	cursor += terminalNumLen
 	hardwareVerLen := int(data[cursor : cursor+1][0])
 	cursor++
 	println("HardwareVer: " + string(data[cursor:cursor+hardwareVerLen]))
 
-	return devid
+	return pin
 }

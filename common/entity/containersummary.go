@@ -2,8 +2,8 @@ package entity
 
 type ContainerSummary struct {
 	Simno      string `json:"simno"`
-	Carno      string `json:"carno"`
-	Carid      string `json:"carid"`
+	Carno      string `json:"carno"` // e.g. C04254
+	Carid      string `json:"carid"` // e.g. CXRU1495240
 	Commmode   string `json:"commmode"`
 	Unitcode   string `json:"unitcode"`
 	Cartype    string `json:"cartype"`

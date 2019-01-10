@@ -1,0 +1,21 @@
+{
+  "name": "smugetsim",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smugetsim",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU GetSimNo",
+  "inputs":[
+    {
+      "name": "simcardpin",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "simno",
+      "type": "string"
+    }
+  ]
+}

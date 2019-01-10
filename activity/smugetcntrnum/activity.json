@@ -1,0 +1,24 @@
+{
+  "name": "smugetcntrnum",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "inputs":[
+    {
+      "name": "containersummary",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "devId",
+      "type": "string"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    }
+  ]
+}
