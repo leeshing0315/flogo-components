@@ -67,6 +67,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("cntrNum", cntrNum)
 	context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
+	println("**********multiData*cntrNum", cntrNum, "**********")
+	println("**********multiData*devId", devId, "**********")
 	if len(gpsEventStrs) > 0 {
 		gpsEventsOutput, _ := json.Marshal(gpsEventStrs)
 		context.SetOutput("gpsEvents", string(gpsEventsOutput))

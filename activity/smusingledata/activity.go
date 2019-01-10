@@ -44,6 +44,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("cntrNum", cntrNum)
 	context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
+	println("**********singleData*cntrNum", cntrNum, "**********")
+	println("**********singleData*devId", devId, "**********")
 
 	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
 	gpsEventBytes, _ := json.Marshal(gpsEvent)
