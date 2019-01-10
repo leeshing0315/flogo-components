@@ -42,3 +42,14 @@ func FromDecStrToHexStr(str string) []byte {
 	}
 	return []byte(strconv.FormatUint(value, 16))
 }
+
+func GetEndBytes(input []byte, size int) []byte {
+	inputLen := len(input)
+	result := make([]byte, size)
+	if inputLen < size {
+		copy(result[size-inputLen:], input)
+	} else {
+		copy(result, input[inputLen-size:])
+	}
+	return result
+}
