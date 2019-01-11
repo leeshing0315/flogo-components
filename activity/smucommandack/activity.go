@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/leeshing0315/flogo-components/common/entity"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -41,7 +42,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	if len(reqDataSegment) > 1 {
 		// read config
-		valueMap["value"] = string(reqDataSegment)
+		valueMap["value"] = entity.DecodeReadConfigAck(reqDataSegment)
 	}
 
 	jsonBytes, _ := json.Marshal(valueMap)

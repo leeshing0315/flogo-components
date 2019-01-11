@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/leeshing0315/flogo-components/common/util"
@@ -17,7 +18,7 @@ type DeviceConfigCmd struct {
 	LastUpdateTime string `json:"lastupdatetime"`
 }
 
-// GenSetConfigCommand fot generating Command for setting config
+// GenSetConfigCommand for generating Command for setting config
 func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err error) {
 
 	powerOnFrequency := make([]byte, 5)
@@ -70,4 +71,62 @@ func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err
 	copy(content[34:36], []byte{0x32, 0x33}) // # => 0x23 => (2=>0x32, 3=>0x33)
 
 	return content, nil
+}
+
+// DecodeReadConfigAck for decoding the Read Config Cmd Ack
+func DecodeReadConfigAck(original []byte) string {
+	var str strings.Builder
+	str.WriteString("*L")
+
+	// powerOnFrequency
+	str.WriteString(strconv.FormatUint(uint64(original[4]), 10))
+	for i := 5; i < 9; i++ {
+		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
+			str.WriteString("0")
+		} else {
+			current := string(original[i])
+			str.WriteString(current)
+		}
+	}
+
+	// powerOffFrequency
+	str.WriteString(strconv.FormatUint(uint64(original[9]), 10))
+	for i := 10; i < 14; i++ {
+		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
+			str.WriteString("0")
+		} else {
+			current := string(original[i])
+			str.WriteString(current)
+		}
+	}
+
+	// collectFrequency
+	str.WriteString(strconv.FormatUint(uint64(original[14]), 10))
+	for i := 15; i < 19; i++ {
+		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
+			str.WriteString("0")
+		} else {
+			current := string(original[i])
+			str.WriteString(current)
+		}
+	}
+
+	// serverIPAndPort
+	str.WriteString(strconv.FormatUint(uint64(original[19]), 10))
+	for i := 20; i < 32; i++ {
+		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
+			str.WriteString("0")
+		} else {
+			current := string(original[i])
+			str.WriteString(current)
+		}
+	}
+
+	//sleepMode
+	str.WriteString(strconv.FormatUint(uint64(original[32]), 10))
+	str.WriteString(strconv.FormatUint(uint64(original[33]), 10))
+
+	str.WriteString("#")
+
+	return str.String()
 }

@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/binary"
 	"strconv"
+	"strings"
 )
 
 const symbolicBitMask byte = 0x20 // 0010 0000
@@ -40,7 +41,7 @@ func FromDecStrToHexStr(str string) []byte {
 	if err != nil {
 		return nil
 	}
-	return []byte(strconv.FormatUint(value, 16))
+	return []byte(strings.ToUpper(strconv.FormatUint(value, 16)))
 }
 
 func GetEndBytes(input []byte, size int) []byte {
