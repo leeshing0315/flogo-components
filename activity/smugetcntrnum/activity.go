@@ -32,6 +32,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 		containersummary := &entity.ContainerSummary{}
 		err = json.Unmarshal(([]byte)(containersummaryInterface.(string)), containersummary)
 		if err == nil {
+			println("**********devId", containersummary.Carno, "**********")
+			println("**********cntrNum", containersummary.Carid, "**********")
 			context.SetOutput("devId", containersummary.Carno)
 			context.SetOutput("cntrNum", containersummary.Carid)
 		}
