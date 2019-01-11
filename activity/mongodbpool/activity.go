@@ -105,7 +105,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		}
 		result := coll.FindOne(context.Background(), document)
 		val := make(map[string]interface{})
-		err := result.Decode(val)
+		err := result.Decode(&val)
 		if err != nil {
 			return false, err
 		}
