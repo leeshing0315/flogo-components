@@ -2,6 +2,7 @@ package smugetcntrnum
 
 import (
 	"encoding/json"
+	"sort"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/leeshing0315/flogo-components/common/entity"
@@ -26,17 +27,24 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	containersummaryInterface := context.GetInput("containersummary")
+	containersummaryInterface := context.GetInput("containersummaries")
 
 	if containersummaryInterface != nil {
-		containersummary := &entity.ContainerSummary{}
-		err = json.Unmarshal(([]byte)(containersummaryInterface.(string)), containersummary)
-		if err == nil {
-			println("**********devId", containersummary.Carno, "**********")
-			println("**********cntrNum", containersummary.Carid, "**********")
-			context.SetOutput("devId", containersummary.Carno)
-			context.SetOutput("cntrNum", containersummary.Carid)
+		var containersummaries []entity.ContainerSummary
+		err = json.Unmarshal(([]byte)(containersummaryInterface.(string)), &containersummaries)
+		if err != nil {
+			return true, nil
 		}
+
+		sort.Slice(containersummaries, func(i, j int) bool {
+			return containersummaries[i].Regtime > containersummaries[j].Regtime
+		})
+		latestContainerSummary := containersummaries[0]
+
+		println("**********devId", latestContainerSummary.Carno, "**********")
+		println("**********cntrNum", latestContainerSummary.Carid, "**********")
+		context.SetOutput("devId", latestContainerSummary.Carno)
+		context.SetOutput("cntrNum", latestContainerSummary.Carid)
 	}
 	return true, nil
 }

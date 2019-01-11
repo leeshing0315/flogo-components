@@ -49,12 +49,12 @@ func TestEval(t *testing.T) {
 	tc := test.NewTestActivityContext(getActivityMetadata())
 
 	//setup attrs
-	tc.SetInput("containersummary", `{ 
+	tc.SetInput("containersummaries", `[{ 
 		"_id" : "5c35ae47d5adca004faa4054", 
 		"tableName" : "Tblcarbaseinfo", 
 		"simno" : "14540694003", 
-		"carno" : "C04254", 
-		"carid" : "CXRU1495240", 
+		"carno" : "C04253", 
+		"carid" : "CXRU1495241", 
 		"commmode" : "GPRS", 
 		"unitcode" : "00000", 
 		"cartype" : "船舶", 
@@ -66,7 +66,26 @@ func TestEval(t *testing.T) {
 		"useacc" : "0", 
 		"checkflag" : "1", 
 		"boxtype" : "D"
-	}`)
+	},
+	{ 
+		"_id" : "5c35ae47d5adca004faa4055", 
+		"tableName" : "Tblcarbaseinfo", 
+		"simno" : "14540694003", 
+		"carno" : "C04254", 
+		"carid" : "CXRU1495240", 
+		"commmode" : "GPRS", 
+		"unitcode" : "00000", 
+		"cartype" : "船舶", 
+		"saveflag" : "1", 
+		"calcflag" : "3", 
+		"changeflag" : "1", 
+		"changetime" : "2018-08-27 15:09:27.0", 
+		"regtime" : "2018-08-27 15:09:27.0", 
+		"useacc" : "0", 
+		"checkflag" : "1", 
+		"boxtype" : "D"
+	}
+	]`)
 
 	act.Eval(tc)
 

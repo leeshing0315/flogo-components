@@ -8,7 +8,7 @@
   "title": "SMU GetCntrNum",
   "inputs":[
     {
-      "name": "containersummary",
+      "name": "containersummaries",
       "type": "string"
     }
   ],
