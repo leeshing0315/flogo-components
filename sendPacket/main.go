@@ -8,16 +8,19 @@ import (
 )
 
 func main() {
-	conn, err := net.Dial("tcp", "itciot-tcp.cargosmart.ai:8080")
-	// conn, err := net.Dial("tcp", "localhost:8033")
+	// conn, err := net.Dial("tcp", "itciot-tcp.cargosmart.ai:8080")
+	conn, err := net.Dial("tcp", "localhost:8033")
 	// conn, err := net.Dial("tcp", "52.193.135.87:8033")
 	if err != nil {
 		return
 	}
-	sendLoginPacket(conn)
+	// sendLoginPacket(conn)
 	// sendSinglePacket(conn)
 	// sendMultiPacket(conn)
-	// testSendCmd(conn)
+	// testSendSetConfigCmd(conn)
+	// testSendReadConfigCmd(conn)
+	testBothConfigCmd(conn)
+
 }
 
 func sendLoginPacket(conn net.Conn) {
@@ -92,7 +95,7 @@ func sendMultiPacket(conn net.Conn) {
 	println(shouldBeNothing)
 }
 
-func testSendCmd(conn net.Conn) {
+func testSendSetConfigCmd(conn net.Conn) {
 	// send login packet (first send devid)
 	_, err := conn.Write([]byte{80, 32, 84, 32, 73, 32, 73, 32, 80, 32, 80, 32, 13, 10,
 		50, 12, 207, 0, 33, 2, 15, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56,
@@ -129,6 +132,123 @@ func testSendCmd(conn net.Conn) {
 	checksum := crc16.Checksum(cmdAck[:5], myTable)
 	binary.LittleEndian.PutUint16(cmdAck[5:], checksum)
 	_, err = conn.Write(cmdAck)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	ackBuffer := make([]byte, 7)
+	conn.Read(ackBuffer)
+	println(ackBuffer)
+}
+
+func testSendReadConfigCmd(conn net.Conn) {
+	// send login packet (first send devid)
+	_, err := conn.Write([]byte{80, 32, 84, 32, 73, 32, 73, 32, 80, 32, 80, 32, 13, 10,
+		50, 12, 207, 0, 33, 2, 15, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56,
+		6, 67, 48, 51, 54, 50, 53, // C03625
+		8, 72, 83, 49, 56, 49, 49, 48, 56, 171, 17})
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	loginAckBuffer := make([]byte, 7)
+	conn.Read(loginAckBuffer)
+
+	// send data packet
+	_, err = conn.Write([]byte{54, 12, 208, 0, 108, 0, 0, 0, 114, 24, 17, 33, 23, 67, 81, 1, 215, 31, 42, 7, 68, 30, 6, 0, 1, 0, 40, 100, 4, 2, 15, 10, 1, 33, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56, 67, 48, 48, 48, 48, 49, 83, 77, 85, 84, 48, 48, 48, 48, 48, 48, 49, 68, 2, 44, 68, 1, 255, 255, 255, 64, 195, 87, 254, 143, 254, 131, 255, 111, 255, 255, 255, 38, 6, 15, 210, 1, 182, 1, 142, 194, 183, 255, 195, 254, 99, 4, 63, 0, 208, 1, 72, 0, 0, 255, 193, 255, 195, 80, 140, 233})
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	dataAckBuffer := make([]byte, 7)
+	conn.Read(dataAckBuffer)
+
+	// receive cmd
+	setCmdBuffer, err := parseByProtocol(conn)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	// send cmd ack packet
+	cmdAck := []byte{52, 12, 209, 0, 36,
+		50, 65, 52, 67, 1, 0, 0, 0, 49, 1, 0, 0, 0, 70, 1, 0, 0, 49, 48, 1, 68, 69, 52, 57, 68, 50, 56, 57, 57, 67, 52, 55, 1, 0, 50, 51,
+		1, 1}
+	cmdAck[1] = setCmdBuffer[1]
+	cmdAck[2] = setCmdBuffer[2]
+	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum := crc16.Checksum(cmdAck[:41], myTable)
+	binary.LittleEndian.PutUint16(cmdAck[41:], checksum)
+	_, err = conn.Write(cmdAck)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	ackBuffer := make([]byte, 7)
+	conn.Read(ackBuffer)
+	println(ackBuffer)
+}
+
+func testBothConfigCmd(conn net.Conn) {
+	// send login packet (first send devid)
+	_, err := conn.Write([]byte{80, 32, 84, 32, 73, 32, 73, 32, 80, 32, 80, 32, 13, 10,
+		50, 12, 207, 0, 33, 2, 15, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56,
+		6, 67, 48, 51, 54, 50, 53, // C03625
+		8, 72, 83, 49, 56, 49, 49, 48, 56, 171, 17})
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	loginAckBuffer := make([]byte, 7)
+	conn.Read(loginAckBuffer)
+
+	// send data packet
+	_, err = conn.Write([]byte{54, 12, 208, 0, 108, 0, 0, 0, 114, 24, 17, 33, 23, 67, 81, 1, 215, 31, 42, 7, 68, 30, 6, 0, 1, 0, 40, 100, 4, 2, 15, 10, 1, 33, 52, 54, 48, 48, 49, 49, 55, 49, 48, 51, 50, 52, 48, 56, 56, 67, 48, 48, 48, 48, 49, 83, 77, 85, 84, 48, 48, 48, 48, 48, 48, 49, 68, 2, 44, 68, 1, 255, 255, 255, 64, 195, 87, 254, 143, 254, 131, 255, 111, 255, 255, 255, 38, 6, 15, 210, 1, 182, 1, 142, 194, 183, 255, 195, 254, 99, 4, 63, 0, 208, 1, 72, 0, 0, 255, 193, 255, 195, 80, 140, 233})
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	dataAckBuffer := make([]byte, 7)
+	conn.Read(dataAckBuffer)
+
+	// receive set and read cmd
+	setCmdBuffer, err := parseByProtocol(conn)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	readCmdBuffer, err := parseByProtocol(conn)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	// send set cmd ack packet
+	setCmdAck := []byte{52, 12, 209, 0, 0, 1, 1}
+	setCmdAck[1] = setCmdBuffer[1]
+	setCmdAck[2] = setCmdBuffer[2]
+	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum := crc16.Checksum(setCmdAck[:5], myTable)
+	binary.LittleEndian.PutUint16(setCmdAck[5:], checksum)
+	_, err = conn.Write(setCmdAck)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+
+	// send read cmd ack packet
+	readCmdAck := []byte{52, 12, 209, 0, 36,
+		50, 65, 52, 67, 1, 0, 0, 0, 49, 1, 0, 0, 0, 70, 1, 0, 0, 49, 48, 1, 68, 69, 52, 57, 68, 50, 56, 57, 57, 67, 52, 55, 1, 0, 50, 51,
+		1, 1}
+	readCmdAck[1] = readCmdBuffer[1]
+	readCmdAck[2] = readCmdBuffer[2]
+	myTable = crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum = crc16.Checksum(readCmdAck[:41], myTable)
+	binary.LittleEndian.PutUint16(readCmdAck[41:], checksum)
+	_, err = conn.Write(readCmdAck)
 	if err != nil {
 		println(err.Error())
 		return
