@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -9,13 +10,13 @@ import (
 
 // DeviceConfigCmd entity
 type DeviceConfigCmd struct {
-	DeviceID       string `json:"devid"`
-	SeqNo          string `json:"seqno"`
-	Subcmd         string `json:"subcmd"`
-	Value          string `json:"value"`
-	SendFlag       string `json:"sendflag"`
-	SendTime       string `json:"sendtime"`
-	LastUpdateTime string `json:"lastupdatetime"`
+	DeviceID       string      `json:"devid"`
+	SeqNo          json.Number `json:"seqno"`
+	Subcmd         string      `json:"subcmd"`
+	Value          string      `json:"value"`
+	SendFlag       string      `json:"sendflag"`
+	SendTime       string      `json:"sendtime"`
+	LastUpdateTime string      `json:"lastupdatetime"`
 }
 
 // GenSetConfigCommand for generating Command for setting config

@@ -49,42 +49,65 @@ func TestEval(t *testing.T) {
 	tc := test.NewTestActivityContext(getActivityMetadata())
 
 	//setup attrs
-	tc.SetInput("containersummaries", `[{ 
-		"_id" : "5c35ae47d5adca004faa4054", 
-		"tableName" : "Tblcarbaseinfo", 
-		"simno" : "14540694003", 
-		"carno" : "C04253", 
-		"carid" : "CXRU1495241", 
-		"commmode" : "GPRS", 
-		"unitcode" : "00000", 
-		"cartype" : "船舶", 
-		"saveflag" : "1", 
-		"calcflag" : "3", 
-		"changeflag" : "1", 
-		"changetime" : "2018-08-27 15:08:27.0", 
-		"regtime" : "2018-08-27 15:08:27.0", 
-		"useacc" : "0", 
-		"checkflag" : "1", 
-		"boxtype" : "D"
-	},
-	{ 
-		"_id" : "5c35ae47d5adca004faa4055", 
-		"tableName" : "Tblcarbaseinfo", 
-		"simno" : "14540694003", 
-		"carno" : "C04254", 
-		"carid" : "CXRU1495240", 
-		"commmode" : "GPRS", 
-		"unitcode" : "00000", 
-		"cartype" : "船舶", 
-		"saveflag" : "1", 
-		"calcflag" : "3", 
-		"changeflag" : "1", 
-		"changetime" : "2018-08-27 15:09:27.0", 
-		"regtime" : "2018-08-27 15:09:27.0", 
-		"useacc" : "0", 
-		"checkflag" : "1", 
-		"boxtype" : "D"
-	}
+	// tc.SetInput("containersummaries", `[{
+	// 	"_id" : "5c35ae47d5adca004faa4054",
+	// 	"tableName" : "Tblcarbaseinfo",
+	// 	"simno" : "14540694003",
+	// 	"carno" : "C04253",
+	// 	"carid" : "CXRU1495241",
+	// 	"commmode" : "GPRS",
+	// 	"unitcode" : "00000",
+	// 	"cartype" : "船舶",
+	// 	"saveflag" : "1",
+	// 	"calcflag" : "3",
+	// 	"changeflag" : "1",
+	// 	"changetime" : "2018-08-27 15:08:27.0",
+	// 	"regtime" : "2018-08-27 15:08:27.0",
+	// 	"useacc" : "0",
+	// 	"checkflag" : "1",
+	// 	"boxtype" : "D"
+	// },
+	// {
+	// 	"_id" : "5c35ae47d5adca004faa4055",
+	// 	"tableName" : "Tblcarbaseinfo",
+	// 	"simno" : "14540694003",
+	// 	"carno" : "C04254",
+	// 	"carid" : "CXRU1495240",
+	// 	"commmode" : "GPRS",
+	// 	"unitcode" : "00000",
+	// 	"cartype" : "船舶",
+	// 	"saveflag" : "1",
+	// 	"calcflag" : "3",
+	// 	"changeflag" : "1",
+	// 	"changetime" : "2018-08-27 15:09:27.0",
+	// 	"regtime" : "2018-08-27 15:09:27.0",
+	// 	"useacc" : "0",
+	// 	"checkflag" : "1",
+	// 	"boxtype" : "D"
+	// }
+	// ]`)
+	tc.SetInput("containersummaries", `[
+		{
+			"_id": "5b7f59beeb9f83a6ac7ca234",
+			"boxsize": null,
+			"boxtype": "D",
+			"calcflag": 3,
+			"carid": "CXRU1338831",
+			"carno": "C01937",
+			"cartype": "船舶",
+			"changeflag": 1,
+			"changetime": "7/18/2018 16:00",
+			"checkflag": 1,
+			"commmode": "GPRS",
+			"devtype": null,
+			"groupname": null,
+			"regtime": "7/18/2018 16:00",
+			"saveflag": 1,
+			"simno": "14540622818",
+			"tableName": "Tblcarbaseinfo",
+			"unitcode": 0,
+			"useacc": 0
+		}
 	]`)
 
 	act.Eval(tc)
