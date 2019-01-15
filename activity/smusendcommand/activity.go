@@ -47,11 +47,11 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 		for _, command := range commandArr {
 			if command.Subcmd == "FF" {
 				readCommandSegment = []byte{0x32, 0x41, 0x34, 0x43, 0x33, 0x32}
-				readCommandSeqNo = command.SeqNo
+				readCommandSeqNo = string(command.SeqNo)
 
 			} else {
 				setCmdVal[command.Subcmd] = command.Value
-				setCommandSeqNo = command.SeqNo
+				setCommandSeqNo = string(command.SeqNo)
 			}
 		}
 		if len(setCmdVal) > 0 {
