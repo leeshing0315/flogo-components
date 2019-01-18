@@ -23,25 +23,25 @@ type DeviceConfigCmd struct {
 func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err error) {
 
 	powerOnFrequency := make([]byte, 5)
-	if val, found := cmdVal["1"]; found {
+	if val, found := cmdVal["01"]; found {
 		powerOnFrequency[0] = 1
 		copy(powerOnFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	powerOffFrequency := make([]byte, 5)
-	if val, found := cmdVal["2"]; found {
+	if val, found := cmdVal["02"]; found {
 		powerOffFrequency[0] = 1
 		copy(powerOffFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	collectFrequency := make([]byte, 5)
-	if val, found := cmdVal["3"]; found {
+	if val, found := cmdVal["03"]; found {
 		collectFrequency[0] = 1
 		copy(collectFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	serverIPAndPort := make([]byte, 13)
-	if val, found := cmdVal["4"]; found {
+	if val, found := cmdVal["04"]; found {
 		serverIPAndPort[0] = 1
 		array := strings.Split(val, ":")
 		serverIPStr := array[0]
@@ -56,7 +56,7 @@ func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err
 	}
 
 	sleepMode := make([]byte, 2)
-	if val, found := cmdVal["5"]; found {
+	if val, found := cmdVal["05"]; found {
 		sleepMode[0] = 1
 		copy(sleepMode[1:], util.FromStrToUint32(val))
 	}
