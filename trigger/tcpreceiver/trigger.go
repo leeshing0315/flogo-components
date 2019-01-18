@@ -177,6 +177,7 @@ func sendCommandToDevice(seqNo uint16, writer *bufio.Writer, dataSegment []byte)
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
 	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	log.Println("**********Cmd:", content, "**********")
 
 	_, err := writer.Write(content)
 	if err != nil {
