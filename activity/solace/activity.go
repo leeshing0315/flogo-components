@@ -2,6 +2,7 @@ package solace
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -65,6 +66,9 @@ func (a *MyActivity) Eval(actCtx activity.Context) (done bool, err error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	// defer sender.Close(ctx)
 	defer cancel()
+	if strings.HasPrefix(data, "{") {
+		data = "[" + data + "]"
+	}
 	err = sender.Send(ctx, amqp.NewMessage([]byte(data)))
 
 	if err != nil {
