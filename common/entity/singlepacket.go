@@ -35,14 +35,14 @@ const (
 	clockModuleStatusMask                byte = 0x04 // 0000 0100
 	timedUploadDataMask                  byte = 0x01 // 0000 0001
 
-	Bit0Mask byte = 0x80 // 1000 0000
-	Bit1Mask byte = 0x40 // 0100 0000
-	Bit2Mask byte = 0x20 // 0010 0000
-	Bit3Mask byte = 0x10 // 0001 0000
-	Bit4Mask byte = 0x08 // 0000 1000
-	Bit5Mask byte = 0x04 // 0000 0100
-	Bit6Mask byte = 0x02 // 0000 0010
-	Bit7Mask byte = 0x01 // 0000 0001
+	Bit0Mask byte = 0x01 // 0000 0001
+	Bit1Mask byte = 0x02 // 0000 0010
+	Bit2Mask byte = 0x04 // 0000 0100
+	Bit3Mask byte = 0x08 // 0000 1000
+	Bit4Mask byte = 0x10 // 0001 0000
+	Bit5Mask byte = 0x20 // 0010 0000
+	Bit6Mask byte = 0x40 // 0100 0000
+	Bit7Mask byte = 0x80 // 1000 0000
 )
 
 var BitMask = []byte{
@@ -504,7 +504,7 @@ func handleInfoItem(item []byte, singlePacket *SinglePacket) {
 func isValid(validState []byte, number int) bool {
 	index := number / 8
 	offset := number % 8
-	return (validState[index] & BitMask[offset]) == BitMask[offset]
+	return (validState[len(validState)-1-index] & BitMask[offset]) == BitMask[offset]
 }
 
 func handleDebugTextItem(item []byte, singlePacket *SinglePacket) {
