@@ -46,7 +46,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 		for _, command := range commandArr {
 			if command.Subcmd == "FF" {
-				readCommandSegment = []byte{0x32, 0x41, 0x34, 0x43, 0x02, 0x32, 0x23}
+				readCommandSegment = []byte{0x2A, 0x4C, 0x02, 0x23}
 				readCommandSeqNo = string(command.SeqNo)
 			} else {
 				setCmdVal[command.Subcmd] = command.Value
