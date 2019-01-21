@@ -1,5 +1,11 @@
 package entity
 
+import (
+	"strconv"
+
+	crg "github.com/leeshing0315/go-city-reverse-geocoder"
+)
+
 // GpsEvent entity gpsEvent
 type GpsEvent struct {
 	ID string `json:"id"`
@@ -114,6 +120,7 @@ func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrN
 	gpsEvent.Hs = ReturnValueByCondition(singlePacket.InfoItem.HsValid, singlePacket.InfoItem.Hs, "")
 	gpsEvent.Source = GPSEVENT_SOURCE_TCPSERVER
 	gpsEvent.Carrier = GPSEVENT_CARRIER_COSU
+	gpsEvent.Address = getAddress(singlePacket.Lat, singlePacket.Lng)
 
 	return gpsEvent
 }
@@ -123,5 +130,21 @@ func ReturnValueByCondition(condition bool, trueVal string, falseVal string) str
 		return trueVal
 	} else {
 		return falseVal
+	}
+}
+
+func getAddress(latStr string, lonStr string) GpsEventAddress {
+	lat, err := strconv.ParseFloat(latStr, 64)
+	if err != nil {
+		return GpsEventAddress{}
+	}
+	lon, err := strconv.ParseFloat(lonStr, 64)
+	if err != nil {
+		return GpsEventAddress{}
+	}
+	results, err := crg.GetNearestCities(lat, lon, 1, "mi")
+	result := results[0]
+	return GpsEventAddress{
+		RegionCode: result.Region_code,
 	}
 }
