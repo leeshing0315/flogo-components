@@ -43,6 +43,8 @@ const (
 	Bit5Mask byte = 0x20 // 0010 0000
 	Bit6Mask byte = 0x40 // 0100 0000
 	Bit7Mask byte = 0x80 // 1000 0000
+
+	LOW_4_BITS_MASK byte = 0x0F // 0000 1111
 )
 
 var BitMask = []byte{
@@ -388,7 +390,7 @@ func handleInfoItem(item []byte, singlePacket *SinglePacket) {
 
 	// OP_MODE: 1byte
 	infoItem.OpModeValid = isValid(validState, 0)
-	infoItem.OpMode = opModeMapping[dataSegment[5]]
+	infoItem.OpMode = opModeMapping[dataSegment[5]&LOW_4_BITS_MASK]
 
 	// SET_TEM: 2byte 多字节时，注意低位在右，参与计算的区间：b2-b13，乘以0.0625，其中LSB：b2，MSB：b13，单位是C。
 	infoItem.SetTemValid = isValid(validState, 1)
