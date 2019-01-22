@@ -26,9 +26,10 @@ func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err
 
 	powerOnFrequency := make([]byte, 5)
 	if val, found := cmdVal["01"]; found {
-		powerOnFrequency[0] = 1
-		uintVal, _ := strconv.ParseUint(val, 10, 32)
-		binary.BigEndian.PutUint32(powerOnFrequency[1:], uint32(uintVal))
+		powerOnFrequency[0] = '1'
+		// uintVal, _ := strconv.ParseUint(val, 10, 32)
+		// binary.BigEndian.PutUint32(powerOnFrequency[1:], uint32(uintVal))
+		copy(powerOnFrequency[1:], util.GetEndBytes(util.FromDecStrToHexStr(val), 4))
 	}
 
 	powerOffFrequency := make([]byte, 5)
