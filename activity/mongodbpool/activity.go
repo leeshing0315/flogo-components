@@ -171,6 +171,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 				return false, err
 			}
 			var insertedIDArray []string
+			var resultArray []map[string]interface{}
 			for _, val := range valueArray {
 				var valueMap map[string]interface{}
 				err = json.Unmarshal([]byte(val), &valueMap)
@@ -186,8 +187,14 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 				}
 				activityLog.Debugf("Insert Results $#v", result)
 				insertedIDArray = append(insertedIDArray, result.InsertedID.(primitive.ObjectID).String())
+				valueMap["_id"] = result.InsertedID.(primitive.ObjectID).String()
+				resultArray = append(resultArray, valueMap)
 			}
 			ctx.SetOutput(ovOutput, strings.Join(insertedIDArray, ","))
+			resultArrayBytes, err := json.Marshal(resultArray)
+			if err != nil {
+				ctx.SetOutput("resultArray", string(resultArrayBytes))
+			}
 		} else {
 			var valueMap map[string]interface{}
 			err = json.Unmarshal([]byte(value.(string)), &valueMap)
@@ -203,6 +210,13 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			}
 			activityLog.Debugf("Insert Results $#v", result)
 			ctx.SetOutput(ovOutput, result.InsertedID)
+			var resultArray []map[string]interface{}
+			valueMap["_id"] = result.InsertedID.(primitive.ObjectID).String()
+			resultArray = append(resultArray, valueMap)
+			resultArrayBytes, err := json.Marshal(resultArray)
+			if err != nil {
+				ctx.SetOutput("resultArray", string(resultArrayBytes))
+			}
 		}
 	case methodReplace:
 		if value == nil || value.(string) == "" {

@@ -55,6 +55,10 @@
     {
       "name": "count",
       "type": "integer"
+    },
+    {
+      "name": "resultArray",
+      "type": "string"
     }
   ]
 }
