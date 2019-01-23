@@ -35,6 +35,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	context.SetOutput("keyName", strings.Join([]string{"devid", "seqno"}, ","))
 	context.SetOutput("keyValue", strings.Join([]string{devid, seqNo}, ","))
+	println("**********CMDACK keyName", strings.Join([]string{"devid", "seqno"}, ","), "**********")
+	println("**********CMDACK keyValue", strings.Join([]string{devid, seqNo}, ","), "**********")
 
 	valueMap := make(map[string]string)
 	valueMap["sendflag"] = "2"
@@ -47,6 +49,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	jsonBytes, _ := json.Marshal(valueMap)
 	context.SetOutput("updateVal", string(jsonBytes))
+	println("**********CMDACK value", string(jsonBytes), "**********")
 
 	return true, nil
 }

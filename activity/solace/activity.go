@@ -49,6 +49,8 @@ func (a *MyActivity) Eval(actCtx activity.Context) (done bool, err error) {
 	hostIP := actCtx.GetInput("hostIP").(string)
 	vpnName := actCtx.GetInput("vpnName").(string)
 	topicName := actCtx.GetInput("topicName").(string)
+	username := actCtx.GetInput("username").(string)
+	password := actCtx.GetInput("password").(string)
 	data := actCtx.GetInput("data").(string)
 
 	// 1. if many data send in same time, it will create many connections that may over solace connection number limit, you can run the activity_test and switch the TEST_ROUTINE_NUM to 600 or 700
@@ -56,7 +58,7 @@ func (a *MyActivity) Eval(actCtx activity.Context) (done bool, err error) {
 	// TODO 3. check which amqp object(client, session, sender) are concurrent safe, and use github.com/jolestar/go-commons-pool to pooling it's children
 	senderLock.Lock()
 	defer senderLock.Unlock()
-	sender, err := getSender(hostIP, vpnName, topicName)
+	sender, err := getSender(hostIP, vpnName, topicName, username, password)
 
 	if err != nil {
 		actCtx.SetOutput("publishSuccess", "false")
@@ -86,9 +88,9 @@ func (a *MyActivity) Eval(actCtx activity.Context) (done bool, err error) {
 	return true, nil
 }
 
-func getSender(hostIP string, vpnName string, topicName string) (*amqp.Sender, error) {
+func getSender(hostIP, vpnName, topicName, username, password string) (*amqp.Sender, error) {
 	if hostIP != storedHostIP || vpnName != storedVpnName || topicName != storedTopicName || storedClient == nil || storedSession == nil || storedSender == nil {
-		err := createSender(hostIP, vpnName, topicName)
+		err := createSender(hostIP, vpnName, topicName, username, password)
 		if err != nil {
 			return nil, err
 		}
@@ -96,8 +98,14 @@ func getSender(hostIP string, vpnName string, topicName string) (*amqp.Sender, e
 	return storedSender, nil
 }
 
-func createSender(hostIP string, vpnName string, topicName string) error {
-	client, err := amqp.Dial("amqp://" + hostIP + "/" + vpnName)
+func createSender(hostIP, vpnName, topicName, username, password string) error {
+	var client *amqp.Client
+	var err error
+	if username != "" {
+		client, err = amqp.Dial("amqp://"+hostIP+"/"+vpnName, amqp.ConnSASLPlain(username, password))
+	} else {
+		client, err = amqp.Dial("amqp://" + hostIP + "/" + vpnName)
+	}
 	if err != nil {
 		log.Errorf("AMQP Dial fail by hostIP [%s] and vpnName [%s] and error is [%s]", hostIP, vpnName, err)
 		return err
