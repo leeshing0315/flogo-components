@@ -47,6 +47,9 @@ func FromDecStrToHexStr(str string) []byte {
 func GetEndBytes(input []byte, size int) []byte {
 	inputLen := len(input)
 	result := make([]byte, size)
+	for i := range result {
+		result[i] = '0'
+	}
 	if inputLen < size {
 		copy(result[size-inputLen:], input)
 	} else {
