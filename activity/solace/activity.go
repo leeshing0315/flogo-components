@@ -71,6 +71,7 @@ func (a *MyActivity) Eval(actCtx activity.Context) (done bool, err error) {
 	if strings.HasPrefix(data, "{") {
 		data = "[" + data + "]"
 	}
+	println("**********SOLACE SENDING", data, "**********")
 	err = sender.Send(ctx, amqp.NewMessage([]byte(data)))
 
 	if err != nil {
@@ -82,6 +83,7 @@ func (a *MyActivity) Eval(actCtx activity.Context) (done bool, err error) {
 		actCtx.SetOutput("publishSuccess", "false")
 		return false, err
 	}
+	println("**********SOLACE SEND SUCCESS", data, "**********")
 
 	log.Debugf("Solace publisher send successfully by topicName [%s] and data [%s]", topicName, data)
 	actCtx.SetOutput("publishSuccess", "true")
