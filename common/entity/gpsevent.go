@@ -145,6 +145,7 @@ func getAddress(latStr string, lonStr string) GpsEventAddress {
 	results, err := crg.GetNearestCities(lat, lon, 1, "mi")
 	result := results[0]
 	return GpsEventAddress{
-		RegionCode: result.Region_code,
+		RegionCode:  result.Region_code,
+		CountryCode: result.Country_code,
 	}
 }
