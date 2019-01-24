@@ -187,7 +187,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 				}
 				activityLog.Debugf("Insert Results $#v", result)
 				insertedIDArray = append(insertedIDArray, result.InsertedID.(primitive.ObjectID).String())
-				valueMap["id"] = result.InsertedID.(string)
+				valueMap["id"] = result.InsertedID.(primitive.ObjectID).Hex()
 				resultArray = append(resultArray, valueMap)
 			}
 			ctx.SetOutput(ovOutput, strings.Join(insertedIDArray, ","))
@@ -211,7 +211,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			activityLog.Debugf("Insert Results $#v", result)
 			ctx.SetOutput(ovOutput, result.InsertedID)
 			var resultArray = []map[string]interface{}{}
-			valueMap["id"] = result.InsertedID.(string)
+			valueMap["id"] = result.InsertedID.(primitive.ObjectID).Hex()
 			resultArray = append(resultArray, valueMap)
 			resultArrayBytes, err := json.Marshal(resultArray)
 			if err == nil {
