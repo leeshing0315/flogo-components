@@ -104,9 +104,9 @@ func createSender(hostIP, vpnName, topicName, username, password string) error {
 	var client *amqp.Client
 	var err error
 	if username != "" {
-		client, err = amqp.Dial("amqp://"+hostIP+"/"+vpnName, amqp.ConnSASLPlain(username, password))
+		client, err = amqp.Dial("amqp://"+hostIP+"/"+vpnName, amqp.ConnSASLPlain(username, password), amqp.ConnIdleTimeout(time.Duration(0)))
 	} else {
-		client, err = amqp.Dial("amqp://" + hostIP + "/" + vpnName)
+		client, err = amqp.Dial("amqp://"+hostIP+"/"+vpnName, amqp.ConnIdleTimeout(time.Duration(0)))
 	}
 	if err != nil {
 		log.Errorf("AMQP Dial fail by hostIP [%s] and vpnName [%s] and error is [%s]", hostIP, vpnName, err)
