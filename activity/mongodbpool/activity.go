@@ -192,7 +192,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			}
 			ctx.SetOutput(ovOutput, strings.Join(insertedIDArray, ","))
 			resultArrayBytes, err := json.Marshal(resultArray)
-			if err != nil {
+			if err == nil {
 				ctx.SetOutput("resultArray", string(resultArrayBytes))
 			}
 		} else {
@@ -214,7 +214,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			valueMap["_id"] = result.InsertedID.(primitive.ObjectID).String()
 			resultArray = append(resultArray, valueMap)
 			resultArrayBytes, err := json.Marshal(resultArray)
-			if err != nil {
+			if err == nil {
 				ctx.SetOutput("resultArray", string(resultArrayBytes))
 			}
 		}
