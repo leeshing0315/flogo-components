@@ -31,12 +31,14 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// do eval
 	reqDataSegment := context.GetInput("reqDataSegment").([]byte)
 	devid := context.GetInput("devid").(string)
-	seqNo := strconv.FormatUint(uint64(context.GetInput("seqNo").(int)), 10)
+	seqNo := context.GetInput("seqNo").(int)
 
-	context.SetOutput("keyName", strings.Join([]string{"devid", "seqno"}, ","))
-	context.SetOutput("keyValue", strings.Join([]string{devid, seqNo}, ","))
-	println("**********CMDACK keyName", strings.Join([]string{"devid", "seqno"}, ","), "**********")
-	println("**********CMDACK keyValue", strings.Join([]string{devid, seqNo}, ","), "**********")
+	condition := make(map[string]interface{})
+	condition["devid"] = devid
+	condition["seqno"] = seqNo
+	conditionBytes, _ := json.Marshal(condition)
+	context.SetOutput("keyValue", string(conditionBytes))
+	println("**********CMDACK", strings.Join([]string{devid, strconv.FormatUint(uint64(seqNo), 10)}, ","), "**********")
 
 	valueMap := make(map[string]string)
 	valueMap["sendflag"] = "2"
