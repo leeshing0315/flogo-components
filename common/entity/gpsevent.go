@@ -11,52 +11,52 @@ import (
 type GpsEvent struct {
 	ID string `json:"id"`
 
-	Seqno       string          `json:"seqno"`
-	CntrNum     string          `json:"cntrNum"`
-	RevTime     string          `json:"revTime"`
-	CltTime     string          `json:"cltTime"`
-	LocateTime  string          `json:"locateTime"`
-	EleState    string          `json:"eleState"`
-	BatLevel    string          `json:"batLevel"`
-	OpMode      string          `json:"opMode"`
-	SetTem      string          `json:"setTem"`
-	SupTem      string          `json:"supTem"`
-	RetTem      string          `json:"retTem"`
-	Hum         string          `json:"hum"`
-	Lng         string          `json:"lng"`
-	Lat         string          `json:"lat"`
-	Speed       string          `json:"speed"`
-	Direction   string          `json:"direction"`
-	PosFlag     string          `json:"posFlag"`
-	GpsNum      string          `json:"gpsNum"`
-	BdNum       string          `json:"bdNum"`
-	Source      string          `json:"source"`
+	Seqno       interface{}     `json:"seqno"`
+	CntrNum     interface{}     `json:"cntrNum"`
+	RevTime     interface{}     `json:"revTime"`
+	CltTime     interface{}     `json:"cltTime"`
+	LocateTime  interface{}     `json:"locateTime"`
+	EleState    interface{}     `json:"eleState"`
+	BatLevel    interface{}     `json:"batLevel"`
+	OpMode      interface{}     `json:"opMode"`
+	SetTem      interface{}     `json:"setTem"`
+	SupTem      interface{}     `json:"supTem"`
+	RetTem      interface{}     `json:"retTem"`
+	Hum         interface{}     `json:"hum"`
+	Lng         interface{}     `json:"lng"`
+	Lat         interface{}     `json:"lat"`
+	Speed       interface{}     `json:"speed"`
+	Direction   interface{}     `json:"direction"`
+	PosFlag     interface{}     `json:"posFlag"`
+	GpsNum      interface{}     `json:"gpsNum"`
+	BdNum       interface{}     `json:"bdNum"`
+	Source      interface{}     `json:"source"`
 	Address     GpsEventAddress `json:"address"`
-	DisplayName string          `json:"displayName"`
-	Ambs        string          `json:"ambs"`
-	Hs          string          `json:"hs"`
-	Usda1       string          `json:"usda1"`
-	Usda2       string          `json:"usda2"`
-	Usda3       string          `json:"usda3"`
+	DisplayName interface{}     `json:"displayName"`
+	Ambs        interface{}     `json:"ambs"`
+	Hs          interface{}     `json:"hs"`
+	Usda1       interface{}     `json:"usda1"`
+	Usda2       interface{}     `json:"usda2"`
+	Usda3       interface{}     `json:"usda3"`
 
-	Hpt       string `json:"hpt"`
-	FaultCode string `json:"faultCode"`
-	Ism       string `json:"ism"`
-	FromDate  string `json:"fromDate"`
-	ToDate    string `json:"toDate"`
-	Carrier   string `json:"carrier"`
-	Lpt       string `json:"lpt"`
-	Pt        string `json:"pt"`
-	Ct1       string `json:"ct1"`
-	Ct2       string `json:"ct2"`
-	Eis       string `json:"eis"`
-	Eos       string `json:"eos"`
-	Dchs      string `json:"dchs"`
-	Sgs       string `json:"sgs"`
-	Smv       string `json:"smv"`
-	Ev        string `json:"ev"`
-	Dss       string `json:"dss"`
-	Drs       string `json:"drs"`
+	Hpt       interface{} `json:"hpt"`
+	FaultCode interface{} `json:"faultCode"`
+	Ism       interface{} `json:"ism"`
+	FromDate  interface{} `json:"fromDate"`
+	ToDate    interface{} `json:"toDate"`
+	Carrier   interface{} `json:"carrier"`
+	Lpt       interface{} `json:"lpt"`
+	Pt        interface{} `json:"pt"`
+	Ct1       interface{} `json:"ct1"`
+	Ct2       interface{} `json:"ct2"`
+	Eis       interface{} `json:"eis"`
+	Eos       interface{} `json:"eos"`
+	Dchs      interface{} `json:"dchs"`
+	Sgs       interface{} `json:"sgs"`
+	Smv       interface{} `json:"smv"`
+	Ev        interface{} `json:"ev"`
+	Dss       interface{} `json:"dss"`
+	Drs       interface{} `json:"drs"`
 }
 
 const (
@@ -87,38 +87,38 @@ func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrN
 	gpsEvent.LocateTime = singlePacket.Date
 	gpsEvent.EleState = ReturnValueByCondition(singlePacket.PowerSupplyStatus, "1", "0")
 	gpsEvent.BatLevel = singlePacket.BatLevel
-	gpsEvent.OpMode = ReturnValueByCondition(singlePacket.InfoItem.OpModeValid, singlePacket.InfoItem.OpMode, "")
-	gpsEvent.SetTem = ReturnValueByCondition(singlePacket.InfoItem.SetTemValid, singlePacket.InfoItem.SetTem, "")
-	gpsEvent.SupTem = ReturnValueByCondition(singlePacket.InfoItem.SupTemValid, singlePacket.InfoItem.SupTem, "")
-	gpsEvent.RetTem = ReturnValueByCondition(singlePacket.InfoItem.RetTemValid, singlePacket.InfoItem.RetTem, "")
-	gpsEvent.Hum = ReturnValueByCondition(singlePacket.InfoItem.HumValid, singlePacket.InfoItem.Hum, "")
+	gpsEvent.OpMode = ReturnValueByCondition(singlePacket.InfoItem.OpModeValid, singlePacket.InfoItem.OpMode, nil)
+	gpsEvent.SetTem = ReturnValueByCondition(singlePacket.InfoItem.SetTemValid, singlePacket.InfoItem.SetTem, nil)
+	gpsEvent.SupTem = ReturnValueByCondition(singlePacket.InfoItem.SupTemValid, singlePacket.InfoItem.SupTem, nil)
+	gpsEvent.RetTem = ReturnValueByCondition(singlePacket.InfoItem.RetTemValid, singlePacket.InfoItem.RetTem, nil)
+	gpsEvent.Hum = ReturnValueByCondition(singlePacket.InfoItem.HumValid, singlePacket.InfoItem.Hum, nil)
 	gpsEvent.Lat = singlePacket.Lat
 	gpsEvent.Lng = singlePacket.Lng
 	gpsEvent.Speed = singlePacket.Speed
 	gpsEvent.Direction = singlePacket.Direction
-	gpsEvent.Hpt = ReturnValueByCondition(singlePacket.InfoItem.HptValid, singlePacket.InfoItem.Hpt, "")
-	gpsEvent.Usda1 = ReturnValueByCondition(singlePacket.InfoItem.Usda1Valid, singlePacket.InfoItem.Usda1, "")
-	gpsEvent.Usda2 = ReturnValueByCondition(singlePacket.InfoItem.Usda2Valid, singlePacket.InfoItem.Usda2, "")
-	gpsEvent.Usda3 = ReturnValueByCondition(singlePacket.InfoItem.Usda3Valid, singlePacket.InfoItem.Usda3, "")
-	gpsEvent.FaultCode = ReturnValueByCondition(singlePacket.InfoItem.FaultCodeValid, singlePacket.InfoItem.FaultCode, "")
+	gpsEvent.Hpt = ReturnValueByCondition(singlePacket.InfoItem.HptValid, singlePacket.InfoItem.Hpt, nil)
+	gpsEvent.Usda1 = ReturnValueByCondition(singlePacket.InfoItem.Usda1Valid, singlePacket.InfoItem.Usda1, nil)
+	gpsEvent.Usda2 = ReturnValueByCondition(singlePacket.InfoItem.Usda2Valid, singlePacket.InfoItem.Usda2, nil)
+	gpsEvent.Usda3 = ReturnValueByCondition(singlePacket.InfoItem.Usda3Valid, singlePacket.InfoItem.Usda3, nil)
+	gpsEvent.FaultCode = ReturnValueByCondition(singlePacket.InfoItem.FaultCodeValid, singlePacket.InfoItem.FaultCode, nil)
 	gpsEvent.PosFlag = ReturnValueByCondition(singlePacket.PositioningModuleStatus, "1", "0")
 	gpsEvent.Ism = "0"
 	gpsEvent.GpsNum = singlePacket.NumberOfSatellitesItem.GpsSatelliteNumber
 	gpsEvent.BdNum = singlePacket.NumberOfSatellitesItem.BeidouSatelliteNumber
-	gpsEvent.Lpt = ReturnValueByCondition(singlePacket.InfoItem.LptValid, singlePacket.InfoItem.Lpt, "")
-	gpsEvent.Pt = ReturnValueByCondition(singlePacket.InfoItem.PtValid, singlePacket.InfoItem.Pt, "")
-	gpsEvent.Ct1 = ReturnValueByCondition(singlePacket.InfoItem.Ct1Valid, singlePacket.InfoItem.Ct1, "")
-	gpsEvent.Ct2 = ReturnValueByCondition(singlePacket.InfoItem.Ct2Valid, singlePacket.InfoItem.Ct2, "")
-	gpsEvent.Ambs = ReturnValueByCondition(singlePacket.InfoItem.AmbsValid, singlePacket.InfoItem.Ambs, "")
-	gpsEvent.Eis = ReturnValueByCondition(singlePacket.InfoItem.EisValid, singlePacket.InfoItem.Eis, "")
-	gpsEvent.Eos = ReturnValueByCondition(singlePacket.InfoItem.EosValid, singlePacket.InfoItem.Eos, "")
-	gpsEvent.Dchs = ReturnValueByCondition(singlePacket.InfoItem.DchsValid, singlePacket.InfoItem.Dchs, "")
-	gpsEvent.Sgs = ReturnValueByCondition(singlePacket.InfoItem.SgsValid, singlePacket.InfoItem.Sgs, "")
-	gpsEvent.Smv = ReturnValueByCondition(singlePacket.InfoItem.SmvValid, singlePacket.InfoItem.Smv, "")
-	gpsEvent.Ev = ReturnValueByCondition(singlePacket.InfoItem.EvValid, singlePacket.InfoItem.Ev, "")
-	gpsEvent.Dss = ReturnValueByCondition(singlePacket.InfoItem.DssValid, singlePacket.InfoItem.Dss, "")
-	gpsEvent.Drs = ReturnValueByCondition(singlePacket.InfoItem.DrsValid, singlePacket.InfoItem.Drs, "")
-	gpsEvent.Hs = ReturnValueByCondition(singlePacket.InfoItem.HsValid, singlePacket.InfoItem.Hs, "")
+	gpsEvent.Lpt = ReturnValueByCondition(singlePacket.InfoItem.LptValid, singlePacket.InfoItem.Lpt, nil)
+	gpsEvent.Pt = ReturnValueByCondition(singlePacket.InfoItem.PtValid, singlePacket.InfoItem.Pt, nil)
+	gpsEvent.Ct1 = ReturnValueByCondition(singlePacket.InfoItem.Ct1Valid, singlePacket.InfoItem.Ct1, nil)
+	gpsEvent.Ct2 = ReturnValueByCondition(singlePacket.InfoItem.Ct2Valid, singlePacket.InfoItem.Ct2, nil)
+	gpsEvent.Ambs = ReturnValueByCondition(singlePacket.InfoItem.AmbsValid, singlePacket.InfoItem.Ambs, nil)
+	gpsEvent.Eis = ReturnValueByCondition(singlePacket.InfoItem.EisValid, singlePacket.InfoItem.Eis, nil)
+	gpsEvent.Eos = ReturnValueByCondition(singlePacket.InfoItem.EosValid, singlePacket.InfoItem.Eos, nil)
+	gpsEvent.Dchs = ReturnValueByCondition(singlePacket.InfoItem.DchsValid, singlePacket.InfoItem.Dchs, nil)
+	gpsEvent.Sgs = ReturnValueByCondition(singlePacket.InfoItem.SgsValid, singlePacket.InfoItem.Sgs, nil)
+	gpsEvent.Smv = ReturnValueByCondition(singlePacket.InfoItem.SmvValid, singlePacket.InfoItem.Smv, nil)
+	gpsEvent.Ev = ReturnValueByCondition(singlePacket.InfoItem.EvValid, singlePacket.InfoItem.Ev, nil)
+	gpsEvent.Dss = ReturnValueByCondition(singlePacket.InfoItem.DssValid, singlePacket.InfoItem.Dss, nil)
+	gpsEvent.Drs = ReturnValueByCondition(singlePacket.InfoItem.DrsValid, singlePacket.InfoItem.Drs, nil)
+	gpsEvent.Hs = ReturnValueByCondition(singlePacket.InfoItem.HsValid, singlePacket.InfoItem.Hs, nil)
 	gpsEvent.Source = GPSEVENT_SOURCE_TCPSERVER
 	gpsEvent.Carrier = GPSEVENT_CARRIER_COSU
 	address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
@@ -128,7 +128,7 @@ func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrN
 	return gpsEvent
 }
 
-func ReturnValueByCondition(condition bool, trueVal string, falseVal string) string {
+func ReturnValueByCondition(condition bool, trueVal interface{}, falseVal interface{}) interface{} {
 	if condition {
 		return trueVal
 	} else {
@@ -136,14 +136,14 @@ func ReturnValueByCondition(condition bool, trueVal string, falseVal string) str
 	}
 }
 
-func getAddress(latStr string, lonStr string) (address GpsEventAddress, displayName string) {
+func getAddress(latStr string, lonStr string) (address GpsEventAddress, displayName interface{}) {
 	lat, err := strconv.ParseFloat(latStr, 64)
 	if err != nil {
-		return GpsEventAddress{}, ""
+		return GpsEventAddress{}, nil
 	}
 	lon, err := strconv.ParseFloat(lonStr, 64)
 	if err != nil {
-		return GpsEventAddress{}, ""
+		return GpsEventAddress{}, nil
 	}
 	results, err := crg.GetNearestCities(lat, lon, 1, "mi")
 	result := results[0]
