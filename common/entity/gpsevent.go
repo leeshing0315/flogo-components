@@ -9,8 +9,6 @@ import (
 
 // GpsEvent entity gpsEvent
 type GpsEvent struct {
-	ID string `json:"id"`
-
 	Seqno       interface{}     `json:"seqno"`
 	CntrNum     interface{}     `json:"cntrNum"`
 	RevTime     interface{}     `json:"revTime"`
