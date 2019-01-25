@@ -1,0 +1,29 @@
+{
+  "name": "smucntrdevmapping",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smucntrdevmapping",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU CntrDevMapping",
+  "inputs":[
+    {
+      "name": "cntrDevMapping",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "sim",
+      "type": "string"
+    },
+    {
+      "name": "devId",
+      "type": "string"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    }
+  ]
+}
