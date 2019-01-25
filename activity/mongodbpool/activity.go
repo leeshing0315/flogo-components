@@ -303,20 +303,30 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 }
 
 func buildDocument(keyName string, keyValue string) (interface{}, error) {
-	names := strings.Split(keyName, ",")
-	values := strings.Split(keyValue, ",")
+	if keyName != "" {
+		names := strings.Split(keyName, ",")
+		values := strings.Split(keyValue, ",")
 
-	namesLen := len(names)
-	valuesLen := len(values)
-	if namesLen != valuesLen {
-		return nil, errors.New("KeyValueLenNotMatch")
+		namesLen := len(names)
+		valuesLen := len(values)
+		if namesLen != valuesLen {
+			return nil, errors.New("KeyValueLenNotMatch")
+		}
+
+		result := bson.M{}
+
+		for i := 0; i < namesLen; i++ {
+			result[names[i]] = values[i]
+		}
+
+		return result, nil
+	} else {
+		result := make(map[string]interface{})
+		err := json.Unmarshal([]byte(keyValue), result)
+		if err != nil {
+			return nil, errors.New("KeyValueNotJson")
+		}
+
+		return result, nil
 	}
-
-	result := bson.M{}
-
-	for i := 0; i < namesLen; i++ {
-		result[names[i]] = values[i]
-	}
-
-	return result, nil
 }
