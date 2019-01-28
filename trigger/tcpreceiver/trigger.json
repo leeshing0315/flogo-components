@@ -44,6 +44,10 @@
       "type": "string"
     },
     {
+      "name": "pin",
+      "type": "string"
+    },
+    {
       "name": "emptyByteArray",
       "type": "array"
     }
@@ -75,6 +79,10 @@
     },
     {
       "name": "devId",
+      "type": "string"
+    },
+    {
+      "name": "pin",
       "type": "string"
     }
   ],

@@ -79,6 +79,7 @@ func (t *MyTrigger) Start() error {
 		triggerData["reqDataSegment"] = packet.DataSegment
 		triggerData["cntrNum"] = s.CntrNum
 		triggerData["devId"] = s.DevId
+		triggerData["pin"] = s.Pin
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
 			results, _ := handler.Handle(context.Background(), triggerData)
@@ -88,6 +89,7 @@ func (t *MyTrigger) Start() error {
 				readCommandAttr, _ := results["readCommandSegment"]
 				cntrNumAttr, _ := results["cntrNum"]
 				devIdAttr, _ := results["devId"]
+				pinAttr, _ := results["pin"]
 
 				cntrNum := cntrNumAttr.Value().(string)
 				if cntrNum != "" {
@@ -96,6 +98,10 @@ func (t *MyTrigger) Start() error {
 				devId := devIdAttr.Value().(string)
 				if devId != "" {
 					s.DevId = devId
+				}
+				pin := pinAttr.Value().(string)
+				if pin != "" {
+					s.Pin = pin
 				}
 
 				if ok && packet.Command != 0x34 {
