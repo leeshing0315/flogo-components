@@ -27,8 +27,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	cntrDevMappingStr := context.GetInput("cntrDevMapping").(string)
 
 	// do eval
-	var cntrDevMapping *entity.ContainerDeviceMapping
-	err = json.Unmarshal([]byte(cntrDevMappingStr), cntrDevMapping)
+	var cntrDevMapping = entity.ContainerDeviceMapping{}
+	err = json.Unmarshal([]byte(cntrDevMappingStr), &cntrDevMapping)
 	if err != nil {
 		return false, err
 	}
