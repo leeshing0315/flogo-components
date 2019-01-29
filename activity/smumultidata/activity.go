@@ -37,15 +37,18 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	gpsEventStrs := []string{}
 	opModeChangeStrs := []string{}
 	deviceErrorsStrs := []string{}
+	autoReg := "false"
 
 	packets := splitPackets(reqDataSegment)
 	for _, dateSegment := range packets {
 		singlePacket := entity.ParseToSinglePacket(dateSegment)
 		if singlePacket.LoginItem.ContainerNumber != "" {
 			cntrNum = singlePacket.LoginItem.ContainerNumber
+			autoReg = "true"
 		}
 		if singlePacket.LoginItem.DeviceID != "" {
 			devId = singlePacket.LoginItem.DeviceID
+			autoReg = "true"
 		}
 
 		gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
@@ -67,8 +70,10 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("cntrNum", cntrNum)
 	context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
+	context.SetOutput("autoReg", autoReg)
 	println("**********multiData*cntrNum", cntrNum, "**********")
 	println("**********multiData*devId", devId, "**********")
+	println("**********multiData*autoReg", autoReg, "**********")
 	if len(gpsEventStrs) > 0 {
 		gpsEventsOutput, _ := json.Marshal(gpsEventStrs)
 		context.SetOutput("gpsEvents", string(gpsEventsOutput))

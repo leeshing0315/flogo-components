@@ -33,19 +33,25 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 	eventTime := context.GetInput("eventTime").(string)
 
+	autoReg := "false"
+
 	singlePacket := entity.ParseToSinglePacket(reqDataSegment)
 	if singlePacket.LoginItem.ContainerNumber != "" {
 		cntrNum = singlePacket.LoginItem.ContainerNumber
+		autoReg = "true"
 	}
 	if singlePacket.LoginItem.DeviceID != "" {
 		devId = singlePacket.LoginItem.DeviceID
+		autoReg = "true"
 	}
 
 	context.SetOutput("cntrNum", cntrNum)
 	context.SetOutput("devId", devId)
 	context.SetOutput("resDataSegment", []byte{})
+	context.SetOutput("autoReg", autoReg)
 	println("**********singleData*cntrNum", cntrNum, "**********")
 	println("**********singleData*devId", devId, "**********")
+	println("**********singleData*autoReg", autoReg, "**********")
 
 	gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
 	gpsEventBytes, _ := json.Marshal(gpsEvent)
