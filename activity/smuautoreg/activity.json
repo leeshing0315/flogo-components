@@ -1,0 +1,42 @@
+{
+  "name": "smuautoreg",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "input": [
+    {
+      "name": "uri",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "dbName",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "pin",
+      "type": "string"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devId",
+      "type": "object"
+    }
+  ],
+  "output": [
+    {
+      "name": "output",
+      "type": "any"
+    },
+    {
+      "name": "count",
+      "type": "integer"
+    }
+  ]
+}
