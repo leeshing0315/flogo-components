@@ -31,7 +31,7 @@
     },
     {
       "name": "devId",
-      "type": "object"
+      "type": "string"
     }
   ],
   "output": [
