@@ -18,6 +18,10 @@
       "required": true
     },
     {
+      "name": "autoReg",
+      "type": "string"
+    },
+    {
       "name": "pin",
       "type": "string"
     },
