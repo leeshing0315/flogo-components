@@ -173,7 +173,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 			var insertedIDArray []string
 			var resultArray = []map[string]interface{}{}
 			for _, val := range valueArray {
-				var valueMap map[string]interface{}
+				var valueMap = make(map[string]interface{})
 				err = json.Unmarshal([]byte(val), &valueMap)
 				if err != nil {
 					return false, err
@@ -196,7 +196,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 				ctx.SetOutput("resultArray", string(resultArrayBytes))
 			}
 		} else {
-			var valueMap map[string]interface{}
+			var valueMap = make(map[string]interface{})
 			err = json.Unmarshal([]byte(value.(string)), &valueMap)
 			if err != nil {
 				return false, err
@@ -226,7 +226,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		if buildErr != nil {
 			return false, buildErr
 		}
-		var valueMap map[string]interface{}
+		var valueMap = make(map[string]interface{})
 		err = json.Unmarshal([]byte(value.(string)), &valueMap)
 		if err != nil {
 			return false, err
