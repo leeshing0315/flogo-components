@@ -148,7 +148,7 @@ func buildAuditLog(oldActive, newActive map[string]interface{}) map[string]inter
 }
 
 func isNumberNotChanged(oldActive map[string]interface{}, cntrNum, devId string) bool {
-	if oldActive["carid"] != cntrNum || oldActive["carno"] != devId {
+	if oldActive["carid"] == cntrNum && oldActive["carno"] == devId {
 		return true
 	} else {
 		return false
