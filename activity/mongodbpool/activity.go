@@ -252,7 +252,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		if buildErr != nil {
 			return false, buildErr
 		}
-		var valueMap map[string]interface{}
+		var valueMap = make(map[string]interface{})
 		err = json.Unmarshal([]byte(value.(string)), &valueMap)
 		if err != nil {
 			return false, err
@@ -277,7 +277,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		if buildErr != nil {
 			return false, buildErr
 		}
-		var valueMap map[string]interface{}
+		var valueMap = make(map[string]interface{})
 		err = json.Unmarshal([]byte(value.(string)), &valueMap)
 		if err != nil {
 			return false, err
@@ -322,7 +322,7 @@ func buildDocument(keyName string, keyValue string) (interface{}, error) {
 		return result, nil
 	} else {
 		result := make(map[string]interface{})
-		err := json.Unmarshal([]byte(keyValue), result)
+		err := json.Unmarshal([]byte(keyValue), &result)
 		if err != nil {
 			return nil, errors.New("KeyValueNotJson")
 		}
