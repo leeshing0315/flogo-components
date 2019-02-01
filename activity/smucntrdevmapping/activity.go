@@ -36,5 +36,9 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("devId", cntrDevMapping["carno"])
 	context.SetOutput("cntrNum", cntrDevMapping["carid"])
 
+	println("**********login*sim", cntrDevMapping["simno"], "**********")
+	println("**********login*devId", cntrDevMapping["carno"], "**********")
+	println("**********login*cntrNum", cntrDevMapping["carid"], "**********")
+
 	return true, nil
 }
