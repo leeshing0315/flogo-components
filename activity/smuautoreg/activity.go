@@ -60,7 +60,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, nil
 	}
 	if len(oldActiveBytes) == 0 {
-		return
+		return true, nil
 	}
 	oldActive := make(map[string]interface{})
 	err = json.Unmarshal(oldActiveBytes, &oldActive)
