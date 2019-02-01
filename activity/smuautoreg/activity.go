@@ -129,8 +129,8 @@ func buildNewActive(oldActive map[string]interface{}, cntrNum, devId, cntrDevMap
 	delete(newActive, "_id")
 	delete(newActive, "id")
 	newActive["status"] = "active"
-	newActive["carno"] = "devId"
-	newActive["carid"] = "cntrNum"
+	newActive["carno"] = devId
+	newActive["carid"] = cntrNum
 	newActive["regtime"] = cntrDevMappingDateStr
 	newActive["changetime"] = cntrDevMappingDateStr
 	newActive["lastUpdated"] = cntrDevMappingDateStr
