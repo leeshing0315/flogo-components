@@ -1,0 +1,45 @@
+{
+  "name": "smueventlog",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smueventlog",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU EventLog",
+  "inputs":[
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    },
+    {
+      "name": "seqNo",
+      "type": "integer"
+    },
+    {
+      "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "devid",
+      "type": "string"
+    },
+    {
+      "name": "reqDataSegment",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "resDataSegment",
+      "type": "array"
+    },
+    {
+      "name": "eventLogs",
+      "type": "string"
+    }
+  ]
+}
