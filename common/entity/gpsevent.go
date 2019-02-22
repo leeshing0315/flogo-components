@@ -61,6 +61,7 @@ type GpsEvent struct {
 	Smode      interface{} `json:"smode,omitempty"`
 	Cts        interface{} `json:"cts,omitempty"`
 	IsEventLog bool        `json:"isEventLog"`
+	CreatedAt  interface{} `json:"createdAt,omitempty"`
 }
 
 const (

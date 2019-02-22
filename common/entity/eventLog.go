@@ -5,28 +5,29 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type EventLog struct {
-	Seq     string `json:"SEQ"`
-	CntrNum string `json:"CNTR_NUM"`
-	RevTime string `json:"REV_TIME"`
-	LogTime string `json:"LOG_TIME"`
-	Sp      string `json:"SP"`
-	Isc     string `json:"ISC"`
-	Ss      string `json:"SS"`
-	Rs      string `json:"RS"`
-	Dss     string `json:"DSS"`
-	Drs     string `json:"DRS"`
-	Ambs    string `json:"AMBS"`
-	Hus     string `json:"HUS"`
-	Sh      string `json:"SH"`
-	Usda1   string `json:"USDA1"`
-	Usda2   string `json:"USDA2"`
-	Usda3   string `json:"USDA3"`
-	Cts     string `json:"CTS"`
-	Smode   string `json:"SMODE"`
-	Isa     int32  `json:"ISA"`
+	Seq     interface{} `json:"SEQ"`
+	CntrNum interface{} `json:"CNTR_NUM"`
+	RevTime interface{} `json:"REV_TIME"`
+	LogTime interface{} `json:"LOG_TIME"`
+	Sp      interface{} `json:"SP"`
+	Isc     interface{} `json:"ISC"`
+	Ss      interface{} `json:"SS"`
+	Rs      interface{} `json:"RS"`
+	Dss     interface{} `json:"DSS"`
+	Drs     interface{} `json:"DRS"`
+	Ambs    interface{} `json:"AMBS"`
+	Hus     interface{} `json:"HUS"`
+	Sh      interface{} `json:"SH"`
+	Usda1   interface{} `json:"USDA1"`
+	Usda2   interface{} `json:"USDA2"`
+	Usda3   interface{} `json:"USDA3"`
+	Cts     interface{} `json:"CTS"`
+	Smode   interface{} `json:"SMODE"`
+	Isa     int32       `json:"ISA"`
 }
 
 var smodeMapping = map[int]string{
@@ -55,17 +56,17 @@ var smodeMapping = map[int]string{
 	0xB103: "Set DHU to ON by MODEM",
 }
 
-func ParseToEventLog(bytes []byte) *EventLog {
+func ParseToEventLog(bytes []byte, now time.Time) *EventLog {
 	if bytes[0] == 1 {
-		return parseTemperatureLog(bytes[1:])
+		return parseTemperatureLog(bytes[1:], now)
 	} else if bytes[0] == 2 {
-		return parseSmodeLog(bytes[1:])
+		return parseSmodeLog(bytes[1:], now)
 	} else {
 		return nil
 	}
 }
 
-func parseTemperatureLog(bytes []byte) *EventLog {
+func parseTemperatureLog(bytes []byte, now time.Time) *EventLog {
 	eventLog := &EventLog{}
 	eventLog.LogTime = parseDateTime(bytes[0:4])
 	eventLog.Smode = opModeMapping[bytes[4]>>4]
@@ -91,10 +92,12 @@ func parseTemperatureLog(bytes []byte) *EventLog {
 	eventLog.Usda2 = strconv.FormatFloat(float64((int(bytes[18]&0x30)<<4)+int(bytes[15]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Usda3 = strconv.FormatFloat(float64((int(bytes[18]&0xc)<<6)+int(bytes[16]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Cts = strconv.FormatFloat(float64((int(bytes[18]&0x3)<<8)+int(bytes[17]))/10.0-40.0, 'f', 1, 64)
+	loc, _ := time.LoadLocation("Asia/Hong_Kong")
+	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	return eventLog
 }
 
-func parseSmodeLog(bytes []byte) *EventLog {
+func parseSmodeLog(bytes []byte, now time.Time) *EventLog {
 	eventLog := &EventLog{}
 	eventLog.LogTime = parseDateTime(bytes[0:4])
 	smode := smodeMapping[int(binary.BigEndian.Uint16(bytes[4:6]))]
@@ -102,6 +105,8 @@ func parseSmodeLog(bytes []byte) *EventLog {
 		smode = getSmodeByCal(bytes[4], bytes[5])
 	}
 	eventLog.Smode = smode
+	loc, _ := time.LoadLocation("Asia/Hong_Kong")
+	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	return eventLog
 }
 
@@ -177,9 +182,24 @@ func parseDateTime(bytes []byte) string {
 	var hour int = int(((bytes[2] & 0x7) << 2) + ((bytes[3] >> 6) & 0x3))
 	var minute int = int(bytes[3] & 0x3f)
 	yearStr := strconv.FormatInt(int64(year), 10)
-	monthStr := strconv.FormatInt(int64(month), 10)
-	dayStr := strconv.FormatInt(int64(day), 10)
-	hourStr := strconv.FormatInt(int64(hour), 10)
+	var monthStr string
+	if month < 10 {
+		monthStr = "0" + strconv.FormatInt(int64(month), 10)
+	} else {
+		monthStr = strconv.FormatInt(int64(month), 10)
+	}
+	var dayStr string
+	if day < 10 {
+		dayStr = "0" + strconv.FormatInt(int64(day), 10)
+	} else {
+		dayStr = strconv.FormatInt(int64(day), 10)
+	}
+	var hourStr string
+	if hour < 10 {
+		hourStr = "0" + strconv.FormatInt(int64(hour), 10)
+	} else {
+		hourStr = strconv.FormatInt(int64(hour), 10)
+	}
 	var minuteStr string
 	if minute < 10 {
 		minuteStr = "0" + strconv.FormatInt(int64(minute), 10)
@@ -188,15 +208,36 @@ func parseDateTime(bytes []byte) string {
 	}
 	// 1/26/2019 6:00
 	// 1/28/2019 15:44
+	// 2019-1-28T15:44:00+8:00
 	var builder strings.Builder
-	builder.WriteString(monthStr)
-	builder.WriteString("/")
-	builder.WriteString(dayStr)
-	builder.WriteString("/")
 	builder.WriteString(yearStr)
-	builder.WriteString(" ")
+	builder.WriteString("-")
+	builder.WriteString(monthStr)
+	builder.WriteString("-")
+	builder.WriteString(dayStr)
+	builder.WriteString("T")
 	builder.WriteString(hourStr)
 	builder.WriteString(":")
 	builder.WriteString(minuteStr)
+	builder.WriteString(":")
+	builder.WriteString("00+08:00")
 	return builder.String()
+}
+
+func ConvertEventLogToGPSEvent(eventLog *EventLog) *GpsEvent {
+	gpsEvent := &GpsEvent{}
+	gpsEvent.CntrNum = eventLog.CntrNum
+	gpsEvent.SetTem = eventLog.Sp
+	gpsEvent.SupTem = eventLog.Ss
+	gpsEvent.RetTem = eventLog.Rs
+	gpsEvent.Hum = eventLog.Hus
+	gpsEvent.Hs = eventLog.Sh
+	gpsEvent.RevTime = eventLog.RevTime
+	gpsEvent.CltTime = eventLog.LogTime
+	gpsEvent.IsEventLog = true
+	gpsEvent.CreatedAt = eventLog.RevTime
+	gpsEvent.LocateTime = eventLog.LogTime
+	gpsEvent.Source = "TCP_SERVER"
+	gpsEvent.Carrier = "COSU"
+	return gpsEvent
 }
