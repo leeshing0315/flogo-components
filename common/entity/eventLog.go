@@ -56,17 +56,23 @@ var smodeMapping = map[int]string{
 	0xB103: "Set DHU to ON by MODEM",
 }
 
-func ParseToEventLog(bytes []byte, now time.Time) *EventLog {
+func ParseToEventLog(bytes []byte, now time.Time, cntrNum string, seqNo int) *EventLog {
+	var eventLog *EventLog
 	if bytes[0] == 1 {
-		return parseTemperatureLog(bytes[1:], now)
+		eventLog = parseTemperatureLog(bytes[1:])
 	} else if bytes[0] == 2 {
-		return parseSmodeLog(bytes[1:], now)
+		eventLog = parseSmodeLog(bytes[1:])
 	} else {
 		return nil
 	}
+	loc, _ := time.LoadLocation("Asia/Hong_Kong")
+	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
+	eventLog.CntrNum = cntrNum
+	eventLog.Seq = seqNo
+	return eventLog
 }
 
-func parseTemperatureLog(bytes []byte, now time.Time) *EventLog {
+func parseTemperatureLog(bytes []byte) *EventLog {
 	eventLog := &EventLog{}
 	eventLog.LogTime = parseDateTime(bytes[0:4])
 	eventLog.Smode = opModeMapping[bytes[4]>>4]
@@ -92,12 +98,10 @@ func parseTemperatureLog(bytes []byte, now time.Time) *EventLog {
 	eventLog.Usda2 = strconv.FormatFloat(float64((int(bytes[18]&0x30)<<4)+int(bytes[15]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Usda3 = strconv.FormatFloat(float64((int(bytes[18]&0xc)<<6)+int(bytes[16]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Cts = strconv.FormatFloat(float64((int(bytes[18]&0x3)<<8)+int(bytes[17]))/10.0-40.0, 'f', 1, 64)
-	loc, _ := time.LoadLocation("Asia/Hong_Kong")
-	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	return eventLog
 }
 
-func parseSmodeLog(bytes []byte, now time.Time) *EventLog {
+func parseSmodeLog(bytes []byte) *EventLog {
 	eventLog := &EventLog{}
 	eventLog.LogTime = parseDateTime(bytes[0:4])
 	smode := smodeMapping[int(binary.BigEndian.Uint16(bytes[4:6]))]
@@ -105,8 +109,6 @@ func parseSmodeLog(bytes []byte, now time.Time) *EventLog {
 		smode = getSmodeByCal(bytes[4], bytes[5])
 	}
 	eventLog.Smode = smode
-	loc, _ := time.LoadLocation("Asia/Hong_Kong")
-	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	return eventLog
 }
 
