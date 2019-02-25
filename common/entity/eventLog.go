@@ -146,7 +146,7 @@ func getSmodeByCal(hiByte, loByte byte) string {
 		return fmt.Sprintf("Change Defrost Interval %s hour by %s", value, mode)
 	}
 	// Change Set Humidity
-	if (hiByte & 0x80) == 0x80 {
+	if (hiByte >> 4) == 0x8 {
 		modeValue := (hiByte & 0xc) >> 2
 		var mode string
 		if modeValue == 0 {
@@ -176,7 +176,7 @@ func getSmodeByCal(hiByte, loByte byte) string {
 		var value string = strconv.FormatInt(int64(loByte), 10)
 		return fmt.Sprintf("Change Time Setting to %s (MINUTE)", value)
 	}
-	return strconv.FormatUint((uint64(hiByte)<<8)+uint64(loByte), 16)
+	return strings.ToUpper(strconv.FormatUint((uint64(hiByte)<<8)+uint64(loByte), 16))
 }
 
 func parseDateTime(bytes []byte) string {
