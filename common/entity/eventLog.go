@@ -157,7 +157,7 @@ func getSmodeByCal(hiByte, loByte byte) string {
 			mode = "PC"
 		}
 		var value string = strconv.FormatInt(int64(loByte&0x7f), 10)
-		return fmt.Sprintf("Change Set Humidity %s%RH by %s", value, mode)
+		return fmt.Sprintf("Change Set Humidity %s%%RH by %s", value, mode)
 	}
 	// Change Set Time
 	if hiByte == 0x65 {
