@@ -9,25 +9,26 @@ import (
 )
 
 type EventLog struct {
-	Seq     interface{} `json:"SEQ"`
-	CntrNum interface{} `json:"CNTR_NUM"`
-	RevTime interface{} `json:"REV_TIME"`
-	LogTime interface{} `json:"LOG_TIME"`
-	Sp      interface{} `json:"SP"`
-	Isc     interface{} `json:"ISC"`
-	Ss      interface{} `json:"SS"`
-	Rs      interface{} `json:"RS"`
-	Dss     interface{} `json:"DSS"`
-	Drs     interface{} `json:"DRS"`
-	Ambs    interface{} `json:"AMBS"`
-	Hus     interface{} `json:"HUS"`
-	Sh      interface{} `json:"SH"`
-	Usda1   interface{} `json:"USDA1"`
-	Usda2   interface{} `json:"USDA2"`
-	Usda3   interface{} `json:"USDA3"`
-	Cts     interface{} `json:"CTS"`
-	Smode   interface{} `json:"SMODE"`
-	Isa     int32       `json:"ISA"`
+	Seq       string  `json:"seqno,omitempty"`
+	CntrNum   string  `json:"cntrnum,omitempty"`
+	RevTime   string  `json:"revtime,omitempty"`
+	LogTime   string  `json:"logtime,omitempty"`
+	Sp        float64 `json:"sp,omitempty"`
+	Isc       int32   `json:"isc,omitempty"`
+	Ss        float64 `json:"ss,omitempty"`
+	Rs        float64 `json:"rs,omitempty"`
+	Dss       float64 `json:"dss,omitempty"`
+	Drs       float64 `json:"drs,omitempty"`
+	Ambs      float64 `json:"ambs,omitempty"`
+	Hus       string  `json:"hus,omitempty"`
+	Sh        string  `json:"sh,omitempty"`
+	Usda1     string  `json:"usda1,omitempty"`
+	Usda2     string  `json:"usda2,omitempty"`
+	Usda3     string  `json:"usda3,omitempty"`
+	Cts       string  `json:"cts,omitempty"`
+	Smode     string  `json:"smode,omitempty"`
+	Isa       int32   `json:"isa,omitempty"`
+	TableName string  `json:"tableName,omitempty"`
 }
 
 var smodeMapping = map[int]string{
@@ -68,7 +69,7 @@ func ParseToEventLog(bytes []byte, now time.Time, cntrNum string, seqNo int) *Ev
 	loc, _ := time.LoadLocation("Asia/Hong_Kong")
 	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	eventLog.CntrNum = cntrNum
-	eventLog.Seq = seqNo
+	eventLog.Seq = strconv.FormatInt(int64(seqNo), 10)
 	return eventLog
 }
 
@@ -76,17 +77,17 @@ func parseTemperatureLog(bytes []byte) *EventLog {
 	eventLog := &EventLog{}
 	eventLog.LogTime = parseDateTime(bytes[0:4])
 	eventLog.Smode = opModeMapping[bytes[4]>>4]
-	eventLog.Ss = strconv.FormatFloat(float64((int(bytes[4]&0xf)<<6)+int(bytes[5]>>2))/10.0-40.0, 'f', 1, 64)
-	eventLog.Rs = strconv.FormatFloat(float64(((int(bytes[5]&0x3)<<8)+int(bytes[6])))/10.0-40.0, 'f', 1, 64)
-	eventLog.Sp = strconv.FormatFloat(float64((int(bytes[7])<<3)+int(bytes[8]>>5))/10.0-40.0, 'f', 1, 64)
+	eventLog.Ss = roundFloat(float64((int(bytes[4]&0xf)<<6)+int(bytes[5]>>2))/10.0 - 40.0)
+	eventLog.Rs = roundFloat(float64(((int(bytes[5]&0x3)<<8)+int(bytes[6])))/10.0 - 40.0)
+	eventLog.Sp = roundFloat(float64((int(bytes[7])<<3)+int(bytes[8]>>5))/10.0 - 40.0)
 	if (bytes[8] & 0x10) == 0 {
-		eventLog.Isc = "1"
+		eventLog.Isc = 1
 	} else {
-		eventLog.Isc = "0"
+		eventLog.Isc = 0
 	}
-	eventLog.Dss = strconv.FormatFloat(float64((int(bytes[8]&0xf)<<6)+int(bytes[9]>>2))/10.0-40.0, 'f', 1, 64)
-	eventLog.Drs = strconv.FormatFloat(float64(((int(bytes[9]&0x3)<<8)+int(bytes[10])))/10.0-40.0, 'f', 1, 64)
-	eventLog.Ambs = strconv.FormatFloat(float64(bytes[11]&0x7f)-40.0, 'f', 1, 64)
+	eventLog.Dss = roundFloat(float64((int(bytes[8]&0xf)<<6)+int(bytes[9]>>2))/10.0 - 40.0)
+	eventLog.Drs = roundFloat(float64(((int(bytes[9]&0x3)<<8)+int(bytes[10])))/10.0 - 40.0)
+	eventLog.Ambs = roundFloat(float64(bytes[11]&0x7f) - 40.0)
 	if (bytes[13] & 0x80) == 0x80 {
 		eventLog.Isa = 1
 		eventLog.Hus = strconv.FormatInt(int64(bytes[12]&0x7f), 10)
@@ -228,18 +229,45 @@ func parseDateTime(bytes []byte) string {
 
 func ConvertEventLogToGPSEvent(eventLog *EventLog) *GpsEvent {
 	gpsEvent := &GpsEvent{}
+	gpsEvent.Seqno = eventLog.Seq
 	gpsEvent.CntrNum = eventLog.CntrNum
-	gpsEvent.SetTem = eventLog.Sp
-	gpsEvent.SupTem = eventLog.Ss
-	gpsEvent.RetTem = eventLog.Rs
-	gpsEvent.Hum = eventLog.Hus
-	gpsEvent.Hs = eventLog.Sh
 	gpsEvent.RevTime = eventLog.RevTime
 	gpsEvent.CltTime = eventLog.LogTime
-	gpsEvent.IsEventLog = true
-	gpsEvent.CreatedAt = eventLog.RevTime
 	gpsEvent.LocateTime = eventLog.LogTime
+	if eventLog.Smode == "Electric Power Shut Off" {
+		gpsEvent.EleState = "0"
+	} else {
+		gpsEvent.EleState = "1"
+	}
+	if eventLog.Isa == 1 && eventLog.Isc == 1 {
+		gpsEvent.OpMode = eventLog.Smode
+	} else {
+		gpsEvent.EventLog = eventLog.Smode
+	}
+	gpsEvent.SetTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
+	gpsEvent.SupTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)
+	gpsEvent.RetTem = strconv.FormatFloat(eventLog.Rs, 'f', 1, 64)
+	gpsEvent.Hum = eventLog.Hus
+	gpsEvent.PosFlag = "0"
+	gpsEvent.Ambs = strconv.FormatFloat(eventLog.Ambs, 'f', 1, 64)
+	gpsEvent.Hs = eventLog.Sh
+	gpsEvent.Usda1 = eventLog.Usda1
+	gpsEvent.Usda2 = eventLog.Usda2
+	gpsEvent.Usda3 = eventLog.Usda3
+	gpsEvent.Drs = strconv.FormatFloat(eventLog.Drs, 'f', 1, 64)
+	gpsEvent.Dss = strconv.FormatFloat(eventLog.Dss, 'f', 1, 64)
+	gpsEvent.Cts = eventLog.Cts
 	gpsEvent.Source = "TCP_SERVER"
 	gpsEvent.Carrier = "COSU"
+	gpsEvent.IsEventLog = true
+	gpsEvent.Isc = strconv.FormatInt(int64(eventLog.Isc), 10)
+	gpsEvent.Isa = strconv.FormatInt(int64(eventLog.Isa), 10)
+	gpsEvent.CreatedAt = eventLog.RevTime
+
 	return gpsEvent
+}
+
+func roundFloat(input float64) float64 {
+	result, _ := strconv.ParseFloat(strconv.FormatFloat(input, 'f', 1, 64), 64)
+	return result
 }
