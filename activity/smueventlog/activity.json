@@ -40,6 +40,10 @@
     {
       "name": "eventLogs",
       "type": "string"
+    },
+    {
+      "name": "gpsEvents",
+      "type": "string"
     }
   ]
 }

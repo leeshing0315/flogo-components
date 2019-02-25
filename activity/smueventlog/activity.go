@@ -2,7 +2,6 @@ package smueventlog
 
 import (
 	"encoding/json"
-	"strconv"
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
@@ -33,30 +32,36 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
 	eventLogStrs := []string{}
+	gpsEventStrs := []string{}
 
 	packets := splitPackets(reqDataSegment)
 	for _, dataSegment := range packets {
-		eventLog := entity.ParseToEventLog(dataSegment)
+		eventLog := entity.ParseToEventLog(dataSegment, time.Now(), cntrNum, seqNo)
 		if eventLog == nil {
 			break
 		}
-
-		eventLog.CntrNum = cntrNum
-		eventLog.Seq = strconv.FormatInt(int64(seqNo), 10)
-		loc, _ := time.LoadLocation("Asia/Hong_Kong")
-		eventLog.LogTime = time.Now().In(loc).Format("01/02/2006 15:04")
-
 		eventLogBytes, err := json.Marshal(eventLog)
 		if err != nil {
 			break
 		}
+
+		gpsEvent := entity.ConvertEventLogToGPSEvent(eventLog)
+		gpsEventBytes, err := json.Marshal(gpsEvent)
+		if err != nil {
+			break
+		}
+
 		eventLogStrs = append(eventLogStrs, string(eventLogBytes))
+		gpsEventStrs = append(gpsEventStrs, string(gpsEventBytes))
 	}
 
 	context.SetOutput("resDataSegment", []byte{})
 	if len(eventLogStrs) > 0 {
 		eventLogsOutput, _ := json.Marshal(eventLogStrs)
 		context.SetOutput("eventLogs", string(eventLogsOutput))
+
+		gpsEventsOutput, _ := json.Marshal(gpsEventStrs)
+		context.SetOutput("gpsEvents", string(gpsEventsOutput))
 	}
 
 	return true, nil
