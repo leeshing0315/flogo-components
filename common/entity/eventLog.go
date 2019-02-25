@@ -3,6 +3,7 @@ package entity
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -244,25 +245,27 @@ func ConvertEventLogToGPSEvent(eventLog *EventLog) *GpsEvent {
 	} else {
 		gpsEvent.EventLog = eventLog.Smode
 	}
-	gpsEvent.SetTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
-	gpsEvent.SupTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)
-	gpsEvent.RetTem = strconv.FormatFloat(eventLog.Rs, 'f', 1, 64)
-	gpsEvent.Hum = eventLog.Hus
 	gpsEvent.PosFlag = "0"
-	gpsEvent.Ambs = strconv.FormatFloat(eventLog.Ambs, 'f', 1, 64)
-	gpsEvent.Hs = eventLog.Sh
-	gpsEvent.Usda1 = eventLog.Usda1
-	gpsEvent.Usda2 = eventLog.Usda2
-	gpsEvent.Usda3 = eventLog.Usda3
-	gpsEvent.Drs = strconv.FormatFloat(eventLog.Drs, 'f', 1, 64)
-	gpsEvent.Dss = strconv.FormatFloat(eventLog.Dss, 'f', 1, 64)
-	gpsEvent.Cts = eventLog.Cts
 	gpsEvent.Source = "TCP_SERVER"
 	gpsEvent.Carrier = "COSU"
 	gpsEvent.IsEventLog = true
-	gpsEvent.Isc = strconv.FormatInt(int64(eventLog.Isc), 10)
-	gpsEvent.Isa = strconv.FormatInt(int64(eventLog.Isa), 10)
 	gpsEvent.CreatedAt = eventLog.RevTime
+	if math.Abs(eventLog.Sp) < 0.0001 {
+		gpsEvent.SetTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
+		gpsEvent.SupTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)
+		gpsEvent.RetTem = strconv.FormatFloat(eventLog.Rs, 'f', 1, 64)
+		gpsEvent.Hum = eventLog.Hus
+		gpsEvent.Ambs = strconv.FormatFloat(eventLog.Ambs, 'f', 1, 64)
+		gpsEvent.Hs = eventLog.Sh
+		gpsEvent.Usda1 = eventLog.Usda1
+		gpsEvent.Usda2 = eventLog.Usda2
+		gpsEvent.Usda3 = eventLog.Usda3
+		gpsEvent.Drs = strconv.FormatFloat(eventLog.Drs, 'f', 1, 64)
+		gpsEvent.Dss = strconv.FormatFloat(eventLog.Dss, 'f', 1, 64)
+		gpsEvent.Cts = eventLog.Cts
+		gpsEvent.Isc = strconv.FormatInt(int64(eventLog.Isc), 10)
+		gpsEvent.Isa = strconv.FormatInt(int64(eventLog.Isa), 10)
+	}
 
 	return gpsEvent
 }
