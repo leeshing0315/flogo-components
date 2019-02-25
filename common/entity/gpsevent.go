@@ -72,15 +72,15 @@ const (
 
 // GpsEventAddress entity gpsEventAddress
 type GpsEventAddress struct {
-	distance  float64
-	longitude float64
-	latitude  float64
+	Distance  float64
+	Longitude float64
+	Latitude  float64
 
-	city        string
+	City        string
 	RegionCode  string `json:"region_code"`
-	region      string
+	Region      string
 	CountryCode string `json:"country_code"`
-	country     string
+	Country     string
 }
 
 func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrNum string, nowDateStr string) *GpsEvent {
