@@ -130,7 +130,7 @@ func getSmodeByCal(hiByte, loByte byte) string {
 		return fmt.Sprintf("Set Point %s by %s", sp, mode)
 	}
 	// Change Defrost Interval
-	if (hiByte & 0x30) == 0x30 {
+	if ((hiByte >> 4) == 3) && (hiByte != 0x31) {
 		modeValue := (hiByte & 0xc) >> 2
 		var mode string
 		if modeValue == 1 {
