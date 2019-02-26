@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/leeshing0315/flogo-components/common/service"
+
 	crg "github.com/leeshing0315/go-city-reverse-geocoder"
 )
 
@@ -129,9 +131,10 @@ func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrN
 	gpsEvent.Hs = returnValueByCondition(singlePacket.InfoItem.HsValid, singlePacket.InfoItem.Hs, nil).(string)
 	gpsEvent.Source = GPSEVENT_SOURCE_TCPSERVER
 	gpsEvent.Carrier = GPSEVENT_CARRIER_COSU
-	address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
-	gpsEvent.Address = address
-	gpsEvent.DisplayName = displayName.(string)
+	// address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
+	// gpsEvent.Address = address
+	// gpsEvent.DisplayName = displayName.(string)
+	service.AttachLocation(gpsEvent)
 
 	return gpsEvent
 }

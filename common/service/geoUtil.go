@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"os"
 
 	"math"
 	"reflect"
@@ -19,7 +20,7 @@ const DISTANCE_FROM_CITY = 10
 
 var geofences = make(map[string][]Geofence)
 
-var mongoUri = "mongodb://localhost:27017"
+var mongoUri = os.Getenv("MONGO_URI")
 
 func init() {
 	if mongoUri == "" {
@@ -31,7 +32,7 @@ func init() {
 	if err != nil {
 		return
 	}
-	iotDatabase := client.Database("gps")
+	iotDatabase := client.Database("iot")
 	geoColl := iotDatabase.Collection("geofences")
 	coscoGeo, err := queryGeofences(geoColl, map[string]interface{}{
 		"carrier":   "COSCO",
@@ -87,9 +88,35 @@ func isPointInPolygon(point [2]float64, polyCornersTmp []interface{}) bool {
 	for i = 0; i < len(polyCorners); i++ {
 		polyCornersItemCurrent := []interface{}(polyCorners[i].(primitive.A))
 		polyCornersItemBefore := []interface{}(polyCorners[j].(primitive.A))
-		if polyCornersItemCurrent[1].(float64) < point[1] && polyCornersItemBefore[1].(float64) >= point[1] ||
-			polyCornersItemBefore[1].(float64) < point[1] && polyCornersItemCurrent[1].(float64) >= point[1] {
-			if polyCornersItemCurrent[0].(float64)+(point[1]-polyCornersItemCurrent[1].(float64))/(polyCornersItemBefore[1].(float64)-polyCornersItemCurrent[1].(float64))*(polyCornersItemBefore[0].(float64)-polyCornersItemCurrent[0].(float64)) < point[0] {
+		polyCornersItemCurrentArr := []float64{}
+		polyCornersItemBeforeArr := []float64{}
+		if reflect.TypeOf(polyCornersItemBefore[0]).Name() == "int32" {
+			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, float64(polyCornersItemBefore[0].(int32)))
+		}
+		if reflect.TypeOf(polyCornersItemCurrent[0]).Name() == "float64" {
+			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, polyCornersItemCurrent[0].(float64))
+		}
+		if reflect.TypeOf(polyCornersItemBefore[1]).Name() == "int32" {
+			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, float64(polyCornersItemBefore[1].(int32)))
+		}
+		if reflect.TypeOf(polyCornersItemCurrent[1]).Name() == "float64" {
+			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, polyCornersItemCurrent[1].(float64))
+		}
+		if reflect.TypeOf(polyCornersItemBefore[0]).Name() == "float64" {
+			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, polyCornersItemBefore[0].(float64))
+		}
+		if reflect.TypeOf(polyCornersItemCurrent[0]).Name() == "int32" {
+			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, float64(polyCornersItemCurrent[0].(int32)))
+		}
+		if reflect.TypeOf(polyCornersItemBefore[1]).Name() == "float64" {
+			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, polyCornersItemBefore[1].(float64))
+		}
+		if reflect.TypeOf(polyCornersItemCurrent[1]).Name() == "int32" {
+			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, float64(polyCornersItemCurrent[1].(int32)))
+		}
+		if polyCornersItemCurrentArr[1] < point[1] && polyCornersItemBeforeArr[1] >= point[1] ||
+			polyCornersItemBeforeArr[1] < point[1] && polyCornersItemCurrentArr[1] >= point[1] {
+			if polyCornersItemCurrentArr[0]+(point[1]-polyCornersItemCurrentArr[1])/(polyCornersItemBeforeArr[1]-polyCornersItemCurrentArr[1])*(polyCornersItemBeforeArr[0]-polyCornersItemCurrentArr[0]) < point[0] {
 				oddNodes = !oddNodes
 			}
 		}
@@ -132,7 +159,8 @@ func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
 				result = geo
 				return result
 			}
-		} else {
+		}
+		if geo.GeoType == "polygon" {
 			if geo.Coords.Coordinates != nil {
 				var inPolygon = isPointInPolygon([2]float64{lon, lat}, []interface{}(geo.Coords.Coordinates.(primitive.A)))
 				if inPolygon {
@@ -171,15 +199,15 @@ func searchFromOceanPolygon(lat float64, lon float64) Geofence {
 	return result
 }
 
-func AttachLocation(gpsevent entity.GpsEvent) entity.GpsEvent {
+func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 	var location interface{}
 	lat, err := strconv.ParseFloat(gpsevent.Lat, 64)
 	if err != nil {
-		return entity.GpsEvent{}
+		return nil
 	}
 	lon, err := strconv.ParseFloat(gpsevent.Lng, 64)
 	if err != nil {
-		return entity.GpsEvent{}
+		return nil
 	}
 	if gpsevent.Carrier == "COSU" {
 		location = getLocationByLatLon(lat, lon, "COSCO")

@@ -21,7 +21,7 @@ func TestGeoUtil(t *testing.T) {
 		Carrier: "COSU",
 	}
 	// test()
-	gps := AttachLocation(gpsEvents)
+	gps := AttachLocation(&gpsEvents)
 	// result := getLocationByLatLon(22.904, 113.074, "COSCO")
 	fmt.Println(gps)
 }
