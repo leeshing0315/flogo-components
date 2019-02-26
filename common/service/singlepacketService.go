@@ -1,4 +1,4 @@
-package entity
+package service
 
 import (
 	"encoding/binary"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/leeshing0315/flogo-components/common/entity"
 	"github.com/leeshing0315/flogo-components/common/util"
 )
 
@@ -58,133 +59,8 @@ var BitMask = []byte{
 	Bit7Mask,
 }
 
-type SinglePacket struct {
-	PositioningModuleFailure   bool
-	SerialCommunicationFailure bool
-	CommunicationModuleFailure bool
-	PowerSupplyFailure         bool
-	BatteryChargingFailure     bool
-	ClockModuleFailure         bool
-	ColdBoxFaultCodeChange     bool
-	ColdBoxOperationModeChange bool
-	PowerSupplyStatusChange    bool
-
-	Positioning                      bool
-	LatitudeNorthSouth               bool
-	LongitudeEastWest                bool
-	UseGpsSatellitesForPositioning   bool
-	UseBeidouSatelliteForPositioning bool
-	SupplyByBatteryOrPower           bool
-	InThePolygonArea                 bool
-	PositioningModuleStatus          bool
-	SerialCommunicationStatus        bool
-	CommunicationModuleStatus        bool
-	PowerSupplyStatus                bool
-	BatteryChargingStatus            bool
-	ClockModuleStatus                bool
-	TimedUploadData                  bool
-
-	Date      string
-	Lat       string
-	Lng       string
-	Speed     string
-	Direction string
-	BatLevel  string
-
-	LoginItem              LoginItem
-	InfoItem               InfoItem
-	DebugTextItem          DebugTextItem
-	NumberOfSatellitesItem NumberOfSatellitesItem
-	OpModeItem             OpModeItem
-	FaultCodeItem          FaultCodeItem
-	ColdBoxTimeItem        ColdBoxTimeItem
-}
-
-type LoginItem struct {
-	Pin             string
-	DeviceID        string
-	ContainerNumber string
-	ReeferType      string
-}
-
-type InfoItem struct {
-	ReeferType     string
-	OpModeValid    bool
-	OpMode         string
-	SetTemValid    bool
-	SetTem         string
-	SupTemValid    bool
-	SupTem         string
-	RetTemValid    bool
-	RetTem         string
-	HumValid       bool
-	Hum            string
-	HptValid       bool
-	Hpt            string
-	Usda1Valid     bool
-	Usda1          string
-	Usda2Valid     bool
-	Usda2          string
-	Usda3Valid     bool
-	Usda3          string
-	CtlTypeValid   bool
-	CtlType        string
-	LptValid       bool
-	Lpt            string
-	PtValid        bool
-	Pt             string
-	Ct1Valid       bool
-	Ct1            string
-	Ct2Valid       bool
-	Ct2            string
-	AmbsValid      bool
-	Ambs           string
-	EisValid       bool
-	Eis            string
-	EosValid       bool
-	Eos            string
-	DchsValid      bool
-	Dchs           string
-	SgsValid       bool
-	Sgs            string
-	SmvValid       bool
-	Smv            string
-	EvValid        bool
-	Ev             string
-	DssValid       bool
-	Dss            string
-	DrsValid       bool
-	Drs            string
-	HsValid        bool
-	Hs             string
-	FaultCodeValid bool
-	FaultCode      string
-}
-
-type DebugTextItem struct {
-	DebugText string
-}
-
-type NumberOfSatellitesItem struct {
-	GpsSatelliteNumber    string
-	BeidouSatelliteNumber string
-}
-
-type OpModeItem struct {
-	OpMode string
-}
-
-type FaultCodeItem struct {
-	FaultCode string
-}
-
-type ColdBoxTimeItem struct {
-	CntrTime           string
-	CollectColdBoxTime string
-}
-
-func ParseToSinglePacket(data []byte) *SinglePacket {
-	singlePacket := &SinglePacket{}
+func ParseToSinglePacket(data []byte) *entity.SinglePacket {
+	singlePacket := &entity.SinglePacket{}
 
 	handleLocationBasicInformation(data[0:23], singlePacket)
 	handleAdditionalInformationItems(data[23:], singlePacket)
@@ -192,14 +68,14 @@ func ParseToSinglePacket(data []byte) *SinglePacket {
 	return singlePacket
 }
 
-func handleLocationBasicInformation(data []byte, singlePacket *SinglePacket) {
+func handleLocationBasicInformation(data []byte, singlePacket *entity.SinglePacket) {
 	handleTriggerEvent(data[0:2], singlePacket)
 	handleStatus(data[2:4], singlePacket)
 	handleDate(data[4:10], singlePacket)
 	handleRemainingInfo(data, singlePacket)
 }
 
-func handleTriggerEvent(data []byte, singlePacket *SinglePacket) {
+func handleTriggerEvent(data []byte, singlePacket *entity.SinglePacket) {
 	positioningModuleFailure := data[0] & positioningModuleFailureMask
 	if positioningModuleFailure == positioningModuleFailureMask {
 		singlePacket.PositioningModuleFailure = true
@@ -246,7 +122,7 @@ func handleTriggerEvent(data []byte, singlePacket *SinglePacket) {
 	}
 }
 
-func handleStatus(data []byte, singlePacket *SinglePacket) {
+func handleStatus(data []byte, singlePacket *entity.SinglePacket) {
 	positioning := data[0] & positioningMask
 	if positioning == positioningMask {
 		singlePacket.Positioning = true
@@ -318,11 +194,11 @@ func handleStatus(data []byte, singlePacket *SinglePacket) {
 	}
 }
 
-func handleDate(data []byte, singlePacket *SinglePacket) {
+func handleDate(data []byte, singlePacket *entity.SinglePacket) {
 	singlePacket.Date = util.ParseDateStrFromBCD6(data)
 }
 
-func handleRemainingInfo(data []byte, singlePacket *SinglePacket) {
+func handleRemainingInfo(data []byte, singlePacket *entity.SinglePacket) {
 	singlePacket.Lat = strconv.FormatFloat(float64(binary.BigEndian.Uint32(data[10:14]))/math.Pow10(6), 'f', 6, 64)
 	singlePacket.Lng = strconv.FormatFloat(float64(binary.BigEndian.Uint32(data[14:18]))/math.Pow10(6), 'f', 6, 64)
 	singlePacket.Speed = strconv.FormatFloat(float64(binary.BigEndian.Uint16(data[18:20]))/10, 'f', 1, 64)
@@ -330,7 +206,7 @@ func handleRemainingInfo(data []byte, singlePacket *SinglePacket) {
 	singlePacket.BatLevel = strconv.FormatUint(uint64(data[22]), 10)
 }
 
-func handleAdditionalInformationItems(data []byte, singlePacket *SinglePacket) {
+func handleAdditionalInformationItems(data []byte, singlePacket *entity.SinglePacket) {
 	items := splitItems(data)
 	for _, item := range items {
 		switch item[0] {
@@ -365,9 +241,9 @@ func splitItems(data []byte) [][]byte {
 	return items
 }
 
-func handleLoginItem(item []byte, singlePacket *SinglePacket) {
+func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegment := item[2:]
-	loginItem := LoginItem{}
+	loginItem := entity.LoginItem{}
 
 	loginItem.Pin = string(dataSegment[0:15])
 	loginItem.DeviceID = string(dataSegment[15:21])
@@ -377,10 +253,10 @@ func handleLoginItem(item []byte, singlePacket *SinglePacket) {
 	singlePacket.LoginItem = loginItem
 }
 
-func handleInfoItem(item []byte, singlePacket *SinglePacket) {
+func handleInfoItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegmentLen := item[1]
 	dataSegment := item[2:]
-	infoItem := InfoItem{}
+	infoItem := entity.InfoItem{}
 
 	// VALIDSTATE: 4byte 下面冷箱数据段有效位 0：无效  1：有效，bit0对应OP_MODE……bit24对应FAULT_CODE  现在有25个数据段
 	validState := dataSegment[1:5]
@@ -509,18 +385,18 @@ func isValid(validState []byte, number int) bool {
 	return (validState[len(validState)-1-index] & BitMask[offset]) == BitMask[offset]
 }
 
-func handleDebugTextItem(item []byte, singlePacket *SinglePacket) {
+func handleDebugTextItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegment := item[2:]
-	debugTextItem := DebugTextItem{}
+	debugTextItem := entity.DebugTextItem{}
 
-	debugTextItem.debugText = string(dataSegment)
+	debugTextItem.DebugText = string(dataSegment)
 
 	singlePacket.DebugTextItem = debugTextItem
 }
 
-func handleNumberOfSatellitesItem(item []byte, singlePacket *SinglePacket) {
+func handleNumberOfSatellitesItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegment := item[2:]
-	numberOfSatellitesItem := NumberOfSatellitesItem{}
+	numberOfSatellitesItem := entity.NumberOfSatellitesItem{}
 
 	numberOfSatellitesItem.GpsSatelliteNumber = strconv.FormatUint(uint64(dataSegment[0]), 10)
 	numberOfSatellitesItem.BeidouSatelliteNumber = strconv.FormatUint(uint64(dataSegment[1]), 10)
@@ -528,19 +404,19 @@ func handleNumberOfSatellitesItem(item []byte, singlePacket *SinglePacket) {
 	singlePacket.NumberOfSatellitesItem = numberOfSatellitesItem
 }
 
-func handleOpModeItem(item []byte, singlePacket *SinglePacket) {
+func handleOpModeItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegment := item[2:]
-	opModeItem := OpModeItem{}
+	opModeItem := entity.OpModeItem{}
 
 	opModeItem.OpMode = opModeMapping[dataSegment[0]]
 
 	singlePacket.OpModeItem = opModeItem
 }
 
-func handleFaultCodeItem(item []byte, singlePacket *SinglePacket) {
+func handleFaultCodeItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegmentLen := item[1]
 	dataSegment := item[2:]
-	faultCodeItem := FaultCodeItem{}
+	faultCodeItem := entity.FaultCodeItem{}
 
 	faultCodes := make([]string, dataSegmentLen)
 	for _, faultCode := range dataSegment {
@@ -551,9 +427,9 @@ func handleFaultCodeItem(item []byte, singlePacket *SinglePacket) {
 	singlePacket.FaultCodeItem = faultCodeItem
 }
 
-func handleColdBoxTimeItem(item []byte, singlePacket *SinglePacket) {
+func handleColdBoxTimeItem(item []byte, singlePacket *entity.SinglePacket) {
 	dataSegment := item[2:]
-	coldBoxTimeItem := ColdBoxTimeItem{}
+	coldBoxTimeItem := entity.ColdBoxTimeItem{}
 
 	coldBoxTimeItem.CntrTime = util.ParseDateStrFromBCD6(dataSegment[0:6])
 	coldBoxTimeItem.CollectColdBoxTime = util.ParseDateStrFromBCD6(dataSegment[6:12])
