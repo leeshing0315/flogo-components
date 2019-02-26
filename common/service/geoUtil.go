@@ -1,4 +1,4 @@
-package util
+package service
 
 import (
 	"math"
@@ -102,41 +102,41 @@ func searchFromOceanPolygon(lat float64, lon float64) Geofence {
 	return result
 }
 
-func AttachLocation (lat float64, lon float64, gpsevent entity.GpsEvent) entity.GpsEvent {
+func AttachLocation(lat float64, lon float64, gpsevent entity.GpsEvent) entity.GpsEvent {
 	var location interface{}
-	if (gpsevent.Carrier == "COSU") {
-		location = getLocationByLatLon(lat, lon, "COSCO");
+	if gpsevent.Carrier == "COSU" {
+		location = getLocationByLatLon(lat, lon, "COSCO")
 	} else {
-		location = getLocationByLatLon(lat, lon, gpsevent.Carrier.(string));
+		location = getLocationByLatLon(lat, lon, gpsevent.Carrier.(string))
 	}
-	if (location != nil) {
+	if location != nil {
 		//typeName := reflect.TypeOf(location).String()
 		_, ok := location.(crg.Result)
-		if (ok) {
+		if ok {
 			tmpLocation := location.(crg.Result)
 			gpsevent.Address = entity.GpsEventAddress{
-				Distance: tmpLocation.Distance,
-				City: tmpLocation.City,
-				RegionCode: tmpLocation.Region_code,
-				Region: tmpLocation.Region,
+				Distance:    tmpLocation.Distance,
+				City:        tmpLocation.City,
+				RegionCode:  tmpLocation.Region_code,
+				Region:      tmpLocation.Region,
 				CountryCode: tmpLocation.Country_code,
-				Country: tmpLocation.Country,
+				Country:     tmpLocation.Country,
 			}
-			if (tmpLocation.City != "" && tmpLocation.Region != "" && tmpLocation.Country != "") {
+			if tmpLocation.City != "" && tmpLocation.Region != "" && tmpLocation.Country != "" {
 				gpsevent.DisplayName = tmpLocation.City + ", " + tmpLocation.Region + ", " + tmpLocation.Country
 			} else {
 				gpsevent.DisplayName = ""
 			}
 		}
 		_, ok = location.(Geofence)
-		if (ok) {
+		if ok {
 			tmpLocation := location.(Geofence)
 			gpsevent.Address = entity.GpsEventAddress{city: tmpLocation.geoCity, country: tmpLocation.geoCountry, name: tmpLocation.geoName, code: tmpLocation.geoCode}
 			gpsevent.DisplayName = tmpLocation.geoName
-			if (tmpLocation.geoCity != "") {
+			if tmpLocation.geoCity != "" {
 				gpsevent.DisplayName = gpsevent.DisplayName.string() + ", " + tmpLocation.geoCity
 			}
-			if (tmpLocation.geoCountry != "") {
+			if tmpLocation.geoCountry != "" {
 				gpsevent.DisplayName = gpsevent.DisplayName.string() + ", " + tmpLocation.geoCountry
 			}
 		}
