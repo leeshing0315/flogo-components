@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/leeshing0315/flogo-components/common/service"
-
 	crg "github.com/leeshing0315/go-city-reverse-geocoder"
 )
 
@@ -78,8 +76,8 @@ type GpsEventAddress struct {
 	Longitude float64
 	Latitude  float64
 
-	Code 		string `json:"code"`
-	Name		string `json:"name"`
+	Code        string `json:"code"`
+	Name        string `json:"name"`
 	City        string `json:"city"`
 	RegionCode  string `json:"region_code"`
 	Region      string `json:"region"`
@@ -134,7 +132,7 @@ func GenGpsEventFromSinglePacket(singlePacket *SinglePacket, seqNo string, cntrN
 	// address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
 	// gpsEvent.Address = address
 	// gpsEvent.DisplayName = displayName.(string)
-	service.AttachLocation(gpsEvent)
+	// service.AttachLocation(gpsEvent)
 
 	return gpsEvent
 }
