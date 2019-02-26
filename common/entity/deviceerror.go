@@ -2,6 +2,7 @@ package entity
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 )
 
@@ -61,7 +62,7 @@ func genCommonDeviceError(singlePacket *SinglePacket, seqNo string, devId string
 	deviceError := &DeviceError{}
 
 	deviceError.Devid = devId
-	deviceError.Logtime = singlePacket.Date
+	deviceError.Logtime = changeDateFormatFromECMA(singlePacket.Date)
 	deviceError.Revtime = time.Now().Format("2006-01-02 15:04:05.0")
 	deviceError.Seqno = seqNo
 	deviceError.TableName = "Tbldevicefault"
@@ -75,4 +76,8 @@ func ternaryOperator(b bool, trueVal string, falseVal string) string {
 	} else {
 		return falseVal
 	}
+}
+
+func changeDateFormatFromECMA(input string) string {
+	return strings.Replace(strings.Replace(input, "T", " ", 1), "+08:00", ".0", 1)
 }

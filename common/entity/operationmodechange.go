@@ -16,7 +16,7 @@ func GenOpModeChangeFromSinglePacket(singlePacket *SinglePacket, seqNo string, c
 		operationModeChange := &OperationModeChange{}
 
 		operationModeChange.Seqno = seqNo
-		operationModeChange.Logtime = singlePacket.Date
+		operationModeChange.Logtime = changeDateFormatFromECMA(singlePacket.Date)
 		operationModeChange.Revtime = time.Now().Format("2006-01-02 15:04:05.0")
 		operationModeChange.Cntrnum = cntrNum
 		operationModeChange.Opmode = singlePacket.InfoItem.OpMode
