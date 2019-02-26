@@ -69,7 +69,7 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	// address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
 	// gpsEvent.Address = address
 	// gpsEvent.DisplayName = displayName.(string)
-	// service.AttachLocation(gpsEvent)
+	AttachLocation(gpsEvent)
 
 	return gpsEvent
 }
