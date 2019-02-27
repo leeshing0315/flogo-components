@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/mongodb/mongo-go-driver/bson/primitive"
-	"github.com/mongodb/mongo-go-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -41,7 +42,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	// do eval
-	client, err := mongo.Connect(context.Background(), uri, nil)
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	defer client.Disconnect(context.Background())
 	if err != nil {
 		log.Printf("Connection error: %v", err)

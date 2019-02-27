@@ -10,9 +10,10 @@ import (
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
-	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/primitive"
-	"github.com/mongodb/mongo-go-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ActivityLog is the default logger for the Log Activity
@@ -82,7 +83,7 @@ func (a *MongoDbActivity) Eval(ctx activity.Context) (done bool, err error) {
 		a.clientGetterLock.Lock()
 		client = a.mongoClient
 		if client == nil {
-			client, err = mongo.Connect(context.Background(), connectionURI, nil)
+			client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(connectionURI))
 			if err != nil {
 				activityLog.Errorf("Connection error: %v", err)
 				a.clientGetterLock.Unlock()
