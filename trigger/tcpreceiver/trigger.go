@@ -87,6 +87,7 @@ func (t *MyTrigger) Start() error {
 				dataAttr, ok := results["resDataSegment"]
 				setCommandAttr, _ := results["setCommandSegment"]
 				readCommandAttr, _ := results["readCommandSegment"]
+				upgradeAttr, _ := results["upgradeSegment"]
 				cntrNumAttr, _ := results["cntrNum"]
 				devIdAttr, _ := results["devId"]
 				pinAttr, _ := results["pin"]
@@ -118,7 +119,7 @@ func (t *MyTrigger) Start() error {
 						commandSeqAttr, _ := results["setCommandSeqNo"]
 						commandSeqNo := commandSeqAttr.Value().(string)
 						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(uint16(commandSeqNoUint), writer, setCommand)
+						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, setCommand)
 						if err != nil {
 							return err
 						}
@@ -131,7 +132,20 @@ func (t *MyTrigger) Start() error {
 						commandSeqAttr, _ := results["readCommandSeqNo"]
 						commandSeqNo := commandSeqAttr.Value().(string)
 						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(uint16(commandSeqNoUint), writer, readCommand)
+						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, readCommand)
+						if err != nil {
+							return err
+						}
+					}
+				}
+
+				if upgradeAttr.Value() != nil {
+					upgradeCommand := upgradeAttr.Value().([]byte)
+					if len(upgradeCommand) != 0 {
+						commandSeqAttr, _ := results["upgradeSeqNo"]
+						commandSeqNo := commandSeqAttr.Value().(string)
+						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
+						err := sendCommandToDevice(0x33, uint16(commandSeqNoUint), writer, upgradeCommand)
 						if err != nil {
 							return err
 						}
@@ -173,9 +187,9 @@ func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) 
 	return nil
 }
 
-func sendCommandToDevice(seqNo uint16, writer *bufio.Writer, dataSegment []byte) error {
+func sendCommandToDevice(cmdValue int, seqNo uint16, writer *bufio.Writer, dataSegment []byte) error {
 	content := make([]byte, len(dataSegment)+7)
-	content[0] = 0x34
+	content[0] = byte(cmdValue)
 	binary.BigEndian.PutUint16(content[1:3], seqNo)
 	binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
 	copy(content[5:5+len(dataSegment)], dataSegment)

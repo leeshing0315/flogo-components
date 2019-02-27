@@ -1,0 +1,25 @@
+{
+  "name": "smudistributefile",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU DistributeFile",
+  "inputs":[
+    {
+      "name": "firmwareVersion",
+      "type": "string"
+    },
+    {
+      "name": "serialNumber",
+      "type": "integer"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "upgradeSegment",
+      "type": "array"
+    }
+  ]
+}
