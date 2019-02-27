@@ -18,7 +18,7 @@ import (
 const EARTH_RADIAS = 6378137
 const DISTANCE_FROM_CITY = 10
 
-var geofences = make(map[string][]Geofence)
+var geofences = make(map[string][]map[string]interface{})
 
 var mongoUri = os.Getenv("MONGO_URI")
 
@@ -63,14 +63,14 @@ func init() {
 	geofences["OCEAN"] = oceanGeo
 }
 
-func queryGeofences(geoColl *mongo.Collection, condition map[string]interface{}) ([]Geofence, error) {
+func queryGeofences(geoColl *mongo.Collection, condition map[string]interface{}) ([]map[string]interface{}, error) {
 	cur, err := geoColl.Find(context.Background(), condition)
 	if err != nil {
 		return nil, err
 	}
-	var result []Geofence
+	var result []map[string]interface{}
 	for cur.Next(context.Background()) {
-		var elem Geofence
+		var elem map[string]interface{}
 		// elem := Geofence{}
 		if decodeErr := cur.Decode(&elem); decodeErr != nil {
 			return nil, err
@@ -80,7 +80,7 @@ func queryGeofences(geoColl *mongo.Collection, condition map[string]interface{})
 	return result, nil
 }
 
-func isPointInPolygon(point [2]float64, polyCornersTmp []interface{}) bool {
+func isPointInPolygon(point []float64, polyCornersTmp []interface{}) bool {
 	var i int
 	polyCorners := []interface{}(polyCornersTmp[0].(primitive.A))
 	var j = len(polyCorners) - 1
@@ -125,7 +125,7 @@ func isPointInPolygon(point [2]float64, polyCornersTmp []interface{}) bool {
 	return oddNodes
 }
 
-func calculateDistance(point1 [2]float64, point2 [2]float64) float64 {
+func calculateDistance(point1 []float64, point2 []float64) float64 {
 	var radLat1 = point1[0] * math.Pi / 180.0
 	var radLat2 = point2[0] * math.Pi / 180.0
 	var a = radLat1 - radLat2
@@ -152,17 +152,26 @@ func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
 	var result interface{}
 	for i := 0; i < len(geofences[carrier]); i++ {
 		geo := geofences[carrier][i]
-		if geo.GeoType == "circle" {
-			var tmp [2]float64 = geo.Coords.Coordinates.([2]float64)
-			distance := calculateDistance(tmp, [2]float64{lon, lat})
-			if distance <= geo.RadiusInMetre.(float64) {
+		if geo["geoType"] == "circle" {
+			var tmp = []interface{}((geo["coords"]).(map[string]interface{})["coordinates"].(primitive.A))
+			var point []float64
+			for j := 0;j < len(tmp); j++ {
+				point = append(point, tmp[j].(float64))
+			}
+			distance := calculateDistance(point, []float64{lon, lat})
+			radiusInMetre, ok := geo["radiusInMetre"].(float64)
+			if !ok {
+				continue
+			}
+			if distance <= radiusInMetre {
 				result = geo
 				return result
 			}
 		}
-		if geo.GeoType == "polygon" {
-			if geo.Coords.Coordinates != nil {
-				var inPolygon = isPointInPolygon([2]float64{lon, lat}, []interface{}(geo.Coords.Coordinates.(primitive.A)))
+		if geo["geoType"] == "polygon" {
+			coordinates := geo["coords"].(map[string]interface{})["coordinates"]
+			if coordinates != nil {
+				var inPolygon = isPointInPolygon([]float64{lon, lat}, []interface{}(coordinates.(primitive.A)))
 				if inPolygon {
 					result = geo
 					return result
@@ -173,7 +182,7 @@ func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
 	var location, error = crg.GetNearestCities(lat, lon, 1, "mi")
 	if location[0].Distance > DISTANCE_FROM_CITY || error != nil {
 		var oceanResult = searchFromOceanPolygon(lat, lon)
-		if reflect.ValueOf(oceanResult).IsValid() && oceanResult.GeoName != nil {
+		if reflect.ValueOf(oceanResult).IsValid() && oceanResult["geoName"] != "" {
 			result = oceanResult
 		} else {
 			result = location[0]
@@ -184,12 +193,13 @@ func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
 	return result
 }
 
-func searchFromOceanPolygon(lat float64, lon float64) Geofence {
-	var result Geofence
+func searchFromOceanPolygon(lat float64, lon float64) map[string]interface{} {
+	var result map[string]interface{}
 	for i := 0; i < len(geofences["OCEAN"]); i++ {
 		geo := geofences["OCEAN"][i]
-		if geo.Coords.Coordinates != nil {
-			var inPolygon = isPointInPolygon([2]float64{lon, lat}, []interface{}(geo.Coords.Coordinates.(primitive.A)))
+		coordinates := (geo["coords"]).(map[string]interface{})["coordinates"]
+		if coordinates != nil {
+			var inPolygon = isPointInPolygon([]float64{lon, lat}, []interface{}(coordinates.(primitive.A)))
 			if inPolygon {
 				result = geo
 				return result
@@ -232,19 +242,29 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 				gpsevent.DisplayName = ""
 			}
 		}
-		_, ok = location.(Geofence)
+		_, ok = location.(map[string]interface{})
 		if ok {
-			tmpLocation := location.(Geofence)
-			if tmpLocation.GeoCity == nil && tmpLocation.GeoCountry == nil && tmpLocation.GeoName == nil {
+			tmpLocation := location.(map[string]interface{})
+			if tmpLocation["geoCity"] == nil && tmpLocation["geoCountry"] == nil && tmpLocation["geoName"] == nil {
 				return gpsevent
 			}
-			gpsevent.Address = entity.GpsEventAddress{City: tmpLocation.GeoCity.(string), Country: tmpLocation.GeoCountry.(string), Name: tmpLocation.GeoName.(string), Code: tmpLocation.GeoCode.(string)}
-			gpsevent.DisplayName = tmpLocation.GeoName.(string)
-			if tmpLocation.GeoCity != nil {
-				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation.GeoCity.(string)
+			gpsevent.Address = entity.GpsEventAddress{}
+			gpsevent.Address.Name = tmpLocation["geoName"].(string)
+			if (tmpLocation["geoCity"] != nil) {
+				gpsevent.Address.City = tmpLocation["geoCity"].(string)
 			}
-			if tmpLocation.GeoCountry != nil {
-				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation.GeoCountry.(string)
+			if (tmpLocation["geoCountry"] != nil) {
+				gpsevent.Address.Country = tmpLocation["geoCountry"].(string)
+			}
+			if (tmpLocation["geoCode"] != nil) {
+				gpsevent.Address.Code = tmpLocation["geoCode"].(string)
+			}
+			gpsevent.DisplayName = tmpLocation["geoName"].(string)
+			if tmpLocation["geoCity"] != nil {
+				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation["geoCity"].(string)
+			}
+			if tmpLocation["geoCountry"] != nil {
+				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation["geoCountry"].(string)
 			}
 		}
 		return gpsevent
@@ -257,7 +277,7 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 // //func main() {
 // //	var coord = Coords{
 // //		Type: "Polygon",
-// //		coordinates: [][][2]float64{
+// //		coordinates: [][][]float64{
 // //			{
 // //				{113.078, 22.905},
 // //				{113.079, 22.903},
@@ -269,7 +289,7 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 // //	}
 // //	var coord2 = Coords{
 // //		Type: "Polygon",
-// //		coordinates: [][][2]float64{
+// //		coordinates: [][][]float64{
 // //			{
 // //				{113.074, 22.905},
 // //				{113.073, 22.903},
@@ -309,8 +329,8 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 // //	fmt.Println(result, "result");
 // //	print(reflect.TypeOf(result).String() == "[]geocoder.Result")
 // //	//print(reflect.ValueOf(result).String())
-// //	//geofences2 :=[][2]float64{{113.074, 22.905},{113.073, 22.903},{113.076, 22.902},{113.077, 22.903},{113.074, 22.905}}
-// //	//var result = isPointInPolygon ([2]float64{113.074, 22.904}, geofences2)
+// //	//geofences2 :=[][]float64{{113.074, 22.905},{113.073, 22.903},{113.076, 22.902},{113.077, 22.903},{113.074, 22.905}}
+// //	//var result = isPointInPolygon ([]float64{113.074, 22.904}, geofences2)
 // //	//print(result)
 // //	//t.is(result, 1113.1949)
 // //}
@@ -321,20 +341,20 @@ type Coords struct {
 }
 
 type Geofence struct {
-	GeoId         interface{} `json:"geoId"`
-	GeoName       interface{} `json:"geoName"`
+	GeoId         string `json:"geoId"`
+	GeoName       string `json:"geoName"`
 	Coords        Coords
-	IsDeleted     interface{} `json:"isDeleted"`
+	IsDeleted     string `json:"isDeleted"`
 	CreatedAt     interface{} `json:"createdAt"`
-	GeoCode       interface{} `json:"geoCode"`
-	GeoLocType    interface{} `json:"geoLocType"`
-	IsDisabled    bool        `json:"isDisabled"`
-	RadiusInMetre interface{} `json:"radiusInMetre"`
-	GeoCity       interface{} `json:"geoCity"`
-	Source        interface{} `json:"source"`
-	Carrier       interface{} `json:"carrier"`
-	GeoCountry    interface{} `json:"geoCountry"`
-	GeoType       interface{} `json:"geoType"`
+	GeoCode       string `json:"geoCode"`
+	GeoLocType    string `json:"geoLocType"`
+	IsDisabled    bool   `json:"isDisabled"`
+	RadiusInMetre string `json:"radiusInMetre"`
+	GeoCity       string `json:"geoCity"`
+	Source        string `json:"source"`
+	Carrier       string `json:"carrier"`
+	GeoCountry    string `json:"geoCountry"`
+	GeoType       string `json:"geoType"`
 }
 
 type Location struct {
