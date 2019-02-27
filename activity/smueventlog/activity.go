@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/leeshing0315/flogo-components/common/entity"
+	"github.com/leeshing0315/flogo-components/common/service"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -36,7 +36,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	packets := splitPackets(reqDataSegment)
 	for _, dataSegment := range packets {
-		eventLog := entity.ParseToEventLog(dataSegment, time.Now(), cntrNum, seqNo)
+		eventLog := service.ParseToEventLog(dataSegment, time.Now(), cntrNum, seqNo)
 		if eventLog == nil {
 			break
 		}
@@ -45,7 +45,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			break
 		}
 
-		gpsEvent := entity.ConvertEventLogToGPSEvent(eventLog)
+		gpsEvent := service.ConvertEventLogToGPSEvent(eventLog)
 		gpsEventBytes, err := json.Marshal(gpsEvent)
 		if err != nil {
 			break

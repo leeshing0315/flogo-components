@@ -6,6 +6,7 @@ import (
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/leeshing0315/flogo-components/common/entity"
+	"github.com/leeshing0315/flogo-components/common/service"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -54,7 +55,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			}
 		}
 		if len(setCmdVal) > 0 {
-			setCommand, err := entity.GenSetConfigCommand(setCmdVal)
+			setCommand, err := service.GenSetConfigCommand(setCmdVal)
 			if err != nil {
 				return false, err
 			}

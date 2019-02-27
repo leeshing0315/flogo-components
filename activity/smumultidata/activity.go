@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/leeshing0315/flogo-components/common/entity"
+	"github.com/leeshing0315/flogo-components/common/service"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -41,7 +41,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	packets := splitPackets(reqDataSegment)
 	for _, dateSegment := range packets {
-		singlePacket := entity.ParseToSinglePacket(dateSegment)
+		singlePacket := service.ParseToSinglePacket(dateSegment)
 		if singlePacket.LoginItem.ContainerNumber != "" {
 			cntrNum = singlePacket.LoginItem.ContainerNumber
 			autoReg = "true"
@@ -51,17 +51,17 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			autoReg = "true"
 		}
 
-		gpsEvent := entity.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
+		gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
 		gpsEventBytes, _ := json.Marshal(gpsEvent)
 		gpsEventStrs = append(gpsEventStrs, string(gpsEventBytes))
 
-		opModeChange := entity.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
+		opModeChange := service.GenOpModeChangeFromSinglePacket(singlePacket, seqNo, cntrNum)
 		if opModeChange != nil {
 			opModeChangeBytes, _ := json.Marshal(opModeChange)
 			opModeChangeStrs = append(opModeChangeStrs, string(opModeChangeBytes))
 		}
 
-		deviceErrors := entity.GenDeviceErrorsFromSinglePacket(singlePacket, seqNo, devId)
+		deviceErrors := service.GenDeviceErrorsFromSinglePacket(singlePacket, seqNo, devId)
 		for _, val := range deviceErrors {
 			deviceErrorsStrs = append(deviceErrorsStrs, val)
 		}
