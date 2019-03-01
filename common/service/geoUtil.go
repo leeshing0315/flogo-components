@@ -155,7 +155,7 @@ func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
 		if geo["geoType"] == "circle" {
 			var tmp = []interface{}((geo["coords"]).(map[string]interface{})["coordinates"].(primitive.A))
 			var point []float64
-			for j := 0;j < len(tmp); j++ {
+			for j := 0; j < len(tmp); j++ {
 				point = append(point, tmp[j].(float64))
 			}
 			distance := calculateDistance(point, []float64{lon, lat})
@@ -219,11 +219,7 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 	if err != nil {
 		return nil
 	}
-	if gpsevent.Carrier == "COSU" {
-		location = getLocationByLatLon(lat, lon, "COSCO")
-	} else {
-		location = getLocationByLatLon(lat, lon, gpsevent.Carrier)
-	}
+	location = getLocationByLatLon(lat, lon, "COSCO")
 	if location != nil {
 		_, ok := location.(crg.Result)
 		if ok {
@@ -245,18 +241,17 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 		_, ok = location.(map[string]interface{})
 		if ok {
 			tmpLocation := location.(map[string]interface{})
-			if tmpLocation["geoCity"] == nil && tmpLocation["geoCountry"] == nil && tmpLocation["geoName"] == nil {
-				return gpsevent
-			}
 			gpsevent.Address = entity.GpsEventAddress{}
-			gpsevent.Address.Name = tmpLocation["geoName"].(string)
-			if (tmpLocation["geoCity"] != nil) {
+			if tmpLocation["geoName"] != nil {
+				gpsevent.Address.Name = tmpLocation["geoName"].(string)
+			}
+			if tmpLocation["geoCity"] != nil {
 				gpsevent.Address.City = tmpLocation["geoCity"].(string)
 			}
-			if (tmpLocation["geoCountry"] != nil) {
+			if tmpLocation["geoCountry"] != nil {
 				gpsevent.Address.Country = tmpLocation["geoCountry"].(string)
 			}
-			if (tmpLocation["geoCode"] != nil) {
+			if tmpLocation["geoCode"] != nil {
 				gpsevent.Address.Code = tmpLocation["geoCode"].(string)
 			}
 			gpsevent.DisplayName = tmpLocation["geoName"].(string)
@@ -267,103 +262,30 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation["geoCountry"].(string)
 			}
 		}
-		return gpsevent
 	} else {
 		gpsevent.DisplayName = ""
-		return gpsevent
 	}
-}
+	ooclLocation := getLocationByLatLon(lat, lon, "OOCL")
+	if ooclLocation != nil {
+		_, ok := ooclLocation.(map[string]interface{})
+		if ok {
+			tmpLocation := location.(map[string]interface{})
+			gpsevent.Address.OoclDisplayName = ""
+			if tmpLocation["geoName"] != nil {
+				gpsevent.Address.OoclName = tmpLocation["geoName"].(string)
+				gpsevent.Address.OoclDisplayName = tmpLocation["geoName"].(string)
+			}
+			if tmpLocation["geoCode"] != nil {
+				gpsevent.Address.OoclCode = tmpLocation["geoCode"].(string)
+			}
+			if tmpLocation["geoCity"] != nil {
+				gpsevent.Address.OoclDisplayName = gpsevent.Address.OoclDisplayName + ", " + tmpLocation["geoCity"].(string)
+			}
+			if tmpLocation["geoCountry"] != nil {
+				gpsevent.Address.OoclDisplayName = gpsevent.Address.OoclDisplayName + ", " + tmpLocation["geoCountry"].(string)
+			}
+		}
+	}
 
-// //func main() {
-// //	var coord = Coords{
-// //		Type: "Polygon",
-// //		coordinates: [][][]float64{
-// //			{
-// //				{113.078, 22.905},
-// //				{113.079, 22.903},
-// //				{113.077, 22.902},
-// //				{113.078, 22.903},
-// //				{113.078, 22.905},
-// //			},
-// //		},
-// //	}
-// //	var coord2 = Coords{
-// //		Type: "Polygon",
-// //		coordinates: [][][]float64{
-// //			{
-// //				{113.074, 22.905},
-// //				{113.073, 22.903},
-// //				{113.076, 22.902},
-// //				{113.077, 22.903},
-// //				{113.074, 22.905},
-// //			},
-// //		},
-// //	}
-// //	var tmp1 = Geofence{
-// //		geoId:   "bbd9030d-18a1-4d49-b349-44337d70bb22",
-// //		geoName: "Kerry Intermodal Services",
-// //		geoType: "polygon",
-// //		coords: coord,
-// //		isDeleted:  "F",
-// //		createdAt:  "2017-03-02T09:49:18.007Z",
-// //		geoCode:    "ADL51",
-// //		geoLocType: "Rail Ramp",
-// //		isDisabled: false,
-// //	};
-// //	var tmp2 = Geofence{
-// //		geoId:   "bbd9030d-18a1-4d49-b349-44337d70bb22",
-// //		geoName: "testestestest",
-// //		geoType: "polygon",
-// //		coords: coord2,
-// //		isDeleted:  "F",
-// //		createdAt:  "2017-03-02T09:49:18.007Z",
-// //		geoCode:    "ADL51",
-// //		geoLocType: "Rail Ramp",
-// //		isDisabled: true,
-// //	};
-// //	geofences["COSCO"] = []Geofence{tmp1}
-// //	geofences["OCEAN"] = []Geofence{tmp2}
-// //	//print("asdfasdfsadfasdfasdfs")
-// //	//print(geofences["COSCO"])
-// //	var result = getLocationByLatLon(22.904, 113.074, "COSCO")
-// //	fmt.Println(result, "result");
-// //	print(reflect.TypeOf(result).String() == "[]geocoder.Result")
-// //	//print(reflect.ValueOf(result).String())
-// //	//geofences2 :=[][]float64{{113.074, 22.905},{113.073, 22.903},{113.076, 22.902},{113.077, 22.903},{113.074, 22.905}}
-// //	//var result = isPointInPolygon ([]float64{113.074, 22.904}, geofences2)
-// //	//print(result)
-// //	//t.is(result, 1113.1949)
-// //}
-
-type Coords struct {
-	Type        string      `json:"type"`
-	Coordinates interface{} `json:"coordinates"`
-}
-
-type Geofence struct {
-	GeoId         string `json:"geoId"`
-	GeoName       string `json:"geoName"`
-	Coords        Coords
-	IsDeleted     string `json:"isDeleted"`
-	CreatedAt     interface{} `json:"createdAt"`
-	GeoCode       string `json:"geoCode"`
-	GeoLocType    string `json:"geoLocType"`
-	IsDisabled    bool   `json:"isDisabled"`
-	RadiusInMetre string `json:"radiusInMetre"`
-	GeoCity       string `json:"geoCity"`
-	Source        string `json:"source"`
-	Carrier       string `json:"carrier"`
-	GeoCountry    string `json:"geoCountry"`
-	GeoType       string `json:"geoType"`
-}
-
-type Location struct {
-	country      interface{}
-	country_code interface{}
-	region       interface{}
-	region_code  interface{}
-	city         interface{}
-	latitude     float64
-	longitude    float64
-	distance     float64
+	return gpsevent
 }
