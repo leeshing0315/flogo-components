@@ -32,6 +32,10 @@
     {
       "name": "devId",
       "type": "string"
+    },
+    {
+      "name": "firmwareVersion",
+      "type": "string"
     }
   ],
   "output": [

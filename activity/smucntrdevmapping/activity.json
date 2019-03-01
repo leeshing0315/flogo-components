@@ -10,6 +10,18 @@
     {
       "name": "cntrDevMapping",
       "type": "string"
+    },
+    {
+      "name": "devtype",
+      "type": "string"
+    },
+    {
+      "name": "ip",
+      "type": "string"
+    },
+    {
+      "name": "firmwareVersion",
+      "type": "string"
     }
   ],
   "outputs": [
@@ -23,6 +35,10 @@
     },
     {
       "name": "cntrNum",
+      "type": "string"
+    },
+    {
+      "name": "deviceInfo",
       "type": "string"
     }
   ]

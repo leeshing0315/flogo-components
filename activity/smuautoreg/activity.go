@@ -2,7 +2,6 @@ package smuautoreg
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"time"
 
@@ -35,6 +34,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	pin := ctx.GetInput("pin").(string)
 	cntrNum := ctx.GetInput("cntrNum").(string)
 	devId := ctx.GetInput("devId").(string)
+	firmwareVersion := ctx.GetInput("firmwareVersion").(string)
 
 	// if not autoReg, just pass
 	if autoReg != "true" {
@@ -55,23 +55,18 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	// find old active
 	filter := buildFilter(pin)
-	oldActiveBytes, err := coll.FindOne(context.Background(), filter).DecodeBytes()
-	if err != nil {
-		log.Printf("FindOne error: %v", err)
-		return true, nil
-	}
-	if len(oldActiveBytes) == 0 {
-		return true, nil
-	}
 	oldActive := make(map[string]interface{})
-	err = json.Unmarshal(oldActiveBytes, &oldActive)
+	err = coll.FindOne(context.Background(), filter).Decode(&oldActive)
 	if err != nil {
 		log.Printf("FindOne error: %v", err)
+		return true, nil
+	}
+	if oldActive["pin"] == nil || oldActive["pin"].(string) == "" {
 		return true, nil
 	}
 
 	// if not change, just pass
-	if isNumberNotChanged(oldActive, cntrNum, devId) {
+	if isNumberNotChanged(oldActive, cntrNum, devId, firmwareVersion) {
 		log.Printf("AutoReg not changed")
 		return true, nil
 	}
@@ -87,7 +82,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	// insert new active
-	newActive := buildNewActive(oldActive, cntrNum, devId, cntrDevMappingDateStr)
+	newActive := buildNewActive(oldActive, cntrNum, devId, firmwareVersion, cntrDevMappingDateStr)
 	insertResult, err := coll.InsertOne(context.Background(), newActive)
 	if err != nil {
 		log.Printf("InsertOne error: %v", err)
@@ -122,7 +117,7 @@ func buildUpdate(cntrDevMappingDateStr string) map[string]interface{} {
 	return update
 }
 
-func buildNewActive(oldActive map[string]interface{}, cntrNum, devId, cntrDevMappingDateStr string) map[string]interface{} {
+func buildNewActive(oldActive map[string]interface{}, cntrNum, devId, firmwareVersion, cntrDevMappingDateStr string) map[string]interface{} {
 	newActive := make(map[string]interface{})
 	for k, v := range oldActive {
 		newActive[k] = v
@@ -132,6 +127,7 @@ func buildNewActive(oldActive map[string]interface{}, cntrNum, devId, cntrDevMap
 	newActive["status"] = "active"
 	newActive["carno"] = devId
 	newActive["carid"] = cntrNum
+	newActive["mode"] = firmwareVersion
 	newActive["regtime"] = cntrDevMappingDateStr
 	newActive["changetime"] = cntrDevMappingDateStr
 	newActive["lastUpdated"] = cntrDevMappingDateStr
@@ -148,8 +144,8 @@ func buildAuditLog(oldActive, newActive map[string]interface{}) map[string]inter
 	return auditLog
 }
 
-func isNumberNotChanged(oldActive map[string]interface{}, cntrNum, devId string) bool {
-	if oldActive["carid"] == cntrNum && oldActive["carno"] == devId {
+func isNumberNotChanged(oldActive map[string]interface{}, cntrNum, devId string, firmwareVersion string) bool {
+	if oldActive["carid"] == cntrNum && oldActive["carno"] == devId && oldActive["model"] == firmwareVersion {
 		return true
 	} else {
 		return false

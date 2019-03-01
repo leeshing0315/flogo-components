@@ -80,6 +80,8 @@ func (t *MyTrigger) Start() error {
 		triggerData["cntrNum"] = s.CntrNum
 		triggerData["devId"] = s.DevId
 		triggerData["pin"] = s.Pin
+		triggerData["firmwareVersion"] = s.HardwareVer
+		triggerData["devtype"] = s.Type
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
 			results, _ := handler.Handle(context.Background(), triggerData)
@@ -91,6 +93,8 @@ func (t *MyTrigger) Start() error {
 				cntrNumAttr, _ := results["cntrNum"]
 				devIdAttr, _ := results["devId"]
 				pinAttr, _ := results["pin"]
+				firmwareVersionAttr, _ := results["firmwareVersion"]
+				devtypeAttr, _ := results["devtype"]
 
 				cntrNum := cntrNumAttr.Value().(string)
 				if cntrNum != "" {
@@ -103,6 +107,15 @@ func (t *MyTrigger) Start() error {
 				pin := pinAttr.Value().(string)
 				if pin != "" {
 					s.Pin = pin
+				}
+				firmwareVersion := firmwareVersionAttr.Value().(string)
+				if firmwareVersion != "" {
+					s.HardwareVer = firmwareVersion
+				}
+				devtype := devtypeAttr.Value().(string)
+				if devtype != "" {
+					devtypeStr, _ := strconv.ParseInt(devtype, 10, 64)
+					s.Type = byte(devtypeStr)
 				}
 
 				if ok && packet.Command != 0x34 {

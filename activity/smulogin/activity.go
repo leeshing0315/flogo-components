@@ -29,17 +29,21 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// ip, _ := context.GetInput("ip").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 
-	pin := parseDataSegment(reqDataSegment)
+	devtype, pin, terminalNum, firmwareVersion := parseDataSegment(reqDataSegment)
 
 	context.SetOutput("resDataSegment", []byte{})
+	context.SetOutput("devtype", devtype)
 	context.SetOutput("pin", pin)
+	context.SetOutput("terminalNum", terminalNum)
+	context.SetOutput("firmwareVersion", firmwareVersion)
 
 	return true, nil
 }
 
-func parseDataSegment(data []byte) (pin string) {
+func parseDataSegment(data []byte) (devtype, pin, terminalNum, firmwareVersion string) {
 	var cursor int
-	println("SMU Type: " + "0x" + strconv.FormatUint(uint64(data[cursor]), 16))
+	devtype = strconv.FormatUint(uint64(data[cursor]), 16)
+	println("SMU Type: " + "0x" + devtype)
 	cursor++
 	pinLen := int(data[cursor : cursor+1][0])
 	cursor++
@@ -48,11 +52,13 @@ func parseDataSegment(data []byte) (pin string) {
 	cursor += pinLen
 	terminalNumLen := int(data[cursor : cursor+1][0])
 	cursor++
-	println("TerminalNum: " + string(data[cursor:cursor+terminalNumLen]))
+	terminalNum = string(data[cursor : cursor+terminalNumLen])
+	println("TerminalNum: " + terminalNum)
 	cursor += terminalNumLen
 	hardwareVerLen := int(data[cursor : cursor+1][0])
 	cursor++
-	println("HardwareVer: " + string(data[cursor:cursor+hardwareVerLen]))
+	firmwareVersion = string(data[cursor : cursor+hardwareVerLen])
+	println("HardwareVer: " + firmwareVersion)
 
-	return pin
+	return devtype, pin, terminalNum, firmwareVersion
 }

@@ -26,7 +26,19 @@
       "type": "array"
     },
     {
+      "name": "devtype",
+      "type": "string"
+    },
+    {
       "name": "pin",
+      "type": "string"
+    },
+    {
+      "name": "terminalNum",
+      "type": "string"
+    },
+    {
+      "name": "firmwareVersion",
       "type": "string"
     }
   ]
