@@ -142,7 +142,7 @@ func calculateDistance(point1 []float64, point2 []float64) float64 {
 	return s
 }
 
-func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
+func getLocationByLatLon(lat float64, lon float64, carrier string, onlyQueryGeofence bool) interface{} {
 	if geofences == nil || len(geofences[carrier]) == 0 {
 		return nil
 	}
@@ -178,6 +178,9 @@ func getLocationByLatLon(lat float64, lon float64, carrier string) interface{} {
 				}
 			}
 		}
+	}
+	if onlyQueryGeofence {
+		return nil
 	}
 	var location, error = crg.GetNearestCities(lat, lon, 1, "mi")
 	if location[0].Distance > DISTANCE_FROM_CITY || error != nil {
@@ -219,7 +222,7 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 	if err != nil {
 		return nil
 	}
-	location = getLocationByLatLon(lat, lon, "COSCO")
+	location = getLocationByLatLon(lat, lon, "COSCO", false)
 	if location != nil {
 		_, ok := location.(crg.Result)
 		if ok {
@@ -265,7 +268,7 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 	} else {
 		gpsevent.DisplayName = ""
 	}
-	ooclLocation := getLocationByLatLon(lat, lon, "OOCL")
+	ooclLocation := getLocationByLatLon(lat, lon, "OOCL", true)
 	if ooclLocation != nil {
 		_, ok := ooclLocation.(map[string]interface{})
 		if ok {
