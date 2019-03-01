@@ -188,10 +188,20 @@ func ConvertEventLogToGPSEvent(eventLog *entity.EventLog) *entity.GpsEvent {
 	gpsEvent.RevTime = eventLog.RevTime
 	gpsEvent.CltTime = eventLog.LogTime
 	gpsEvent.LocateTime = eventLog.LogTime
-	if eventLog.Smode == "Electric Power Shut Off" {
+	if eventLog.Smode == "Electric Power Shut Off" || eventLog.Smode == "POWER OFF" || eventLog.Smode == "Battery ON" {
 		gpsEvent.EleState = "0"
 	} else {
-		gpsEvent.EleState = "1"
+		// Reefer datalog
+		if eventLog.Isa == 1 && eventLog.Isc == 1 {
+			if eventLog.Ss == 0 {
+				gpsEvent.EleState = "0"
+			} else {
+				gpsEvent.EleState = "1"
+			}
+		} else {
+			// eventLog
+			gpsEvent.EleState = "1"
+		}
 	}
 	if eventLog.Isa == 1 && eventLog.Isc == 1 {
 		gpsEvent.OpMode = eventLog.Smode
