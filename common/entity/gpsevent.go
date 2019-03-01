@@ -64,11 +64,14 @@ type GpsEventAddress struct {
 	Longitude float64
 	Latitude  float64
 
-	Code        string `json:"code"`
-	Name        string `json:"name"`
-	City        string `json:"city"`
-	RegionCode  string `json:"region_code"`
-	Region      string `json:"region"`
-	CountryCode string `json:"country_code"`
-	Country     string `json:"country"`
+	Code            string `json:"code"`
+	Name            string `json:"name"`
+	City            string `json:"city"`
+	RegionCode      string `json:"region_code"`
+	Region          string `json:"region"`
+	CountryCode     string `json:"country_code"`
+	Country         string `json:"country"`
+	OoclDisplayName string `json:"ooclDisplayName"`
+	OoclName        string `json:"ooclName"`
+	OoclCode        string `json:"ooclCode"`
 }
