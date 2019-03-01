@@ -74,6 +74,10 @@
       "type": "array"
     },
     {
+      "name": "upgradeSegment",
+      "type": "array"
+    },
+    {
       "name": "setCommandSeqNo",
       "type": "string"
     },
