@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -114,7 +115,7 @@ func buildUpdate(cntrDevMappingDateStr string) map[string]interface{} {
 	update := make(map[string]interface{})
 	update["status"] = "inactive"
 	update["changetime"] = cntrDevMappingDateStr
-	return update
+	return bson.M{"$set": update}
 }
 
 func buildNewActive(oldActive map[string]interface{}, cntrNum, devId, firmwareVersion, cntrDevMappingDateStr string) map[string]interface{} {
@@ -127,7 +128,7 @@ func buildNewActive(oldActive map[string]interface{}, cntrNum, devId, firmwareVe
 	newActive["status"] = "active"
 	newActive["carno"] = devId
 	newActive["carid"] = cntrNum
-	newActive["mode"] = firmwareVersion
+	newActive["model"] = firmwareVersion
 	newActive["regtime"] = cntrDevMappingDateStr
 	newActive["changetime"] = cntrDevMappingDateStr
 	newActive["lastUpdated"] = cntrDevMappingDateStr
