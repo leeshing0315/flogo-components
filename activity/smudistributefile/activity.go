@@ -1,12 +1,9 @@
 package smudistributefile
 
 import (
-	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"encoding/json"
-	"os"
-	"bufio"
-	"io"
 	"bytes"
+	"encoding/json"
+	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -36,26 +33,30 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 		return true, nil
 	}
 
-	firmwareVersion := make(map[string]string)
+	firmwareVersion := make(map[string]interface{})
 	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
-	filePath := firmwareVersion["filePath"]
+	firmwareFileBytes := firmwareVersion["firmwareFile"].([]byte)
 
-	// Get file
-	file, err := os.Open(filePath)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
+	// filePath := firmwareVersion["filePath"]
+	// // Get file
+	// file, err := os.Open(filePath)
+	// if err != nil {
+	// 	return false, err
+	// }
+	// defer file.Close()
 
-	bufReader := bufio.NewReader(file)
+	// bufReader := bufio.NewReader(file)
 
-	bufReader.Discard(512 * (serialNumber - 1))
+	// bufReader.Discard(512 * (serialNumber - 1))
+	// firmwareBuff := make([]byte, 512)
+	// _, err = bufReader.Read(firmwareBuff)
+	// if err != nil && err != io.EOF {
+	// 	return false, err
+	// }
+
 	firmwareBuff := make([]byte, 512)
-	_, err = bufReader.Read(firmwareBuff)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
+	copy(firmwareBuff, firmwareFileBytes[512*(serialNumber-1):512*serialNumber])
 
 	context.SetOutput("upgradeSegment", generateResponseContent(firmwareBuff))
 	return true, nil

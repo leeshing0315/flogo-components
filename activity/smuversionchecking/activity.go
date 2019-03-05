@@ -1,23 +1,24 @@
 package smuversionchecking
 
 import (
-	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"encoding/json"
-	"strconv"
-	"time"
-	"encoding/binary"
 	"bytes"
-	"log"
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
+	"encoding/binary"
+	"encoding/json"
+	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"strconv"
+	"strings"
 	"sync"
+	"time"
 )
 
 // MyActivity is a stub for your Activity implementation
 type MyActivity struct {
-	metadata *activity.Metadata
+	metadata         *activity.Metadata
 	mongoClient      *mongo.Client
 	clientGetterLock sync.Mutex
 }
@@ -53,7 +54,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	if len(deploymentMap) == 0 || len(firmwareVersionMap) == 0 {
+	if len(deploymentMap) == 0 || len(firmwareVersionMap) == 0 || !isReachedDeploymentDate(deploymentMap["targetDeployDate"]) {
 		return true, nil
 	}
 	// Response upgrade command and update upgrade status
@@ -124,25 +125,29 @@ func queryDeviceFirmwareInformation(db *mongo.Database, devId string) (error, ma
 	return nil, deploymentMap, firmwareVersionMap
 }
 
+func isReachedDeploymentDate(targetDeployDateStr string) bool {
+	loc, _ := time.LoadLocation("Asia/Hong_Kong")
+	currentDateStr := time.Now().In(loc).Format("2006-01-02T15:04:05+08:00")
+	return strings.Compare(currentDateStr, targetDeployDateStr) >= 0
+}
+
 func buildFirmwareVersionFilter(firmwareVersion string) bson.M {
 	return bson.M{"firmwareVersion": firmwareVersion}
 }
 
 func buildBsonFilter(devId string) bson.M {
-	// return bson.M{"devId": devId, "deployStatus": bson.M{"in": []string{"pending", "inProgress"}}}
 	return bson.M{"devId": devId, "deployStatus": "pending"}
 }
 
 func handleUpgradeCommand(firmwareVersionMap map[string]string) []byte {
-	firmwareName := []byte(firmwareVersionMap["firmwareName"])
+	// firmwareName := []byte(firmwareVersionMap["firmwareName"])
 	firmwareLength, _ := strconv.Atoi(firmwareVersionMap["fileSize"])
 	crcValue, _ := strconv.Atoi(firmwareVersionMap["crcValue"])
-	softwareVersion := []byte(firmwareVersionMap["firmwareVersion"])
+	firmwareVersion := []byte(firmwareVersionMap["firmwareVersion"])
 	operator := []byte(firmwareVersionMap["createdBy"])
 	firmwareDesc := []byte(firmwareVersionMap["firmwareDesc"])
 	identifier := []byte(firmwareVersionMap["identifier"])
 
-	// dataContent := make([]byte, 121)
 	serialNumber := []byte{0x00}
 
 	contentLength := make([]byte, 2)
@@ -158,10 +163,10 @@ func handleUpgradeCommand(firmwareVersionMap map[string]string) []byte {
 
 	// firmware name
 	firmwareNameTag := []byte{0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20}
-	if len(firmwareName) < 8 {
-		copy(firmwareNameTag[0:len(firmwareName)], firmwareName)
+	if len(firmwareVersion) < 8 {
+		copy(firmwareNameTag[0:len(firmwareVersion)], firmwareVersion)
 	} else {
-		copy(firmwareNameTag[0:8], firmwareName)
+		copy(firmwareNameTag[0:8], firmwareVersion)
 	}
 
 	loc, _ := time.LoadLocation("Asia/Hong_Kong")
@@ -173,12 +178,8 @@ func handleUpgradeCommand(firmwareVersionMap map[string]string) []byte {
 	copy(upgradeTime, time.Now().In(loc).Format("03:04:05"))
 
 	// software version
-	softwareVersionTag := []byte{0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20}
-	if len(softwareVersion) < 8 {
-		copy(softwareVersionTag[0:len(softwareVersion)], softwareVersion)
-	} else {
-		copy(softwareVersionTag[0:8], softwareVersion)
-	}
+	firmwareVersionTag := make([]byte, 8)
+	copy(firmwareVersionTag[0:8], firmwareNameTag)
 
 	// operator
 	operatorTag := []byte{0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20}
@@ -209,7 +210,7 @@ func handleUpgradeCommand(firmwareVersionMap map[string]string) []byte {
 	contentBuff.Write(firmwareNameTag)
 	contentBuff.Write(upgradeDate)
 	contentBuff.Write(upgradeTime)
-	contentBuff.Write(softwareVersionTag)
+	contentBuff.Write(firmwareVersionTag)
 	contentBuff.Write(operatorTag)
 	contentBuff.Write(firmwareDescTag)
 
