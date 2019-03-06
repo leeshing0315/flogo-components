@@ -84,7 +84,10 @@ func (t *MyTrigger) Start() error {
 		triggerData["devtype"] = s.Type
 		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
-			results, _ := handler.Handle(context.Background(), triggerData)
+			results, err := handler.Handle(context.Background(), triggerData)
+			if err != nil {
+				return err
+			}
 			if len(results) != 0 {
 				dataAttr, ok := results["resDataSegment"]
 				setCommandAttr, _ := results["setCommandSegment"]

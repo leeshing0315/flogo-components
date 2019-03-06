@@ -10,7 +10,11 @@ import (
 	"github.com/sigurn/crc16"
 )
 
-var serverUri string = "localhost:8033"
+// var serverUri string = "localhost:8033"
+
+var serverUri string = "itciot-tcp.cargosmart.ai:8080"
+
+// var serverUri string = "ciot-tcp.cargosmart.ai:8080"
 
 var deviceIp string = "192.168.0.2"
 
@@ -20,13 +24,23 @@ var nginxIp string = "192.168.0.3"
 
 var nginxPort string = "23456"
 
-var pin string = "460010604706821" // 15 bytes
+// var pin string = "460011234567890" // not being registered
 
-var autoRegDeviceId = "C01937" // 6 bytes
+// var pin string = "460010604706821" // 15 bytes
 
-var autoRegCntrNum = "CXRU1338831" // 11 bytes
+var pin string = "460011710324088" // C00001
 
-var firmwareVersion string = "HS19-2"
+// var autoRegDeviceId = "C01937" // 6 bytes
+
+var autoRegDeviceId = "C00001"
+
+// var autoRegCntrNum = "CXRU1338831" // 11 bytes
+
+var autoRegCntrNum = "SMUT0000001"
+
+// var firmwareVersion string = "HS19-2"
+
+var firmwareVersion string = "HS181120"
 
 var defaultElectricalCommunicationFrequency string = "0005"
 
@@ -59,15 +73,10 @@ func main() {
 	bufReader := bufio.NewReader(conn)
 	bufWriter := bufio.NewWriter(conn)
 
-	ipInfo := genIpInfo()
-	_, err = bufWriter.Write(ipInfo)
-	if err != nil {
-		return
-	}
-	err = bufWriter.Flush()
-	if err != nil {
-		return
-	}
+	// err = sendIpInfo(bufWriter)
+	// if err != nil {
+	// 	return
+	// }
 
 	loginPacket := genLoginPacket()
 	_, err = bufWriter.Write(loginPacket)
@@ -87,6 +96,19 @@ func main() {
 	err = <-errChain
 	log.Println(err)
 	return
+}
+
+func sendIpInfo(writer *bufio.Writer) error {
+	ipInfo := genIpInfo()
+	_, err := writer.Write(ipInfo)
+	if err != nil {
+		return err
+	}
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func genIpInfo() []byte {
