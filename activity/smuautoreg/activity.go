@@ -117,7 +117,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		newAnotherActive := buildNewActive(
 			oldAnotherActive,
-			oldAnotherActive["carid"].(string),
+			oldAnotherActive["simno"].(string),
 			oldAnotherActive["carno"].(string),
 			oldAnotherActive["model"].(string),
 			cntrDevMappingDateStr,
