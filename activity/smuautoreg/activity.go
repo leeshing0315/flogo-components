@@ -82,6 +82,58 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, nil
 	}
 
+	// find another cntrDevMapping with same new cntrNum, if it exist, update it's cntrNum to simno
+	// one cntrNum should be owned by only one device
+	oldAnotherActive := make(map[string]interface{})
+	err = coll.FindOne(
+		context.Background(),
+		map[string]interface{}{
+			"carid":  cntrNum,
+			"status": "active",
+		},
+	).Decode(&oldAnotherActive)
+	if err != nil {
+		log.Printf("FindOne error: %v", err)
+		return true, nil
+	}
+	if oldAnotherActive["pin"] != nil &&
+		oldAnotherActive["pin"].(string) != "" &&
+		oldAnotherActive["pin"].(string) != oldActive["pin"].(string) {
+		_, err = coll.UpdateOne(
+			context.Background(),
+			map[string]interface{}{
+				"carid":  cntrNum,
+				"status": "active",
+			},
+			bson.M{"$set": map[string]interface{}{
+				"status":     "inactive",
+				"changetime": cntrDevMappingDateStr,
+			}},
+		)
+		if err != nil {
+			log.Printf("UpdateOne error: %v", err)
+			return true, nil
+		}
+
+		newAnotherActive := buildNewActive(
+			oldAnotherActive,
+			oldAnotherActive["carid"].(string),
+			oldAnotherActive["carno"].(string),
+			oldAnotherActive["model"].(string),
+			cntrDevMappingDateStr,
+		)
+		insertResult, err := coll.InsertOne(context.Background(), newAnotherActive)
+		if err != nil {
+			log.Printf("InsertOne error: %v", err)
+			return true, nil
+		}
+		newAnotherActive["_id"] = insertResult.InsertedID.(primitive.ObjectID).Hex()
+
+		auditLog := buildAuditLog(oldAnotherActive, newAnotherActive)
+		deviceAuditLogsColl := db.Collection("deviceAuditLogs")
+		deviceAuditLogsColl.InsertOne(context.Background(), auditLog)
+	}
+
 	// insert new active
 	newActive := buildNewActive(oldActive, cntrNum, devId, firmwareVersion, cntrDevMappingDateStr)
 	insertResult, err := coll.InsertOne(context.Background(), newActive)
