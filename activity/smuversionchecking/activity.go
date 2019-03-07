@@ -4,16 +4,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/binary"
-	"encoding/json"
-	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -100,27 +100,22 @@ func queryDeviceFirmwareInformation(db *mongo.Database, devId string) (error, ma
 	deploymentsColl := db.Collection("firmwareDeployments")
 
 	dpBsonFilter := buildBsonFilter(devId)
-	deploymentsBytes, err := deploymentsColl.FindOne(context.Background(), dpBsonFilter).DecodeBytes()
+	deploymentMap := make(map[string]string)
+	err := deploymentsColl.FindOne(context.Background(), dpBsonFilter).Decode(&deploymentMap)
 	if err != nil {
 		log.Printf("Connection query firmware error: %v", err)
-	}
-	if len(deploymentsBytes) == 0 {
 		return nil, nil, nil
 	}
-
-	deploymentMap := make(map[string]string)
-	json.Unmarshal(deploymentsBytes, &deploymentMap)
 
 	firmwareVersion := deploymentMap["firmwareVersion"]
 	firmwareVersionColl := db.Collection("firmwareVersions")
 	fvBsonFilter := buildFirmwareVersionFilter(firmwareVersion)
-	firmwareVersionsBytes, err := firmwareVersionColl.FindOne(context.Background(), fvBsonFilter).DecodeBytes()
+	firmwareVersionMap := make(map[string]string)
+	err = firmwareVersionColl.FindOne(context.Background(), fvBsonFilter).Decode(&firmwareVersionMap)
 	if err != nil {
 		log.Printf("Connection query firmware versions error: %v", err)
+		return nil, nil, nil
 	}
-
-	firmwareVersionMap := make(map[string]string)
-	json.Unmarshal(firmwareVersionsBytes, &firmwareVersionMap)
 
 	return nil, deploymentMap, firmwareVersionMap
 }
