@@ -1,11 +1,11 @@
 {
-  "name": "smuversionchecking",
+  "name": "smuversionupgrade",
   "version": "0.0.1",
   "type": "flogo:activity",
   "description": "activity description",
-  "ref": "github.com/leeshing0315/flogo-components/activity/smuversionchecking",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smuversionupgrade",
   "author": "Your Name <you.name@example.org>",
-  "title": "SMU GetCntrNum",
+  "title": "SMU VersionUpgrade",
   "inputs":[
     {
       "name": "reqDataSegment",

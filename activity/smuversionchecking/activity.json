@@ -5,7 +5,7 @@
   "description": "activity description",
   "ref": "github.com/leeshing0315/flogo-components/activity/smuversionchecking",
   "author": "Your Name <you.name@example.org>",
-  "title": "SMU GetCntrNum",
+  "title": "SMU VersionChecking",
   "inputs":[
     {
       "name": "uri",
