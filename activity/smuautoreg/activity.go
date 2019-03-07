@@ -85,17 +85,13 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	// find another cntrDevMapping with same new cntrNum, if it exist, update it's cntrNum to simno
 	// one cntrNum should be owned by only one device
 	oldAnotherActive := make(map[string]interface{})
-	err = coll.FindOne(
+	coll.FindOne(
 		context.Background(),
 		map[string]interface{}{
 			"carid":  cntrNum,
 			"status": "active",
 		},
 	).Decode(&oldAnotherActive)
-	if err != nil {
-		log.Printf("FindOne error: %v", err)
-		return true, nil
-	}
 	if oldAnotherActive["pin"] != nil &&
 		oldAnotherActive["pin"].(string) != "" &&
 		oldAnotherActive["pin"].(string) != oldActive["pin"].(string) {
