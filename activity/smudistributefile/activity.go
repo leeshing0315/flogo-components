@@ -3,6 +3,7 @@ package smudistributefile
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
 
@@ -29,6 +30,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	serialNumber := context.GetInput("serialNumber").(int)
 
 	if serialNumber == 0xFF {
+		// TODO update firmwareDeployment
 		context.SetOutput("upgradeSegment", generateResponseContent([]byte{}))
 		return true, nil
 	}

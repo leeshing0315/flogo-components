@@ -38,6 +38,9 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	}
 
 	deviceInfo := &entity.DeviceInfo{}
+	if cntrDevMapping["simno"] != nil {
+		deviceInfo.Simno = cntrDevMapping["simno"].(string)
+	}
 	deviceInfo.Devtype = devtype
 	deviceInfo.Ip = ip
 	deviceInfo.Remark = firmwareVersion
