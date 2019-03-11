@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"log"
 
 	"github.com/sigurn/crc16"
 )
@@ -93,7 +95,53 @@ func receiveSetting(writer *bufio.Writer, seqnoBytes []byte, dataSegment []byte)
 }
 
 func receiveFirmware(writer *bufio.Writer, seqnoBytes []byte, dataSegment []byte) error {
+	seqno := dataSegment[2]
+	length := binary.BigEndian.Uint16(dataSegment[3:5])
+	content := dataSegment[5 : 5+length]
+	switch seqno {
+	case 0:
+		err := initUpgrade(writer, content, seqnoBytes)
+		return err
+	case 0xff:
+		clearUpgrade()
+	default:
+		err := receiveFileSlice(seqno, content)
+		return err
+	}
 	return nil
+}
+
+func initUpgrade(writer *bufio.Writer, content, seqnoBytes []byte) error {
+	if len(content) != 118 {
+		log.Println("content length not right")
+		return errors.New("content length not right")
+	}
+	firmwareLock.Lock()
+	NewFirmware(writer, content, seqnoBytes)
+	err := firmwareUpgrade.StartUpgrade()
+	firmwareLock.Unlock()
+	return err
+}
+
+func clearUpgrade() {
+	firmwareLock.Lock()
+	ClearUpgrade()
+	firmwareLock.Unlock()
+}
+
+func receiveFileSlice(seqno byte, content []byte) (err error) {
+	firmwareLock.Lock()
+	defer firmwareLock.Unlock()
+	if firmwareUpgrade != nil {
+		err = firmwareUpgrade.ReceiveFileSlice(seqno, content)
+		if err != nil {
+			return err
+		}
+		if firmwareUpgrade.FileSliceNum == firmwareUpgrade.FileSliceSum {
+			firmwareUpgrade.sendEndPacket()
+		}
+	}
+	return err
 }
 
 func responseEmpty(writer *bufio.Writer, cmd byte, seqnoBytes []byte) error {
