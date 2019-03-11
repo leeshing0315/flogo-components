@@ -6,11 +6,11 @@ import (
 
 // DeviceConfigCmd entity
 type DeviceConfigCmd struct {
-	DeviceID       string      `json:"devid"`
+	DeviceID       string      `json:"devid,omitempty"`
 	SeqNo          json.Number `json:"seqno"`
-	Subcmd         string      `json:"subcmd"`
-	Value          string      `json:"value"`
-	SendFlag       string      `json:"sendflag"`
-	SendTime       string      `json:"sendtime"`
-	LastUpdateTime string      `json:"lastupdatetime"`
+	Subcmd         string      `json:"subcmd,omitempty"`
+	Value          string      `json:"value,omitempty"`
+	SendFlag       string      `json:"sendflag,omitempty"`
+	SendTime       string      `json:"sendtime,omitempty"`
+	LastUpdateTime string      `json:"lastupdatetime,omitempty"`
 }

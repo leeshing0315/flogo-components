@@ -1,10 +1,10 @@
 package entity
 
 type OperationModeChange struct {
-	Seqno     string `json:"seqno"`
-	Cntrnum   string `json:"cntrnum"`
-	Opmode    string `json:"opmode"`
-	Logtime   string `json:"logtime"`
-	Revtime   string `json:"revtime"`
-	TableName string `json:"tableName"` // default: "Tblopmoderec"
+	Seqno     string `json:"seqno,omitempty"`
+	Cntrnum   string `json:"cntrnum,omitempty"`
+	Opmode    string `json:"opmode,omitempty"`
+	Logtime   string `json:"logtime,omitempty"`
+	Revtime   string `json:"revtime,omitempty"`
+	TableName string `json:"tableName,omitempty"` // default: "Tblopmoderec"
 }
