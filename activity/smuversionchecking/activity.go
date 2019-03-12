@@ -77,11 +77,12 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 func getDBConnection(a *MyActivity, uri string, dbName string) (*mongo.Database, error) {
 	client := a.mongoClient
+	var err error
 	if client == nil {
 		a.clientGetterLock.Lock()
 		client = a.mongoClient
 		if client == nil {
-			client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+			client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 			if err != nil {
 				log.Printf("Connection error: %v", err)
 				a.clientGetterLock.Unlock()
