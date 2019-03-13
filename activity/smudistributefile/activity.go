@@ -39,6 +39,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	if serialNumber == 0xFF {
 		// update firmwareDeployment from inProgress to completed
 		client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+		defer client.Disconnect(context.Background())
 		if err != nil {
 			return false, err
 		}
