@@ -14,6 +14,18 @@
     {
       "name": "serialNumber",
       "type": "integer"
+    },
+    {
+      "name": "devId",
+      "type": "string"
+    },
+    {
+      "name": "uri",
+      "type": "string"
+    },
+    {
+      "name": "dbName",
+      "type": "string"
     }
   ],
   "outputs": [

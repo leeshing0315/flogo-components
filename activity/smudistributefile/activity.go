@@ -2,9 +2,13 @@ package smudistributefile
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -23,15 +27,36 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 }
 
 // Eval implements activity.Activity.Eval
-func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
+func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	// do eval
-	firmwareVersionStr := context.GetInput("firmwareVersion").(string)
-	serialNumber := context.GetInput("serialNumber").(int)
+	firmwareVersionStr := ctx.GetInput("firmwareVersion").(string)
+	serialNumber := ctx.GetInput("serialNumber").(int)
+	devId := ctx.GetInput("devId").(string)
+	uri := ctx.GetInput("uri").(string)
+	dbName := ctx.GetInput("dbName").(string)
 
 	if serialNumber == 0xFF {
-		// TODO update firmwareDeployment
-		context.SetOutput("upgradeSegment", generateResponseContent([]byte{}))
+		// update firmwareDeployment from inProgress to completed
+		client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+		if err != nil {
+			return false, err
+		}
+		db := client.Database(dbName)
+		coll := db.Collection("firmwareDeployments")
+		coll.UpdateOne(
+			context.Background(),
+			map[string]interface{}{
+				"devId":  devId,
+				"status": "inProgress",
+			},
+			bson.M{
+				"$set": map[string]interface{}{
+					"status": "completed",
+				},
+			},
+		)
+		ctx.SetOutput("upgradeSegment", generateResponseContent([]byte{}))
 		return true, nil
 	}
 
@@ -60,7 +85,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	firmwareBuff := make([]byte, 512)
 	copy(firmwareBuff, firmwareFileBytes[512*(serialNumber-1):512*serialNumber])
 
-	context.SetOutput("upgradeSegment", generateResponseContent(firmwareBuff))
+	ctx.SetOutput("upgradeSegment", generateResponseContent(firmwareBuff))
 	return true, nil
 }
 
