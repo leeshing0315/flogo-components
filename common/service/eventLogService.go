@@ -22,6 +22,7 @@ func ParseToEventLog(bytes []byte, now time.Time, cntrNum string, seqNo int) *en
 	}
 	loc, _ := time.LoadLocation("Asia/Hong_Kong")
 	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
+	eventLog.RevTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	eventLog.CntrNum = cntrNum
 	eventLog.Seq = strconv.FormatInt(int64(seqNo), 10)
 	return eventLog
@@ -212,7 +213,7 @@ func ConvertEventLogToGPSEvent(eventLog *entity.EventLog) *entity.GpsEvent {
 	gpsEvent.Source = "TCP_SERVER"
 	gpsEvent.Carrier = "COSU"
 	gpsEvent.IsEventLog = true
-	gpsEvent.CreatedAt = eventLog.RevTime
+	gpsEvent.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05Z")
 	if math.Abs(eventLog.Sp) < 0.0001 {
 		gpsEvent.SetTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
 		gpsEvent.SupTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)

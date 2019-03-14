@@ -1,6 +1,10 @@
 package service
 
-import "github.com/leeshing0315/flogo-components/common/entity"
+import (
+	"time"
+
+	"github.com/leeshing0315/flogo-components/common/entity"
+)
 
 const (
 	GPSEVENT_SOURCE_TCPSERVER = "TCP_SERVER"
@@ -70,6 +74,7 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	// gpsEvent.Address = address
 	// gpsEvent.DisplayName = displayName.(string)
 	AttachLocation(gpsEvent)
+	gpsEvent.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05Z")
 
 	return gpsEvent
 }
