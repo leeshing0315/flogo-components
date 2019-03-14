@@ -64,7 +64,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	firmwareVersion := make(map[string]interface{})
 	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
-	firmwareFileBytes := firmwareVersion["firmwareFile"].([]byte)
+	firmwareFileBytes := firmwareVersion["fileContent"].([]interface{})[0].([]byte)
 
 	// filePath := firmwareVersion["filePath"]
 	// // Get file
