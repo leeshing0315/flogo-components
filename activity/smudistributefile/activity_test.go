@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"testing"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -79,4 +80,5 @@ func TestFileContent(t *testing.T) {
 	result.Decode(&resultMap)
 	bytes := getBytesFromMap(resultMap["fileContent"].(primitive.A)[0].(map[string]interface{}))
 	log.Println(bytes)
+	log.Println(time.Now().UTC().Format("2006-01-02T15:04:05Z"))
 }

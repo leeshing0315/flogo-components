@@ -54,7 +54,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	if len(deploymentMap) == 0 || len(firmwareVersionMap) == 0 || !isReachedDeploymentDate(deploymentMap["targetDeployDate"]) {
+	if len(deploymentMap) == 0 || len(firmwareVersionMap) == 0 || !isReachedDeploymentDate(deploymentMap["targetDeployDate"].(string)) {
 		return true, nil
 	}
 	// Response upgrade command and update upgrade status
@@ -97,29 +97,29 @@ func getDBConnection(a *MyActivity, uri string, dbName string) (*mongo.Database,
 	return db, nil
 }
 
-func queryDeviceFirmwareInformation(db *mongo.Database, devId string) (error, map[string]string, map[string]string) {
+func queryDeviceFirmwareInformation(db *mongo.Database, devId string) (error, map[string]interface{}, map[string]interface{}) {
 	deploymentsColl := db.Collection("firmwareDeployments")
 
 	// if find a firmwareDeployment is inProgress, don't start a new upgrade
 	dpInprogressFilter := buildDeploymentInProgressBsonFilter(devId)
-	deploymentInprogressMap := make(map[string]string)
+	deploymentInprogressMap := make(map[string]interface{})
 	err := deploymentsColl.FindOne(context.Background(), dpInprogressFilter).Decode(&deploymentInprogressMap)
 	if err == nil {
 		return nil, nil, nil
 	}
 
 	dpBsonFilter := buildBsonFilter(devId)
-	deploymentMap := make(map[string]string)
+	deploymentMap := make(map[string]interface{})
 	err = deploymentsColl.FindOne(context.Background(), dpBsonFilter).Decode(&deploymentMap)
 	if err != nil {
 		log.Printf("Connection query firmware error: %v", err)
 		return nil, nil, nil
 	}
 
-	firmwareVersion := deploymentMap["firmwareVersion"]
+	firmwareVersion := deploymentMap["firmwareVersion"].(string)
 	firmwareVersionColl := db.Collection("firmwareVersions")
 	fvBsonFilter := buildFirmwareVersionFilter(firmwareVersion)
-	firmwareVersionMap := make(map[string]string)
+	firmwareVersionMap := make(map[string]interface{})
 	err = firmwareVersionColl.FindOne(context.Background(), fvBsonFilter).Decode(&firmwareVersionMap)
 	if err != nil {
 		log.Printf("Connection query firmware versions error: %v", err)
@@ -147,14 +147,14 @@ func buildDeploymentInProgressBsonFilter(devId string) bson.M {
 	return bson.M{"devId": devId, "deployStatus": "inProgress"}
 }
 
-func handleUpgradeCommand(firmwareVersionMap map[string]string) []byte {
+func handleUpgradeCommand(firmwareVersionMap map[string]interface{}) []byte {
 	// firmwareName := []byte(firmwareVersionMap["firmwareName"])
-	firmwareLength, _ := strconv.Atoi(firmwareVersionMap["fileSize"])
-	crcValue, _ := strconv.Atoi(firmwareVersionMap["crcValue"])
-	firmwareVersion := []byte(firmwareVersionMap["firmwareVersion"])
-	operator := []byte(firmwareVersionMap["createdBy"])
-	firmwareDesc := []byte(firmwareVersionMap["firmwareDesc"])
-	identifier := []byte(firmwareVersionMap["identifier"])
+	firmwareLength, _ := strconv.Atoi(firmwareVersionMap["fileSize"].(string))
+	crcValue, _ := strconv.Atoi(firmwareVersionMap["crcValue"].(string))
+	firmwareVersion := []byte(firmwareVersionMap["firmwareVersion"].(string))
+	operator := []byte(firmwareVersionMap["createdBy"].(string))
+	firmwareDesc := []byte(firmwareVersionMap["releaseNote"].(string))
+	identifier := []byte(firmwareVersionMap["identifier"].(string))
 
 	serialNumber := []byte{0x00}
 
