@@ -11,7 +11,9 @@ import (
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/sigurn/crc16"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -150,11 +152,17 @@ func buildDeploymentInProgressBsonFilter(devId string) bson.M {
 func handleUpgradeCommand(firmwareVersionMap map[string]interface{}) []byte {
 	// firmwareName := []byte(firmwareVersionMap["firmwareName"])
 	firmwareLength, _ := strconv.Atoi(firmwareVersionMap["fileSize"].(string))
-	crcValue, _ := strconv.Atoi(firmwareVersionMap["crcValue"].(string))
+	// crcValue, _ := strconv.Atoi(firmwareVersionMap["crcValue"].(string))
 	firmwareVersion := []byte(firmwareVersionMap["firmwareVersion"].(string))
 	operator := []byte(firmwareVersionMap["createdBy"].(string))
 	firmwareDesc := []byte(firmwareVersionMap["releaseNote"].(string))
 	identifier := []byte(firmwareVersionMap["identifier"].(string))
+
+	// cal crcValue by myself
+	fileContentBytes := getBytesFromMap(firmwareVersionMap["fileContent"].(primitive.A)[0].(map[string]interface{}))
+	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
+	checksum := crc16.Checksum(fileContentBytes, myTable)
+	crcValue := int(checksum)
 
 	serialNumber := []byte{0x00}
 
@@ -236,4 +244,17 @@ func updateDeviceDeploymentStatus(db *mongo.Database, deviceId string) error {
 		return err
 	}
 	return nil
+}
+
+func getBytesFromMap(input map[string]interface{}) []byte {
+	resultLen := len(input)
+	result := make([]byte, resultLen)
+	for k, v := range input {
+		index, err := strconv.ParseUint(k, 10, 64)
+		if err != nil || int(index) >= resultLen {
+			break
+		}
+		result[index] = byte(v.(int32))
+	}
+	return result
 }
