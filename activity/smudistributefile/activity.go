@@ -8,7 +8,6 @@ import (
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -66,7 +65,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	firmwareVersion := make(map[string]interface{})
 	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
-	firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].(primitive.A)[0].(map[string]interface{}))
+	firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].([]interface{})[0].(map[string]interface{}))
 
 	// filePath := firmwareVersion["filePath"]
 	// // Get file
