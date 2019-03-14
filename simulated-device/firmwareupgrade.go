@@ -58,7 +58,7 @@ func NewFirmware(writer *bufio.Writer, content, seqnoBytes []byte) {
 }
 
 func (fu *FirmwareUpgrade) StartUpgrade() error {
-	for i := 0; i < int(fu.FileSliceSum); i++ {
+	for i := 1; i <= int(fu.FileSliceSum); i++ {
 		err := fu.requestFirmware(byte(i))
 		if err != nil {
 			return err

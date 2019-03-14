@@ -26,21 +26,21 @@ var nginxPort string = "23456"
 
 // var pin string = "460011234567890" // not being registered
 
-// var pin string = "460010604706821" // 15 bytes
+var pin string = "460010604706821" // C01937 (15 bytes)
 
-var pin string = "460011710324088" // C00001
+// var pin string = "460011710324088" // C00001 (15 bytes)
 
-// var autoRegDeviceId = "C01937" // 6 bytes
+var autoRegDeviceId = "C01937" // 6 bytes
 
-var autoRegDeviceId = "C00001"
+// var autoRegDeviceId = "C00001" // 6 bytes
 
-// var autoRegCntrNum = "CXRU1338831" // 11 bytes
+var autoRegCntrNum = "CXRU1338831" // C01937 (11 bytes)
 
-var autoRegCntrNum = "SMUT0000001"
+// var autoRegCntrNum = "SMUT0000001" // C00001 (11 bytes)
 
-// var firmwareVersion string = "HS19-2"
+var firmwareVersion string = "HS19-2"
 
-var firmwareVersion string = "HS181120"
+// var firmwareVersion string = "HS181120"
 
 var defaultElectricalCommunicationFrequency string = "0005"
 

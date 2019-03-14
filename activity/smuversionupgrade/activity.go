@@ -1,8 +1,9 @@
 package smuversionupgrade
 
 import (
-	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"encoding/binary"
+
+	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -21,14 +22,14 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 }
 
 // Eval implements activity.Activity.Eval
-func (a *MyActivity) Eval(context activity.Context) (done bool, err error)  {
+func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
 	reqDataSegmentBytes := context.GetInput("reqDataSegment").([]byte)
 
-	serialNumber := reqDataSegmentBytes[0]
-	contentLength := binary.BigEndian.Uint16(reqDataSegmentBytes[1:3])
-	identifier := reqDataSegmentBytes[3:11]
+	serialNumber := reqDataSegmentBytes[2]
+	contentLength := binary.BigEndian.Uint16(reqDataSegmentBytes[3:5])
+	identifier := reqDataSegmentBytes[5:13]
 
 	context.SetOutput("serialNumber", int(serialNumber))
 	context.SetOutput("contentLength", int(contentLength))
