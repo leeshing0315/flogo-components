@@ -112,6 +112,7 @@ func receiveFirmware(writer *bufio.Writer, seqnoBytes []byte, dataSegment []byte
 }
 
 func initUpgrade(writer *bufio.Writer, content, seqnoBytes []byte) error {
+	log.Println("initUpgrade")
 	if len(content) != 118 {
 		log.Println("content length not right")
 		return errors.New("content length not right")
@@ -124,12 +125,16 @@ func initUpgrade(writer *bufio.Writer, content, seqnoBytes []byte) error {
 }
 
 func clearUpgrade() {
+	log.Println("clearUpgrade")
 	firmwareLock.Lock()
 	ClearUpgrade()
 	firmwareLock.Unlock()
 }
 
 func receiveFileSlice(seqno byte, content []byte) (err error) {
+	log.Println("receiveFileSlice")
+	log.Println(seqno)
+	log.Println(content)
 	firmwareLock.Lock()
 	defer firmwareLock.Unlock()
 	if firmwareUpgrade != nil {

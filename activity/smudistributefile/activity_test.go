@@ -1,11 +1,17 @@
 package smudistributefile
 
 import (
+	"context"
 	"io/ioutil"
+	"log"
 	"testing"
 
-	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/TIBCOSoftware/flogo-contrib/action/flow/test"
+	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
 
 var activityMetadata *activity.Metadata
@@ -14,7 +20,7 @@ func getActivityMetadata() *activity.Metadata {
 
 	if activityMetadata == nil {
 		jsonMetadataBytes, err := ioutil.ReadFile("activity.json")
-		if err != nil{
+		if err != nil {
 			panic("No Json Metadata found for activity.json path")
 		}
 
@@ -54,4 +60,23 @@ func TestEval(t *testing.T) {
 	act.Eval(tc)
 
 	//check result attr
+}
+
+func TestFileContent(t *testing.T) {
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+		t.Fail()
+		return
+	}
+	db := client.Database("iot")
+	coll := db.Collection("firmwareVersions")
+	result := coll.FindOne(context.Background(), map[string]interface{}{"firmwareVersion": "HS19-2"})
+	if err != nil {
+		t.Fail()
+		return
+	}
+	resultMap := make(map[string]interface{})
+	result.Decode(&resultMap)
+	bytes := getBytesFromMap(resultMap["fileContent"].(primitive.A)[0].(map[string]interface{}))
+	log.Println(bytes)
 }

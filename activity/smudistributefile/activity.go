@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -64,7 +66,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	firmwareVersion := make(map[string]interface{})
 	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
-	firmwareFileBytes := firmwareVersion["fileContent"].([]interface{})[0].([]byte)
+	firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].(primitive.A)[0].(map[string]interface{}))
 
 	// filePath := firmwareVersion["filePath"]
 	// // Get file
@@ -96,4 +98,17 @@ func generateResponseContent(contentBuff []byte) []byte {
 	upgradeSegmentBuff.Write(contentBuff)
 	upgradeSegmentBuff.WriteString("#")
 	return upgradeSegmentBuff.Bytes()
+}
+
+func getBytesFromMap(input map[string]interface{}) []byte {
+	resultLen := len(input)
+	result := make([]byte, resultLen)
+	for k, v := range input {
+		index, err := strconv.ParseUint(k, 10, 64)
+		if err != nil || int(index) >= resultLen {
+			break
+		}
+		result[index] = byte(v.(int32))
+	}
+	return result
 }
