@@ -239,7 +239,13 @@ func updateDeviceDeploymentStatus(db *mongo.Database, deviceId string) error {
 	valueMap["targetDeployDate"] = time.Now().Format("2006-01-02 15:04:05")
 
 	firmwareDeploymentColl := db.Collection("firmwareDeployments")
-	_, err := firmwareDeploymentColl.UpdateOne(context.Background(), bson.M{"devId": deviceId}, valueMap)
+	_, err := firmwareDeploymentColl.UpdateOne(
+		context.Background(),
+		bson.M{"devId": deviceId},
+		bson.M{
+			"$set": valueMap,
+		},
+	)
 	if err != nil {
 		return err
 	}
