@@ -37,6 +37,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	devId := ctx.GetInput("devId").(string)
 	uri := ctx.GetInput("uri").(string)
 	dbName := ctx.GetInput("dbName").(string)
+	identifier := ctx.GetInput("identifier").(string)
 
 	if serialNumber == 0xFF {
 		// update firmwareDeployment from inProgress to completed
@@ -66,7 +67,8 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	firmwareVersion := make(map[string]interface{})
 	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
-	firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].([]interface{})[0].(map[string]interface{}))
+	// firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].([]interface{})[0].(map[string]interface{}))
+	firmwareFileBytes := smuversionchecking.FirmwareCacheMap.Load(identifier)
 
 	// filePath := firmwareVersion["filePath"]
 	// // Get file

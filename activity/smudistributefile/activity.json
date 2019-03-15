@@ -26,6 +26,10 @@
     {
       "name": "dbName",
       "type": "string"
+    },
+    {
+      "name": "identifier",
+      "type": "string"
     }
   ],
   "outputs": [
