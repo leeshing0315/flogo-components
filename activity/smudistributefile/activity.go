@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/leeshing0315/flogo-components/activity/smuversionchecking"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -68,7 +69,11 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
 	// firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].([]interface{})[0].(map[string]interface{}))
-	firmwareFileBytes := smuversionchecking.FirmwareCacheMap.Load(identifier)
+	firmwareFileBytesInterface, ok := smuversionchecking.FirmwareCacheMap.Load(identifier)
+	if ok == false {
+		return false, nil
+	}
+	firmwareFileBytes := firmwareFileBytesInterface.([]byte)
 
 	// filePath := firmwareVersion["filePath"]
 	// // Get file
