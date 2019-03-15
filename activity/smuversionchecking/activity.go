@@ -164,7 +164,7 @@ func handleUpgradeCommand(firmwareVersionMap map[string]interface{}) []byte {
 	// cal crcValue by myself
 	fileContentBytes := getBytesFromMap(firmwareVersionMap["fileContent"].(primitive.A)[0].(map[string]interface{}))
 	// store firmware for cache
-	FirmwareCacheMap.Store(identifier, fileContentBytes)
+	FirmwareCacheMap.Store(string(identifier), fileContentBytes)
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(fileContentBytes, myTable)
 	crcValue := int(checksum)
