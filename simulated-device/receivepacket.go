@@ -55,6 +55,13 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 				return
 			}
 		case 0x33:
+			log.Println("*****receiveFirmware*****")
+			log.Println(cmd)
+			log.Println(seqnoBytes)
+			log.Println(dataSegmentLengthBytes)
+			log.Println(dataSegment)
+			log.Println(crcSegment)
+			log.Println("*****receiveFirmware*****")
 			err = receiveFirmware(writer, seqnoBytes, dataSegment)
 			if err != nil {
 				errChain <- err
@@ -132,9 +139,6 @@ func clearUpgrade() {
 }
 
 func receiveFileSlice(seqno byte, content []byte) (err error) {
-	log.Println("receiveFileSlice")
-	log.Println(seqno)
-	log.Println(content)
 	firmwareLock.Lock()
 	defer firmwareLock.Unlock()
 	if firmwareUpgrade != nil {

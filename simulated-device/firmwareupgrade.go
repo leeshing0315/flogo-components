@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"log"
 	"sync"
 	"time"
 )
@@ -127,11 +128,15 @@ func (fu *FirmwareUpgrade) requestFirmware(seqno byte) error {
 	buf.WriteByte(0x08)
 	buf.WriteString(fu.Identifier)
 	buf.WriteString("#")
-	_, err := fu.Writer.Write(genPacket(0x33, fu.SeqnoBytes, buf.Bytes()))
+	log.Println("before send")
+	result := genPacket(0x33, fu.SeqnoBytes, buf.Bytes())
+	log.Println(result)
+	_, err := fu.Writer.Write(result)
 	if err != nil {
 		return err
 	}
 	err = fu.Writer.Flush()
+	log.Println("after send")
 	return err
 }
 

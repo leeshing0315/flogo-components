@@ -86,7 +86,15 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	// }
 
 	firmwareBuff := make([]byte, 512)
-	copy(firmwareBuff, firmwareFileBytes[512*(serialNumber-1):512*serialNumber])
+	firmwareFileBytesLen := len(firmwareFileBytes)
+	firstIndex := 512 * (serialNumber - 1)
+	lastIndex := 512 * serialNumber
+	if firstIndex < firmwareFileBytesLen {
+		if lastIndex > firmwareFileBytesLen {
+			lastIndex = firmwareFileBytesLen
+		}
+		copy(firmwareBuff, firmwareFileBytes[firstIndex:lastIndex])
+	}
 
 	ctx.SetOutput("upgradeSegment", generateResponseContent(serialNumber, firmwareBuff))
 	return true, nil
