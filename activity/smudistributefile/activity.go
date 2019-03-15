@@ -3,6 +3,7 @@ package smudistributefile
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"strconv"
 
@@ -58,7 +59,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 				},
 			},
 		)
-		ctx.SetOutput("upgradeSegment", generateResponseContent([]byte{}))
+		ctx.SetOutput("upgradeSegment", generateResponseContent(serialNumber, []byte{}))
 		return true, nil
 	}
 
@@ -87,13 +88,16 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	firmwareBuff := make([]byte, 512)
 	copy(firmwareBuff, firmwareFileBytes[512*(serialNumber-1):512*serialNumber])
 
-	ctx.SetOutput("upgradeSegment", generateResponseContent(firmwareBuff))
+	ctx.SetOutput("upgradeSegment", generateResponseContent(serialNumber, firmwareBuff))
 	return true, nil
 }
 
-func generateResponseContent(contentBuff []byte) []byte {
+func generateResponseContent(serialNumber int, contentBuff []byte) []byte {
 	var upgradeSegmentBuff bytes.Buffer
 	upgradeSegmentBuff.WriteString("*Q")
+	upgradeSegmentBuff.WriteByte(byte(serialNumber))
+	contentLength := make([]byte, 2)
+	binary.BigEndian.PutUint16(contentLength, uint16(len(contentBuff)))
 	upgradeSegmentBuff.Write(contentBuff)
 	upgradeSegmentBuff.WriteString("#")
 	return upgradeSegmentBuff.Bytes()
