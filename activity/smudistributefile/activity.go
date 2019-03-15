@@ -107,7 +107,7 @@ func getBytesFromMap(input map[string]interface{}) []byte {
 		if err != nil || int(index) >= resultLen {
 			break
 		}
-		result[index] = byte(v.(int32))
+		result[index] = byte(v.(float64))
 	}
 	return result
 }
