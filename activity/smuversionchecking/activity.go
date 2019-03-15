@@ -171,7 +171,7 @@ func handleUpgradeCommand(firmwareVersionMap map[string]interface{}) []byte {
 
 	// download firmware length
 	downloadFirmwareLength := make([]byte, 4)
-	binary.BigEndian.PutUint16(downloadFirmwareLength, uint16(firmwareLength))
+	binary.BigEndian.PutUint32(downloadFirmwareLength, uint32(firmwareLength))
 
 	// crcValue
 	crcValueTag := make([]byte, 2)
