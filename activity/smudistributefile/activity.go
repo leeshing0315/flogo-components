@@ -50,12 +50,12 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		coll.UpdateOne(
 			context.Background(),
 			map[string]interface{}{
-				"devId":  devId,
-				"status": "inProgress",
+				"devId":        devId,
+				"deployStatus": "inProgress",
 			},
 			bson.M{
 				"$set": map[string]interface{}{
-					"status": "completed",
+					"deployStatus": "completed",
 				},
 			},
 		)

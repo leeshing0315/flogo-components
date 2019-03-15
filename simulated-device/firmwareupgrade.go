@@ -141,8 +141,8 @@ func (fu *FirmwareUpgrade) requestFirmware(seqno byte) error {
 }
 
 func (fu *FirmwareUpgrade) ReceiveFileSlice(seqno byte, content []byte) error {
-	if fu.FileSlices[seqno] != nil {
-		fu.FileSlices[seqno] = &FileSlice{
+	if fu.FileSlices[seqno-1] == nil {
+		fu.FileSlices[seqno-1] = &FileSlice{
 			Identifier:  fu.Identifier,
 			Seqno:       seqno,
 			FirmwareObj: content,
