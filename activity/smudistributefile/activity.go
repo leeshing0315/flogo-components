@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/binary"
-	"encoding/json"
 	"strconv"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
@@ -33,7 +32,7 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	// do eval
-	firmwareVersionStr := ctx.GetInput("firmwareVersion").(string)
+	// firmwareVersionStr := ctx.GetInput("firmwareVersion").(string)
 	serialNumber := ctx.GetInput("serialNumber").(int)
 	devId := ctx.GetInput("devId").(string)
 	uri := ctx.GetInput("uri").(string)
@@ -65,8 +64,8 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, nil
 	}
 
-	firmwareVersion := make(map[string]interface{})
-	json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
+	// firmwareVersion := make(map[string]interface{})
+	// json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
 
 	// firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].([]interface{})[0].(map[string]interface{}))
 	firmwareFileBytesInterface, ok := smuversionchecking.FirmwareCacheMap.Load(identifier)
