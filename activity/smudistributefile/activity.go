@@ -98,6 +98,7 @@ func generateResponseContent(serialNumber int, contentBuff []byte) []byte {
 	upgradeSegmentBuff.WriteByte(byte(serialNumber))
 	contentLength := make([]byte, 2)
 	binary.BigEndian.PutUint16(contentLength, uint16(len(contentBuff)))
+	upgradeSegmentBuff.Write(contentLength)
 	upgradeSegmentBuff.Write(contentBuff)
 	upgradeSegmentBuff.WriteString("#")
 	return upgradeSegmentBuff.Bytes()
