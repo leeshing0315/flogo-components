@@ -18,30 +18,34 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 			return
 		}
 
-		seqnoBytes := make([]byte, 2)
-		_, err = reader.Read(seqnoBytes)
+		// seqnoBytes := make([]byte, 2)
+		// _, err = reader.Read(seqnoBytes)
+		seqnoBytes, err := readCount(reader, 2)
 		if err != nil {
 			errChain <- err
 			return
 		}
 
-		dataSegmentLengthBytes := make([]byte, 2)
-		_, err = reader.Read(dataSegmentLengthBytes)
+		// dataSegmentLengthBytes := make([]byte, 2)
+		// _, err = reader.Read(dataSegmentLengthBytes)
+		dataSegmentLengthBytes, err := readCount(reader, 2)
 		if err != nil {
 			errChain <- err
 			return
 		}
 
 		dataSegmentLength := binary.BigEndian.Uint16(dataSegmentLengthBytes)
-		dataSegment := make([]byte, dataSegmentLength)
-		_, err = reader.Read(dataSegment)
+		// dataSegment := make([]byte, dataSegmentLength)
+		// n, err := reader.Read(dataSegment)
+		dataSegment, err := readCount(reader, int(dataSegmentLength))
 		if err != nil {
 			errChain <- err
 			return
 		}
 
-		crcSegment := make([]byte, 2)
-		_, err = reader.Read(crcSegment)
+		// crcSegment := make([]byte, 2)
+		// _, err = reader.Read(crcSegment)
+		crcSegment, err := readCount(reader, 2)
 		if err != nil {
 			errChain <- err
 			return
@@ -156,4 +160,22 @@ func receiveFileSlice(seqno byte, content []byte) (err error) {
 func responseEmpty(writer *bufio.Writer, cmd byte, seqnoBytes []byte) error {
 	_, err := writer.Write(genPacket(cmd, seqnoBytes, []byte{}))
 	return err
+}
+
+func readCount(reader *bufio.Reader, count int) ([]byte, error) {
+	var result []byte = make([]byte, count)
+	temp := result
+	hasRead := 0
+	for {
+		n, err := reader.Read(temp)
+		if err != nil {
+			return result, err
+		}
+		hasRead += n
+		if hasRead == count {
+			break
+		}
+		temp = temp[n:]
+	}
+	return result, nil
 }

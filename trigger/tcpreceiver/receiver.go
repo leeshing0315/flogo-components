@@ -139,26 +139,22 @@ func parseByProtocol(s *Socket, reader *bufio.Reader) (*BinPacket, error) {
 		return nil, err
 	}
 
-	sequence := make([]byte, 2)
-	_, err = reader.Read(sequence)
+	sequence, err := readCount(reader, 2)
 	if err != nil {
 		return nil, err
 	}
 
-	dataSegmentLength := make([]byte, 2)
-	_, err = reader.Read(dataSegmentLength)
+	dataSegmentLength, err := readCount(reader, 2)
 	if err != nil {
 		return nil, err
 	}
 
-	dataSegment := make([]byte, binary.BigEndian.Uint16(dataSegmentLength))
-	_, err = reader.Read(dataSegment)
+	dataSegment, err := readCount(reader, int(binary.BigEndian.Uint16(dataSegmentLength)))
 	if err != nil {
 		return nil, err
 	}
 
-	crc16Check := make([]byte, 2)
-	_, err = reader.Read(crc16Check)
+	crc16Check, err := readCount(reader, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -170,4 +166,22 @@ func parseByProtocol(s *Socket, reader *bufio.Reader) (*BinPacket, error) {
 		DataSegment:       dataSegment,
 		CRC16Check:        crc16Check,
 	}, nil
+}
+
+func readCount(reader *bufio.Reader, count int) ([]byte, error) {
+	var result []byte = make([]byte, count)
+	temp := result
+	hasRead := 0
+	for {
+		n, err := reader.Read(temp)
+		if err != nil {
+			return result, err
+		}
+		hasRead += n
+		if hasRead == count {
+			break
+		}
+		temp = temp[n:]
+	}
+	return result, nil
 }
