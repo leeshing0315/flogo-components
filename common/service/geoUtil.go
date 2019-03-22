@@ -245,24 +245,21 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 		if ok {
 			tmpLocation := location.(map[string]interface{})
 			gpsevent.Address = entity.GpsEventAddress{}
+			gpsevent.DisplayName = ""
 			if tmpLocation["geoName"] != nil {
 				gpsevent.Address.Name = tmpLocation["geoName"].(string)
+				gpsevent.DisplayName = tmpLocation["geoName"].(string)
 			}
 			if tmpLocation["geoCity"] != nil {
 				gpsevent.Address.City = tmpLocation["geoCity"].(string)
-			}
-			if tmpLocation["geoCountry"] != nil {
-				gpsevent.Address.Country = tmpLocation["geoCountry"].(string)
-			}
-			if tmpLocation["geoCode"] != nil {
-				gpsevent.Address.Code = tmpLocation["geoCode"].(string)
-			}
-			gpsevent.DisplayName = tmpLocation["geoName"].(string)
-			if tmpLocation["geoCity"] != nil {
 				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation["geoCity"].(string)
 			}
 			if tmpLocation["geoCountry"] != nil {
+				gpsevent.Address.Country = tmpLocation["geoCountry"].(string)
 				gpsevent.DisplayName = gpsevent.DisplayName + ", " + tmpLocation["geoCountry"].(string)
+			}
+			if tmpLocation["geoCode"] != nil {
+				gpsevent.Address.Code = tmpLocation["geoCode"].(string)
 			}
 		}
 	} else {
@@ -272,7 +269,7 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 	if ooclLocation != nil {
 		_, ok := ooclLocation.(map[string]interface{})
 		if ok {
-			tmpLocation := location.(map[string]interface{})
+			tmpLocation := ooclLocation.(map[string]interface{})
 			gpsevent.Address.OoclDisplayName = ""
 			if tmpLocation["geoName"] != nil {
 				gpsevent.Address.OoclName = tmpLocation["geoName"].(string)
