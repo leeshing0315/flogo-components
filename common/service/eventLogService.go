@@ -21,7 +21,6 @@ func ParseToEventLog(bytes []byte, now time.Time, cntrNum string, seqNo int) *en
 		return nil
 	}
 	loc, _ := time.LoadLocation("Asia/Hong_Kong")
-	eventLog.LogTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	eventLog.RevTime = now.In(loc).Format("2006-01-02T15:04:05+08:00")
 	eventLog.CntrNum = cntrNum
 	eventLog.Seq = strconv.FormatInt(int64(seqNo), 10)

@@ -246,7 +246,10 @@ func updateDeviceDeploymentStatus(db *mongo.Database, deviceId string) error {
 	firmwareDeploymentColl := db.Collection("firmwareDeployments")
 	_, err := firmwareDeploymentColl.UpdateOne(
 		context.Background(),
-		bson.M{"devId": deviceId},
+		bson.M{
+			"devId":        deviceId,
+			"deployStatus": "pending",
+		},
 		bson.M{
 			"$set": valueMap,
 		},
