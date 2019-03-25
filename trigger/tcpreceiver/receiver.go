@@ -38,7 +38,7 @@ type Socket struct {
 type ServerSocket struct {
 	Address   string
 	OnOpen    func(*Socket) error
-	OnMessage func(*Socket, *BinPacket) error
+	OnMessage func(*Socket, *bufio.Writer, *BinPacket) error
 	OnClose   func(*Socket)
 	OnError   func(*Socket, error)
 	Listener  net.Listener
@@ -50,7 +50,7 @@ func NewServerSocket(address string) *ServerSocket {
 		Address: address,
 	}
 	serverSocket.OnOpen = func(*Socket) error { return nil }
-	serverSocket.OnMessage = func(*Socket, *BinPacket) error { return nil }
+	serverSocket.OnMessage = func(*Socket, *bufio.Writer, *BinPacket) error { return nil }
 	serverSocket.OnClose = func(*Socket) {}
 	serverSocket.OnError = func(*Socket, error) {}
 	return serverSocket
@@ -87,6 +87,7 @@ func (s *Socket) execute() {
 		return
 	}
 	reader := bufio.NewReader(s.Conn)
+	writer := bufio.NewWriter(s.Conn)
 
 	err = handleIpInfo(s, reader)
 	if err != nil {
@@ -105,7 +106,7 @@ func (s *Socket) execute() {
 			return
 		}
 
-		err = s.ServerSocket.OnMessage(s, binPacket)
+		err = s.ServerSocket.OnMessage(s, writer, binPacket)
 		if err != nil {
 			s.ServerSocket.OnError(s, err)
 			s.ServerSocket.OnClose(s)

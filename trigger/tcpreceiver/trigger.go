@@ -66,7 +66,7 @@ func (t *MyTrigger) Start() error {
 		log.Println(err)
 	}
 
-	serverSocket.OnMessage = func(s *Socket, packet *BinPacket) error {
+	serverSocket.OnMessage = func(s *Socket, writer *bufio.Writer, packet *BinPacket) error {
 		log.Println(s.Conn.RemoteAddr().String(), packet)
 
 		triggerData := map[string]interface{}{}
@@ -82,7 +82,6 @@ func (t *MyTrigger) Start() error {
 		triggerData["pin"] = s.Pin
 		triggerData["firmwareVersion"] = s.HardwareVer
 		triggerData["devtype"] = s.Type
-		writer := bufio.NewWriter(s.Conn)
 		for _, handler := range t.handlers {
 			results, err := handler.Handle(context.Background(), triggerData)
 			if err != nil {
