@@ -184,7 +184,11 @@ func (t *MyTrigger) Stop() error {
 
 func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) error {
 	content := make([]byte, len(dataSegment)+7)
-	content[0] = packet.Command
+	if packet.Command == 0x33 {
+		content[0] = 0x34
+	} else {
+		content[0] = packet.Command
+	}
 	copy(content[1:3], packet.Sequence)
 	binary.BigEndian.PutUint16(content[3:5], uint16(len(dataSegment)))
 	copy(content[5:5+len(dataSegment)], dataSegment)
@@ -192,6 +196,7 @@ func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) 
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
 	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	// binary.BigEndian.PutUint16(content[len(content)-2:len(content)], checksum)
 	log.Println("**********Ack:", convertBytesToStrings(content), "**********")
 
 	_, err := writer.Write(content)
