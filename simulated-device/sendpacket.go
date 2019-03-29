@@ -16,42 +16,61 @@ func sendPacket(writer *bufio.Writer, errChain chan error) {
 	for lineBytes, _, err := stdinReader.ReadLine(); err == nil; {
 		line := string(lineBytes)
 		if line == "q" {
-			log.Println("toSendSinglePacket")
 			err = toSendSinglePacket(writer)
 			if err != nil {
 				errChain <- err
 				return
 			}
 		} else if line == "w" {
-			log.Println("toSendMultiPacket")
 			err = toSendMultiPacket(writer)
 			if err != nil {
 				errChain <- err
 				return
 			}
 		} else if line == "e" {
-			log.Println("toSendEventLog")
 			err = toSendEventLog(writer)
 			if err != nil {
 				errChain <- err
 				return
 			}
-		} else if line == "r" {
-			log.Println("toSendTest")
+		} else if line == "1" {
 			err = toSendTest(writer)
 			if err != nil {
 				errChain <- err
 				return
 			}
+		} else if line == "2" {
+			err = toSendTest2Times(writer)
+			if err != nil {
+				errChain <- err
+			}
+		} else if line == "3" {
+			err = toSendTest3Times(writer)
+			if err != nil {
+				errChain <- err
+			}
+		} else if line == "4" {
+			err = toSendTest4Times(writer)
+			if err != nil {
+				errChain <- err
+			}
+		} else if line == "5" {
+			err = toSendTest5Times(writer)
+			if err != nil {
+				errChain <- err
+			}
+		} else if line == "p" {
+			err = toSendSomethingElse(writer)
+			if err != nil {
+				errChain <- err
+			}
 		} else if line == "t" {
-			log.Println("toSendSinglePacketWithAutoReg")
 			err = toSendSinglePacketWithAutoReg(writer)
 			if err != nil {
 				errChain <- err
 				return
 			}
 		} else if line == "y" {
-			log.Println("toSendMultiPacketWithAutoReg")
 			err = toSendMultiPacketWithAutoReg(writer)
 			if err != nil {
 				errChain <- err
@@ -66,6 +85,7 @@ func sendPacket(writer *bufio.Writer, errChain chan error) {
 }
 
 func toSendSinglePacket(writer *bufio.Writer) error {
+	log.Println("toSendSinglePacket Start")
 	dataSegment := []byte{
 		0, 128, 0, 114, 25, 3, 5, 16, 7, 6, 1, 222, 173, 70, 7, 63, 30, 104, 0, 0, 0, 247, 100,
 		4, 2, 17, 15,
@@ -79,11 +99,17 @@ func toSendSinglePacket(writer *bufio.Writer) error {
 	if err != nil {
 		return err
 	}
+	log.Println("toSendSinglePacket Write")
 	err = writer.Flush()
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("toSendSinglePacket Flush")
+	return nil
 }
 
 func toSendMultiPacket(writer *bufio.Writer) error {
+	log.Println("toSendMultiPacket Start")
 	dataSegment := []byte{
 		54,
 		27, 79,
@@ -121,11 +147,17 @@ func toSendMultiPacket(writer *bufio.Writer) error {
 	if err != nil {
 		return err
 	}
+	log.Println("toSendMultiPacket Write")
 	err = writer.Flush()
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("toSendMultiPacket Flush")
+	return nil
 }
 
 func toSendEventLog(writer *bufio.Writer) error {
+	log.Println("toSendEventLog Start")
 	dataSegment := []byte{
 		1, 19, 145, 163, 128, 56, 238, 52, 71, 72, 222, 52, 47, 60, 193, 255, 255, 255, 255, 255, 1, 19, 145, 163, 192, 56, 222, 51, 71, 72, 222, 52, 47, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 164, 0, 56, 234, 52, 71, 72, 222, 52, 47, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 164, 64, 56, 230, 52, 71, 72, 226, 52, 47, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 164, 128, 56, 230, 52, 71, 72, 226, 52, 48, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 164, 192, 56, 226, 51, 71, 72, 230, 54, 48, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 165, 0, 56, 230, 51, 71, 72, 222, 51, 48, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 165, 64, 56, 226, 51, 71, 72, 234, 54, 48, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 165, 128, 56, 234, 52, 71, 72, 218, 51, 50, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 168, 64, 232, 114, 35, 71, 72, 110, 36, 47, 62, 193, 255, 255, 255, 255, 255, 1, 19, 145, 165, 192, 56, 222, 50, 71, 72, 230, 53, 49, 189, 193, 255, 255, 255, 255, 255, 2, 19, 145, 168, 89, 160, 2, 2, 19, 145, 168, 89, 160, 1, 2, 19, 145, 165, 192, 32, 1, 1, 19, 145, 168, 128, 217, 94, 65, 71, 72, 222, 45, 51, 57, 193, 255, 255, 255, 255, 255, 1, 19, 145, 168, 192, 56, 226, 52, 71, 73, 6, 61, 50, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 169, 0, 56, 230, 52, 71, 72, 222, 52, 49, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 169, 64, 56, 238, 53, 71, 72, 222, 52, 49, 60, 193, 255, 255, 255, 255, 255, 1, 19, 145, 169, 128, 56, 222, 51, 71, 72, 222, 52, 49, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 169, 192, 56, 234, 52, 71, 72, 222, 52, 48, 60, 193, 255, 255, 255, 255, 255, 1, 19, 145, 170, 0, 56, 226, 51, 71, 72, 222, 52, 48, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 170, 64, 56, 226, 51, 71, 72, 222, 52, 48, 60, 193, 255, 255, 255, 255, 255, 1, 19, 145, 170, 128, 56, 238, 53, 71, 72, 222, 52, 48, 60, 193, 255, 255, 255, 255, 255, 1, 19, 145, 170, 192, 56, 222, 51, 71, 72, 222, 52, 47, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 171, 0, 56, 238, 52, 71, 72, 222, 52, 47, 60, 193, 255, 255, 255, 255, 255, 1, 19, 145, 171, 64, 56, 226, 52, 71, 72, 226, 52, 47, 61, 193, 255, 255, 255, 255, 255, 1, 19, 145, 171, 128, 56, 222, 51, 71, 72, 230, 53, 48, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 171, 192, 56, 230, 52, 71, 72, 230, 53, 48, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 172, 0, 56, 222, 50, 71, 72, 214, 51, 47, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 172, 64, 56, 226, 51, 71, 72, 226, 52, 47, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 172, 128, 56, 222, 50, 71, 72, 214, 51, 47, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 172, 192, 56, 226, 51, 71, 72, 226, 52, 47, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 173, 0, 56, 226, 51, 71, 72, 218, 50, 47, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 173, 64, 56, 222, 50, 71, 72, 230, 52, 47, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 173, 128, 56, 222, 50, 71, 72, 218, 51, 46, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 173, 192, 56, 222, 50, 71, 72, 226, 52, 46, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 176, 0, 56, 226, 51, 71, 72, 222, 51, 47, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 176, 64, 56, 226, 51, 71, 72, 226, 52, 48, 189, 193, 255, 255, 255, 255, 255, 1, 19, 145, 176, 128, 56, 230, 52, 71, 72, 218, 51, 49, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 176, 192, 40, 226, 51, 71, 72, 226, 52, 49, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 177, 0, 56, 234, 52, 71, 72, 226, 53, 50, 188, 193, 255, 255, 255, 255, 255, 1, 19, 145, 177, 64, 56, 222, 51, 71, 72, 218, 52, 50, 188, 193, 255, 255, 255, 255, 255,
 	}
@@ -134,21 +166,136 @@ func toSendEventLog(writer *bufio.Writer) error {
 	if err != nil {
 		return err
 	}
+	log.Println("toSendEventLog Write")
 	err = writer.Flush()
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("toSendEventLog Flush")
+	return nil
 }
 
 func toSendTest(writer *bufio.Writer) error {
+	log.Println("toSendTest Start")
 	packet := genPacket(0x31, []byte{0, 232}, []byte{})
 	_, err := writer.Write(packet)
 	if err != nil {
 		return err
 	}
+	log.Println("toSendTest Write")
 	err = writer.Flush()
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest Flush")
+	return nil
+}
+
+func toSendTest2Times(writer *bufio.Writer) error {
+	log.Println("toSendTest2Times Start")
+	packet := genPacket(0x31, []byte{0, 232}, []byte{})
+	var bigPacket []byte
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	log.Println(bigPacket)
+	_, err := writer.Write(bigPacket)
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest2Times Write")
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest2Times Flush")
+	return nil
+}
+
+func toSendTest3Times(writer *bufio.Writer) error {
+	log.Println("toSendTest3Times Start")
+	packet := genPacket(0x31, []byte{0, 232}, []byte{})
+	var bigPacket []byte
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	log.Println(bigPacket)
+	_, err := writer.Write(bigPacket)
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest3Times Write")
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest3Times Flush")
+	return nil
+}
+
+func toSendTest4Times(writer *bufio.Writer) error {
+	log.Println("toSendTest4Times Start")
+	packet := genPacket(0x31, []byte{0, 232}, []byte{})
+	var bigPacket []byte
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	log.Println(bigPacket)
+	_, err := writer.Write(bigPacket)
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest4Times Write")
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest4Times Flush")
+	return nil
+}
+
+func toSendTest5Times(writer *bufio.Writer) error {
+	log.Println("toSendTest5Times Start")
+	packet := genPacket(0x31, []byte{0, 232}, []byte{})
+	var bigPacket []byte
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	bigPacket = append(bigPacket, packet...)
+	log.Println(bigPacket)
+	_, err := writer.Write(bigPacket)
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest5Times Write")
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	log.Println("toSendTest5Times Flush")
+	return nil
+}
+
+func toSendSomethingElse(writer *bufio.Writer) error {
+	log.Println("toSendSomethingElse Start")
+	packet := genPacket(0x99, []byte{0, 232}, []byte{})
+	log.Println(packet)
+	_, err := writer.Write(packet)
+	if err != nil {
+		return err
+	}
+	log.Println("toSendSomethingElse Write")
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+	log.Println("toSendSomethingElse Flush")
+	return nil
 }
 
 func toSendSinglePacketWithAutoReg(writer *bufio.Writer) error {
+	log.Println("toSendSinglePacketWithAutoReg Start")
 	dataSegment := []byte{
 		0, 128, 0, 114, 25, 3, 5, 16, 7, 6, 1, 222, 173, 70, 7, 63, 30, 104, 0, 0, 0, 247, 100,
 		4, 2, 17, 15,
@@ -163,11 +310,17 @@ func toSendSinglePacketWithAutoReg(writer *bufio.Writer) error {
 	if err != nil {
 		return err
 	}
+	log.Println("toSendSinglePacketWithAutoReg Write")
 	err = writer.Flush()
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("toSendSinglePacketWithAutoReg Flush")
+	return nil
 }
 
 func toSendMultiPacketWithAutoReg(writer *bufio.Writer) error {
+	log.Println("toSendMultiPacketWithAutoReg Start")
 	firstSubDataSegment := []byte{
 		0, 128, 0, 114, 25, 3, 5, 9, 72, 85, 1, 71, 213, 43, 2, 85, 110, 114, 0, 0, 0, 110, 100,
 		4, 2, 18, 17,
@@ -208,8 +361,13 @@ func toSendMultiPacketWithAutoReg(writer *bufio.Writer) error {
 	if err != nil {
 		return err
 	}
+	log.Println("toSendMultiPacketWithAutoReg Write")
 	err = writer.Flush()
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("toSendMultiPacketWithAutoReg Flush")
+	return nil
 }
 
 func appendLoginItem(dataSegment []byte) []byte {

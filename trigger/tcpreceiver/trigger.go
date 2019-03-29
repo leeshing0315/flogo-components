@@ -157,10 +157,12 @@ func (t *MyTrigger) Start() error {
 				if upgradeAttr.Value() != nil {
 					upgradeCommand := upgradeAttr.Value().([]byte)
 					if len(upgradeCommand) != 0 {
-						commandSeqAttr, _ := results["upgradeSeqNo"]
-						commandSeqNo := commandSeqAttr.Value().(string)
-						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(0x33, uint16(commandSeqNoUint), writer, upgradeCommand)
+						// commandSeqAttr, _ := results["upgradeSeqNo"]
+						// commandSeqNo := commandSeqAttr.Value().(string)
+						// commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
+						// err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, upgradeCommand)
+						err := sendCommandToDevice(0x34, s.CommandSeq, writer, upgradeCommand)
+						s.CommandSeq = s.CommandSeq + 1
 						if err != nil {
 							return err
 						}
@@ -190,6 +192,7 @@ func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) 
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
 	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	log.Println("**********Ack:", convertBytesToStrings(content), "**********")
 
 	_, err := writer.Write(content)
 	if err != nil {
@@ -202,6 +205,14 @@ func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) 
 	return nil
 }
 
+func convertBytesToStrings(input []byte) []string {
+	output := make([]string, len(input))
+	for index, val := range input {
+		output[index] = "0x" + strconv.FormatUint(uint64(val), 16)
+	}
+	return output
+}
+
 func sendCommandToDevice(cmdValue int, seqNo uint16, writer *bufio.Writer, dataSegment []byte) error {
 	content := make([]byte, len(dataSegment)+7)
 	content[0] = byte(cmdValue)
@@ -212,7 +223,8 @@ func sendCommandToDevice(cmdValue int, seqNo uint16, writer *bufio.Writer, dataS
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
 	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
-	log.Println("**********Cmd:", content, "**********")
+	// binary.BigEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	log.Println("**********Cmd:", convertBytesToStrings(content), "**********")
 
 	_, err := writer.Write(content)
 	if err != nil {

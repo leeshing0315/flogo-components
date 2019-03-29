@@ -6,15 +6,18 @@ import (
 	"encoding/binary"
 	"log"
 	"net"
+	"os"
 
 	"github.com/sigurn/crc16"
 )
 
-var serverUri string = "localhost:8033"
+var serverUri string = "localhost:8035"
 
 // var serverUri string = "itciot-tcp.cargosmart.ai:8080"
 
 // var serverUri string = "ciot-tcp.cargosmart.ai:8080"
+
+// var serverUri string = "172.16.180.204:8033"
 
 var deviceIp string = "192.168.0.2"
 
@@ -27,6 +30,8 @@ var nginxPort string = "23456"
 // var pin string = "460011234567890" // not being registered
 
 var pin string = "460010604706821" // C01937 (15 bytes)
+
+// var pin string = "460011517700324" // 14571517564 (15 bytes)
 
 // var pin string = "460011710324088" // C00001 (15 bytes)
 
@@ -55,6 +60,24 @@ var defaultSettingIpPort string = "1F61" // 8033
 var defualtForcedNotToSleep string = "11"
 
 func main() {
+	// location, err := time.LoadLocation("Asia/Shanghai")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// timeInUTC := time.Now()
+	// timeInUTC = timeInUTC.In(location)
+	// fmt.Println(timeInUTC.Format(time.RFC3339Nano))
+
+	// a := []net.Conn{}
+	// for i := 0; i < 100; i++ {
+	// 	conn, err := net.Dial("tcp", serverUri)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// 	a = append(a, conn)
+	// }
+	// log.Println("aaa")
+	// os.Stdin.Read(make([]byte, 1))
 
 	setDeviceInfo(
 		defaultElectricalCommunicationFrequency,
@@ -73,12 +96,13 @@ func main() {
 	bufReader := bufio.NewReader(conn)
 	bufWriter := bufio.NewWriter(conn)
 
-	err = sendIpInfo(bufWriter)
-	if err != nil {
-		return
-	}
+	// err = sendIpInfo(bufWriter)
+	// if err != nil {
+	// 	return
+	// }
 
 	loginPacket := genLoginPacket()
+	log.Println(loginPacket)
 	_, err = bufWriter.Write(loginPacket)
 	if err != nil {
 		return
@@ -92,6 +116,31 @@ func main() {
 
 	go receivePacket(bufReader, bufWriter, errChain)
 	go sendPacket(bufWriter, errChain)
+
+	os.Stdout.WriteString(`Input the following command and press Enter to send SMU device packet:`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"q" - toSendSinglePacket`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"w" - toSendMultiPacket`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"e" - toSendEventLog`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"t" - toSendSinglePacketWithAutoReg`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"y" - toSendMultiPacketWithAutoReg`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"1" - toSendTest`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"2" - toSendTest2Times`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"3" - toSendTest3Times`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"4" - toSendTest4Times`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`"5" - toSendTest5Times`)
+	os.Stdout.Write([]byte{'\n'})
+	os.Stdout.WriteString(`********** Please enjoy **********`)
+	os.Stdout.Write([]byte{'\n'})
 
 	err = <-errChain
 	log.Println(err)
@@ -123,7 +172,9 @@ func genIpInfo() []byte {
 	buf.WriteString(nginxPort)
 	buf.WriteByte(0x0D)
 	buf.WriteByte(0x0A)
-	return buf.Bytes()
+	a := buf.Bytes()
+	log.Println(a)
+	return a
 }
 
 func genLoginPacket() []byte {

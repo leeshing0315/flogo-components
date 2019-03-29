@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/binary"
 	"strconv"
+	"sync"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/leeshing0315/flogo-components/activity/smuversionchecking"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -27,6 +28,10 @@ func NewActivity(metadata *activity.Metadata) activity.Activity {
 func (a *MyActivity) Metadata() *activity.Metadata {
 	return a.metadata
 }
+
+// store firmware for cache
+var firmwareCacheMap = make(map[string][]byte)
+var firmwareCacheLock sync.RWMutex
 
 // Eval implements activity.Activity.Eval
 func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
@@ -64,32 +69,29 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, nil
 	}
 
-	// firmwareVersion := make(map[string]interface{})
-	// json.Unmarshal([]byte(firmwareVersionStr), &firmwareVersion)
-
-	// firmwareFileBytes := getBytesFromMap(firmwareVersion["fileContent"].([]interface{})[0].(map[string]interface{}))
-	firmwareFileBytesInterface, ok := smuversionchecking.FirmwareCacheMap.Load(identifier)
-	if ok == false {
-		return false, nil
+	var firmwareFileBytes []byte
+	firmwareCacheLock.RLock()
+	firmwareFileBytes = firmwareCacheMap[identifier]
+	firmwareCacheLock.RUnlock()
+	if len(firmwareFileBytes) == 0 {
+		firmwareVersion := make(map[string]interface{})
+		client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+		defer client.Disconnect(context.Background())
+		if err != nil {
+			return false, err
+		}
+		db := client.Database(dbName)
+		coll := db.Collection("firmwareVersions")
+		singleResult := coll.FindOne(context.Background(), bson.M{"identifier": identifier})
+		err = singleResult.Decode(&firmwareVersion)
+		if err != nil {
+			return false, nil
+		}
+		firmwareFileBytes = getBytesFromMap(firmwareVersion["fileContent"].(primitive.A)[0].(map[string]interface{}))
+		firmwareCacheLock.Lock()
+		firmwareCacheMap[identifier] = firmwareFileBytes
+		firmwareCacheLock.Unlock()
 	}
-	firmwareFileBytes := firmwareFileBytesInterface.([]byte)
-
-	// filePath := firmwareVersion["filePath"]
-	// // Get file
-	// file, err := os.Open(filePath)
-	// if err != nil {
-	// 	return false, err
-	// }
-	// defer file.Close()
-
-	// bufReader := bufio.NewReader(file)
-
-	// bufReader.Discard(512 * (serialNumber - 1))
-	// firmwareBuff := make([]byte, 512)
-	// _, err = bufReader.Read(firmwareBuff)
-	// if err != nil && err != io.EOF {
-	// 	return false, err
-	// }
 
 	firmwareBuff := make([]byte, 512)
 	firmwareFileBytesLen := len(firmwareFileBytes)
@@ -126,7 +128,7 @@ func getBytesFromMap(input map[string]interface{}) []byte {
 		if err != nil || int(index) >= resultLen {
 			break
 		}
-		result[index] = byte(v.(float64))
+		result[index] = byte(v.(int32))
 	}
 	return result
 }

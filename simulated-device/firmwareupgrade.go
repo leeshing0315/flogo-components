@@ -128,15 +128,18 @@ func (fu *FirmwareUpgrade) requestFirmware(seqno byte) error {
 	buf.WriteByte(0x08)
 	buf.WriteString(fu.Identifier)
 	buf.WriteString("#")
-	log.Println("before send")
+	log.Println("*****before send")
 	result := genPacket(0x33, fu.SeqnoBytes, buf.Bytes())
 	log.Println(result)
-	_, err := fu.Writer.Write(result)
+	n, err := fu.Writer.Write(result)
 	if err != nil {
 		return err
 	}
+	log.Println("n", n)
+	log.Println("err1", err)
 	err = fu.Writer.Flush()
-	log.Println("after send")
+	log.Println("err2", err)
+	log.Println("*****after send")
 	return err
 }
 

@@ -17,6 +17,7 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 			errChain <- err
 			return
 		}
+		log.Println("cmd", cmd)
 
 		// seqnoBytes := make([]byte, 2)
 		// _, err = reader.Read(seqnoBytes)
@@ -25,6 +26,7 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 			errChain <- err
 			return
 		}
+		log.Println("seqnoBytes", seqnoBytes)
 
 		// dataSegmentLengthBytes := make([]byte, 2)
 		// _, err = reader.Read(dataSegmentLengthBytes)
@@ -33,6 +35,7 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 			errChain <- err
 			return
 		}
+		log.Println("dataSegmentLengthBytes", dataSegmentLengthBytes)
 
 		dataSegmentLength := binary.BigEndian.Uint16(dataSegmentLengthBytes)
 		// dataSegment := make([]byte, dataSegmentLength)
@@ -42,6 +45,7 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 			errChain <- err
 			return
 		}
+		log.Println("dataSegment", dataSegment)
 
 		// crcSegment := make([]byte, 2)
 		// _, err = reader.Read(crcSegment)
@@ -50,6 +54,7 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 			errChain <- err
 			return
 		}
+		log.Println("crcSegment", crcSegment)
 
 		switch cmd {
 		case 0x34:
@@ -59,12 +64,6 @@ func receivePacket(reader *bufio.Reader, writer *bufio.Writer, errChain chan err
 				return
 			}
 		case 0x33:
-			log.Println("*****receiveFirmware*****")
-			log.Println(cmd)
-			log.Println(seqnoBytes)
-			log.Println(dataSegmentLengthBytes)
-			log.Println(dataSegment)
-			log.Println(crcSegment)
 			log.Println("*****receiveFirmware*****")
 			err = receiveFirmware(writer, seqnoBytes, dataSegment)
 			if err != nil {

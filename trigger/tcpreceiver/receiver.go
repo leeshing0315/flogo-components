@@ -32,6 +32,7 @@ type Socket struct {
 	RemoteAddrStr string
 	CntrNum       string
 	DevId         string
+	CommandSeq    uint16
 }
 
 // ServerSocket TCP server
