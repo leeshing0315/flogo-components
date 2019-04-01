@@ -18,6 +18,10 @@
     {
       "name": "devid",
       "type": "string"
+    },
+    {
+      "name": "command",
+      "type": "integer"
     }
   ],
   "outputs": [

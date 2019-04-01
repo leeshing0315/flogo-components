@@ -32,10 +32,15 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	reqDataSegment := context.GetInput("reqDataSegment").([]byte)
 	devid := context.GetInput("devid").(string)
 	seqNo := context.GetInput("seqNo").(int)
+	command := context.GetInput("command").(int)
 
 	condition := make(map[string]interface{})
 	condition["devid"] = devid
-	condition["seqno"] = seqNo
+	if command == 0x33 {
+		condition["subcmd"] = "FF"
+	} else {
+		condition["seqno"] = seqNo
+	}
 	conditionBytes, _ := json.Marshal(condition)
 	context.SetOutput("keyValue", string(conditionBytes))
 	println("**********CMDACK", strings.Join([]string{devid, strconv.FormatUint(uint64(seqNo), 10)}, ","), "**********")
