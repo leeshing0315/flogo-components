@@ -134,7 +134,7 @@ func (t *MyTrigger) Start() error {
 						commandSeqAttr, _ := results["setCommandSeqNo"]
 						commandSeqNo := commandSeqAttr.Value().(string)
 						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, setCommand)
+						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, setCommand, false)
 						if err != nil {
 							return err
 						}
@@ -147,7 +147,7 @@ func (t *MyTrigger) Start() error {
 						commandSeqAttr, _ := results["readCommandSeqNo"]
 						commandSeqNo := commandSeqAttr.Value().(string)
 						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
-						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, readCommand)
+						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, readCommand, false)
 						if err != nil {
 							return err
 						}
@@ -161,7 +161,7 @@ func (t *MyTrigger) Start() error {
 						// commandSeqNo := commandSeqAttr.Value().(string)
 						// commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
 						// err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, upgradeCommand)
-						err := sendCommandToDevice(0x34, s.CommandSeq, writer, upgradeCommand)
+						err := sendCommandToDevice(0x34, s.CommandSeq, writer, upgradeCommand, true)
 						s.CommandSeq = s.CommandSeq + 1
 						if err != nil {
 							return err
@@ -195,8 +195,11 @@ func writeToDevice(packet *BinPacket, writer *bufio.Writer, dataSegment []byte) 
 
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
-	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
-	// binary.BigEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	if packet.Command == 0x33 {
+		binary.BigEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	} else {
+		binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	}
 	log.Println("**********Ack:", convertBytesToStrings(content), "**********")
 
 	_, err := writer.Write(content)
@@ -218,7 +221,7 @@ func convertBytesToStrings(input []byte) []string {
 	return output
 }
 
-func sendCommandToDevice(cmdValue int, seqNo uint16, writer *bufio.Writer, dataSegment []byte) error {
+func sendCommandToDevice(cmdValue int, seqNo uint16, writer *bufio.Writer, dataSegment []byte, crcRotate bool) error {
 	content := make([]byte, len(dataSegment)+7)
 	content[0] = byte(cmdValue)
 	binary.BigEndian.PutUint16(content[1:3], seqNo)
@@ -227,8 +230,12 @@ func sendCommandToDevice(cmdValue int, seqNo uint16, writer *bufio.Writer, dataS
 
 	myTable := crc16.MakeTable(crc16.CRC16_MODBUS)
 	checksum := crc16.Checksum(content[0:len(content)-2], myTable)
-	binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
-	// binary.BigEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	if crcRotate == true {
+		binary.BigEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	} else {
+		binary.LittleEndian.PutUint16(content[len(content)-2:len(content)], checksum)
+	}
+
 	log.Println("**********Cmd:", convertBytesToStrings(content), "**********")
 
 	_, err := writer.Write(content)

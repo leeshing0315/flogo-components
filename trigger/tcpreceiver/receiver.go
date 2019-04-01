@@ -74,6 +74,7 @@ func (server *ServerSocket) Listen() error {
 		socket := &Socket{
 			Conn:         conn,
 			ServerSocket: server,
+			CommandSeq:   1,
 		}
 		go socket.execute()
 	}

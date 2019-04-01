@@ -180,7 +180,7 @@ func handleUpgradeCommand(firmwareVersionMap map[string]interface{}) []byte {
 
 	// crcValue
 	crcValueTag := make([]byte, 2)
-	binary.BigEndian.PutUint16(crcValueTag, uint16(crcValue))
+	binary.LittleEndian.PutUint16(crcValueTag, uint16(crcValue))
 
 	// firmware name
 	firmwareNameTag := []byte{0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20}
