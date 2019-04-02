@@ -57,10 +57,16 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	context.SetOutput("resDataSegment", []byte{})
 	if len(eventLogStrs) > 0 {
-		eventLogsOutput, _ := json.Marshal(eventLogStrs)
+		eventLogsOutput, err := json.Marshal(eventLogStrs)
+		if err != nil {
+			return false, err
+		}
 		context.SetOutput("eventLogs", string(eventLogsOutput))
 
-		gpsEventsOutput, _ := json.Marshal(gpsEventStrs)
+		gpsEventsOutput, err := json.Marshal(gpsEventStrs)
+		if err != nil {
+			return false, err
+		}
 		context.SetOutput("gpsEvents", string(gpsEventsOutput))
 	}
 
