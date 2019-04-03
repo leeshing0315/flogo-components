@@ -62,7 +62,9 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 				"sendflag": "2",
 			},
 			bson.M{
-				"value": value,
+				"$set": map[string]interface{}{
+					"value": value,
+				},
 			},
 			&options.FindOneAndUpdateOptions{
 				Sort: bson.M{
@@ -78,7 +80,9 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 				"sendflag": "2",
 			},
 			bson.M{
-				"value": value,
+				"$set": map[string]interface{}{
+					"value": value,
+				},
 			},
 			&options.FindOneAndUpdateOptions{
 				Sort: bson.M{
