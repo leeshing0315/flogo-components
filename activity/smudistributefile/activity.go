@@ -90,6 +90,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 				},
 			},
 		)
+		ctx.SetOutput("upgradeSegment", []byte{})
 		return true, nil
 	}
 

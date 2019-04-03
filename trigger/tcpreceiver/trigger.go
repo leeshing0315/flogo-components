@@ -120,7 +120,7 @@ func (t *MyTrigger) Start() error {
 					s.Type = byte(devtypeStr)
 				}
 
-				if ok && packet.Command != 0x34 {
+				if ok && (packet.Command != 0x34 && !(packet.Command == 0x33 && packet.DataSegment[1] == 'L')) {
 					dataSegment := dataAttr.Value().([]byte)
 					err := writeToDevice(packet, writer, dataSegment)
 					if err != nil {
