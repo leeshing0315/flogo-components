@@ -83,7 +83,11 @@ func DecodeReadConfigAck(original []byte) string {
 	str.WriteString("*L")
 
 	// powerOnFrequency
-	str.WriteString(strconv.FormatUint(uint64(original[2]), 10))
+	if original[2] == 49 {
+		str.WriteString("1")
+	} else {
+		str.WriteString("1")
+	}
 	for i := 3; i < 7; i++ {
 		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
 			str.WriteString("0")
@@ -94,7 +98,11 @@ func DecodeReadConfigAck(original []byte) string {
 	}
 
 	// powerOffFrequency
-	str.WriteString(strconv.FormatUint(uint64(original[7]), 10))
+	if original[7] == 49 {
+		str.WriteString("1")
+	} else {
+		str.WriteString("1")
+	}
 	for i := 8; i < 12; i++ {
 		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
 			str.WriteString("0")
@@ -105,7 +113,11 @@ func DecodeReadConfigAck(original []byte) string {
 	}
 
 	// collectFrequency
-	str.WriteString(strconv.FormatUint(uint64(original[12]), 10))
+	if original[12] == 49 {
+		str.WriteString("1")
+	} else {
+		str.WriteString("1")
+	}
 	for i := 13; i < 17; i++ {
 		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
 			str.WriteString("0")
@@ -116,7 +128,11 @@ func DecodeReadConfigAck(original []byte) string {
 	}
 
 	// serverIPAndPort
-	str.WriteString(strconv.FormatUint(uint64(original[17]), 10))
+	if original[17] == 49 {
+		str.WriteString("1")
+	} else {
+		str.WriteString("1")
+	}
 	for i := 18; i < 30; i++ {
 		if strconv.FormatUint(uint64(original[i]), 10) == "0" {
 			str.WriteString("0")

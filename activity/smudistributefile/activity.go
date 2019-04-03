@@ -58,7 +58,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 			context.Background(),
 			bson.M{
 				"devid":    devId,
-				"submcd":   "FF",
+				"subcmd":   "FF",
 				"sendflag": "2",
 			},
 			bson.M{
@@ -76,7 +76,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 			context.Background(),
 			bson.M{
 				"devid":    devId,
-				"submcd":   "FF",
+				"subcmd":   "FF",
 				"sendflag": "2",
 			},
 			bson.M{
