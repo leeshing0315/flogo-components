@@ -11,7 +11,7 @@ import (
 	"github.com/sigurn/crc16"
 )
 
-var serverUri string = "localhost:8035"
+var serverUri string = "localhost:8033"
 
 // var serverUri string = "itciot-tcp.cargosmart.ai:8080"
 
@@ -96,10 +96,10 @@ func main() {
 	bufReader := bufio.NewReader(conn)
 	bufWriter := bufio.NewWriter(conn)
 
-	// err = sendIpInfo(bufWriter)
-	// if err != nil {
-	// 	return
-	// }
+	err = sendIpInfo(bufWriter)
+	if err != nil {
+		return
+	}
 
 	loginPacket := genLoginPacket()
 	log.Println(loginPacket)

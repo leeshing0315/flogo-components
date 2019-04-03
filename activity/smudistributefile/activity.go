@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/leeshing0315/flogo-components/common/service"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,12 +38,59 @@ var firmwareCacheLock sync.RWMutex
 func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	// do eval
-	// firmwareVersionStr := ctx.GetInput("firmwareVersion").(string)
-	serialNumber := ctx.GetInput("serialNumber").(int)
+	reqDataSegmentBytes := ctx.GetInput("reqDataSegment").([]byte)
 	devId := ctx.GetInput("devId").(string)
 	uri := ctx.GetInput("uri").(string)
 	dbName := ctx.GetInput("dbName").(string)
-	identifier := ctx.GetInput("identifier").(string)
+
+	if reqDataSegmentBytes[1] == 'L' {
+		// update read config content
+		value := service.DecodeReadConfigAck(reqDataSegmentBytes)
+		client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
+		defer client.Disconnect(context.Background())
+		if err != nil {
+			return false, err
+		}
+		db := client.Database(dbName)
+		cmdColl := db.Collection("remotecommands")
+		historyCmdColl := db.Collection("remotecommandhistories")
+		cmdColl.FindOneAndUpdate(
+			context.Background(),
+			bson.M{
+				"devid":    devId,
+				"submcd":   "FF",
+				"sendflag": "2",
+			},
+			bson.M{
+				"value": value,
+			},
+			&options.FindOneAndUpdateOptions{
+				Sort: bson.M{
+					"savetime": -1,
+				},
+			},
+		)
+		historyCmdColl.FindOneAndUpdate(
+			context.Background(),
+			bson.M{
+				"devid":    devId,
+				"submcd":   "FF",
+				"sendflag": "2",
+			},
+			bson.M{
+				"value": value,
+			},
+			&options.FindOneAndUpdateOptions{
+				Sort: bson.M{
+					"savetime": -1,
+				},
+			},
+		)
+		return true, nil
+	}
+
+	serialNumber := int(reqDataSegmentBytes[2])
+	identifier := string(reqDataSegmentBytes[5:13])
 
 	if serialNumber == 0xFF {
 		// update firmwareDeployment from inProgress to completed

@@ -8,14 +8,6 @@
   "title": "SMU DistributeFile",
   "inputs":[
     {
-      "name": "firmwareVersion",
-      "type": "string"
-    },
-    {
-      "name": "serialNumber",
-      "type": "integer"
-    },
-    {
       "name": "devId",
       "type": "string"
     },
@@ -28,8 +20,8 @@
       "type": "string"
     },
     {
-      "name": "identifier",
-      "type": "string"
+      "name": "reqDataSegment",
+      "type": "array"
     }
   ],
   "outputs": [
