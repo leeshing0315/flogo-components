@@ -8,12 +8,20 @@
   "title": "SMU Save Original Packet",
   "inputs":[
     {
+      "name": "ip",
+      "type": "string"
+    },
+    {
       "name": "eventTime",
       "type": "string"
     },
     {
       "name": "originalPacketBytes",
       "type": "array"
+    },
+    {
+      "name": "pin",
+      "type": "string"
     },
     {
       "name": "uri",
