@@ -58,6 +58,10 @@
     {
       "name": "emptyByteArray",
       "type": "array"
+    },
+    {
+      "name": "originalPacket",
+      "type": "array"
     }
   ],
   "reply": [

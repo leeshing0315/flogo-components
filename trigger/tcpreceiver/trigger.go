@@ -2,6 +2,7 @@ package tcpreceiver
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/binary"
 	"log"
@@ -82,6 +83,15 @@ func (t *MyTrigger) Start() error {
 		triggerData["pin"] = s.Pin
 		triggerData["firmwareVersion"] = s.HardwareVer
 		triggerData["devtype"] = s.Type
+
+		var originalPacket bytes.Buffer
+		originalPacket.WriteByte(packet.Command)
+		originalPacket.Write(packet.Sequence)
+		originalPacket.Write(packet.DataSegmentLength)
+		originalPacket.Write(packet.DataSegment)
+		originalPacket.Write(packet.CRC16Check)
+		triggerData["originalPacket"] = originalPacket.Bytes()
+
 		for _, handler := range t.handlers {
 			results, err := handler.Handle(context.Background(), triggerData)
 			if err != nil {

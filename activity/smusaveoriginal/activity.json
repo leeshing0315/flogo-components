@@ -1,0 +1,33 @@
+{
+  "name": "smusaveoriginal",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smusaveoriginal",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU Save Original Packet",
+  "inputs":[
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "originalPacketBytes",
+      "type": "array"
+    },
+    {
+      "name": "uri",
+      "type": "string"
+    },
+    {
+      "name": "dbName",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output",
+      "type": "string"
+    }
+  ]
+}
