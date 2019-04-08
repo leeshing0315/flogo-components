@@ -8,4 +8,6 @@ type DeviceError struct {
 	Logtime   string `json:"logtime,omitempty"`
 	Revtime   string `json:"revtime,omitempty"`
 	TableName string `json:"tableName,omitempty"` // default: "Tbldevicefault"
+
+	Source string `json:"source,omitempty"`
 }

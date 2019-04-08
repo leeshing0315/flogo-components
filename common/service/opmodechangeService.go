@@ -17,6 +17,8 @@ func GenOpModeChangeFromSinglePacket(singlePacket *entity.SinglePacket, seqNo st
 		operationModeChange.Opmode = singlePacket.InfoItem.OpMode
 		operationModeChange.TableName = "Tblopmoderec"
 
+		operationModeChange.Source = "TCP_SERVER"
+
 		return operationModeChange
 	} else {
 		return nil

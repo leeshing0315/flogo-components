@@ -21,4 +21,6 @@ type EventLog struct {
 	Smode     string  `json:"smode,omitempty"`
 	Isa       int32   `json:"isa,omitempty"`
 	TableName string  `json:"tableName,omitempty"`
+
+	Source string `json:"source,omitempty"`
 }

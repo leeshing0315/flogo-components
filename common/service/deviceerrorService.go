@@ -59,6 +59,8 @@ func genCommonDeviceError(singlePacket *entity.SinglePacket, seqNo string, devId
 	deviceError.Seqno = seqNo
 	deviceError.TableName = "Tbldevicefault"
 
+	deviceError.Source = "TCP_SERVER"
+
 	return deviceError
 }
 

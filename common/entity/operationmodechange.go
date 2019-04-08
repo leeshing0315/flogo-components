@@ -7,4 +7,6 @@ type OperationModeChange struct {
 	Logtime   string `json:"logtime,omitempty"`
 	Revtime   string `json:"revtime,omitempty"`
 	TableName string `json:"tableName,omitempty"` // default: "Tblopmoderec"
+
+	Source string `json:"source,omitempty"`
 }

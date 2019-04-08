@@ -177,8 +177,10 @@ func parseDateTime(bytes []byte) string {
 	builder.WriteString(":")
 	builder.WriteString(minuteStr)
 	builder.WriteString(":")
-	builder.WriteString("00+08:00")
-	return builder.String()
+	builder.WriteString("00Z")
+	t, _ := time.Parse(time.RFC3339, builder.String())
+	loc, _ := time.LoadLocation("Asia/Shanghai")
+	return t.In(loc).Format("2006-01-02T15:04:05+08:00")
 }
 
 func ConvertEventLogToGPSEvent(eventLog *entity.EventLog) *entity.GpsEvent {
