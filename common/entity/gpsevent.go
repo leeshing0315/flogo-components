@@ -61,8 +61,8 @@ type GpsEvent struct {
 // GpsEventAddress entity gpsEventAddress
 type GpsEventAddress struct {
 	Distance  float64 `json:"distance"`
-	Longitude float64
-	Latitude  float64
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
 
 	Code            string `json:"code"`
 	Name            string `json:"name"`
