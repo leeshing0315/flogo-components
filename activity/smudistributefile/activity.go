@@ -106,7 +106,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		}
 		db := client.Database(dbName)
 		coll := db.Collection("firmwareDeployments")
-		coll.UpdateOne(
+		coll.UpdateMany(
 			context.Background(),
 			map[string]interface{}{
 				"devId":        devId,

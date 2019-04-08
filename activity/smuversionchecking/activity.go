@@ -103,16 +103,16 @@ func queryDeviceFirmwareInformation(db *mongo.Database, devId string) (error, ma
 	deploymentsColl := db.Collection("firmwareDeployments")
 
 	// if find a firmwareDeployment is inProgress, don't start a new upgrade
-	dpInprogressFilter := buildDeploymentInProgressBsonFilter(devId)
-	deploymentInprogressMap := make(map[string]interface{})
-	err := deploymentsColl.FindOne(context.Background(), dpInprogressFilter).Decode(&deploymentInprogressMap)
-	if err == nil {
-		return nil, nil, nil
-	}
+	// dpInprogressFilter := buildDeploymentInProgressBsonFilter(devId)
+	// deploymentInprogressMap := make(map[string]interface{})
+	// err := deploymentsColl.FindOne(context.Background(), dpInprogressFilter).Decode(&deploymentInprogressMap)
+	// if err == nil {
+	// 	return nil, nil, nil
+	// }
 
 	dpBsonFilter := buildBsonFilter(devId)
 	deploymentMap := make(map[string]interface{})
-	err = deploymentsColl.FindOne(context.Background(), dpBsonFilter).Decode(&deploymentMap)
+	err := deploymentsColl.FindOne(context.Background(), dpBsonFilter).Decode(&deploymentMap)
 	if err != nil {
 		log.Printf("Connection query firmware error: %v", err)
 		return nil, nil, nil
