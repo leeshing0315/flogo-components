@@ -37,6 +37,9 @@ func init() {
 	coscoGeo, err := queryGeofences(geoColl, map[string]interface{}{
 		"carrier":   "COSCO",
 		"isDeleted": "F",
+		"coords": map[string]interface{}{
+			"$exists": true,
+		},
 	})
 	if err != nil {
 		return
@@ -44,6 +47,9 @@ func init() {
 	ooclGeo, err := queryGeofences(geoColl, map[string]interface{}{
 		"carrier":   "OOCL",
 		"isDeleted": "F",
+		"coords": map[string]interface{}{
+			"$exists": true,
+		},
 	})
 	if err != nil {
 		return
@@ -54,6 +60,9 @@ func init() {
 		},
 		"geoLocType": "Ocean",
 		"isDeleted":  "F",
+		"coords": map[string]interface{}{
+			"$exists": true,
+		},
 	})
 	if err != nil {
 		return
