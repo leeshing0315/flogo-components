@@ -97,34 +97,12 @@ func isPointInPolygon(point []float64, polyCornersTmp []interface{}) bool {
 	for i = 0; i < len(polyCorners); i++ {
 		polyCornersItemCurrent := []interface{}(polyCorners[i].(primitive.A))
 		polyCornersItemBefore := []interface{}(polyCorners[j].(primitive.A))
-		polyCornersItemCurrentArr := []float64{}
-		polyCornersItemBeforeArr := []float64{}
-		if reflect.TypeOf(polyCornersItemBefore[0]).Name() == "int32" {
-			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, float64(polyCornersItemBefore[0].(int32)))
+		polyCornersItemCurrentArr := convertNumberToFloat(polyCornersItemCurrent)
+		polyCornersItemBeforeArr := convertNumberToFloat(polyCornersItemBefore)
+		if polyCornersItemCurrentArr == nil || polyCornersItemBeforeArr == nil {
+			continue
 		}
-		if reflect.TypeOf(polyCornersItemCurrent[0]).Name() == "float64" {
-			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, polyCornersItemCurrent[0].(float64))
-		}
-		if reflect.TypeOf(polyCornersItemBefore[1]).Name() == "int32" {
-			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, float64(polyCornersItemBefore[1].(int32)))
-		}
-		if reflect.TypeOf(polyCornersItemCurrent[1]).Name() == "float64" {
-			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, polyCornersItemCurrent[1].(float64))
-		}
-		if reflect.TypeOf(polyCornersItemBefore[0]).Name() == "float64" {
-			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, polyCornersItemBefore[0].(float64))
-		}
-		if reflect.TypeOf(polyCornersItemCurrent[0]).Name() == "int32" {
-			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, float64(polyCornersItemCurrent[0].(int32)))
-		}
-		if reflect.TypeOf(polyCornersItemBefore[1]).Name() == "float64" {
-			polyCornersItemBeforeArr = append(polyCornersItemBeforeArr, polyCornersItemBefore[1].(float64))
-		}
-		if reflect.TypeOf(polyCornersItemCurrent[1]).Name() == "int32" {
-			polyCornersItemCurrentArr = append(polyCornersItemCurrentArr, float64(polyCornersItemCurrent[1].(int32)))
-		}
-		if polyCornersItemCurrentArr[1] < point[1] && polyCornersItemBeforeArr[1] >= point[1] ||
-			polyCornersItemBeforeArr[1] < point[1] && polyCornersItemCurrentArr[1] >= point[1] {
+		if polyCornersItemCurrentArr[1] < point[1] && polyCornersItemBeforeArr[1] >= point[1] || polyCornersItemBeforeArr[1] < point[1] && polyCornersItemCurrentArr[1] >= point[1] {
 			if polyCornersItemCurrentArr[0]+(point[1]-polyCornersItemCurrentArr[1])/(polyCornersItemBeforeArr[1]-polyCornersItemCurrentArr[1])*(polyCornersItemBeforeArr[0]-polyCornersItemCurrentArr[0]) < point[0] {
 				oddNodes = !oddNodes
 			}
@@ -132,6 +110,26 @@ func isPointInPolygon(point []float64, polyCornersTmp []interface{}) bool {
 		j = i
 	}
 	return oddNodes
+}
+
+func convertNumberToFloat (inputArray []interface{}) []float64 {
+	convertArray := []float64{}
+	if reflect.TypeOf(inputArray[0]).Name() == "int32" {
+		convertArray = append(convertArray, float64(inputArray[0].(int32)))
+	}
+	if reflect.TypeOf(inputArray[0]).Name() == "float64" {
+		convertArray = append(convertArray, inputArray[0].(float64))
+	}
+	if reflect.TypeOf(inputArray[1]).Name() == "int32" {
+		convertArray = append(convertArray, float64(inputArray[1].(int32)))
+	}
+	if reflect.TypeOf(inputArray[1]).Name() == "float64" {
+		convertArray = append(convertArray, inputArray[1].(float64))
+	}
+	if len(convertArray) < 2 {
+		return nil
+	}
+	return convertArray
 }
 
 func calculateDistance(point1 []float64, point2 []float64) float64 {
@@ -194,7 +192,7 @@ func getLocationByLatLon(lat float64, lon float64, carrier string, onlyQueryGeof
 	var location, error = crg.GetNearestCities(lat, lon, 1, "mi")
 	if location[0].Distance > DISTANCE_FROM_CITY || error != nil {
 		var oceanResult = searchFromOceanPolygon(lat, lon)
-		if reflect.ValueOf(oceanResult).IsValid() && oceanResult["geoName"] != "" {
+		if reflect.ValueOf(oceanResult).IsValid() && oceanResult["geoName"] != nil && oceanResult["geoName"] != ""{
 			result = oceanResult
 		} else {
 			result = location[0]
