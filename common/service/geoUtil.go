@@ -244,10 +244,23 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 				CountryCode: tmpLocation.Country_code,
 				Country:     tmpLocation.Country,
 			}
-			if tmpLocation.City != "" && tmpLocation.Region != "" && tmpLocation.Country != "" {
-				gpsevent.DisplayName = tmpLocation.City + ", " + tmpLocation.Region + ", " + tmpLocation.Country
-			} else {
-				gpsevent.DisplayName = ""
+			gpsevent.DisplayName = "";
+			if (tmpLocation.City != "") {
+				gpsevent.DisplayName = tmpLocation.City;
+			}
+			if (tmpLocation.Region != "") {
+				if (gpsevent.DisplayName != "") {
+					gpsevent.DisplayName = gpsevent.DisplayName + " ," + tmpLocation.Region;
+				} else {
+					gpsevent.DisplayName = tmpLocation.Region;
+				}
+			}
+			if (tmpLocation.Country != "") {
+				if (gpsevent.DisplayName != "") {
+					gpsevent.DisplayName = gpsevent.DisplayName + " ," + tmpLocation.Country;
+				} else {
+					gpsevent.DisplayName = tmpLocation.Country;
+				}
 			}
 		}
 		_, ok = location.(map[string]interface{})
