@@ -41,8 +41,29 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	gpsEvent.SupTem = returnValueByCondition(singlePacket.InfoItem.SupTemValid, singlePacket.InfoItem.SupTem, "").(string)
 	gpsEvent.RetTem = returnValueByCondition(singlePacket.InfoItem.RetTemValid, singlePacket.InfoItem.RetTem, "").(string)
 	gpsEvent.Hum = returnValueByCondition(singlePacket.InfoItem.HumValid, singlePacket.InfoItem.Hum, "").(string)
-	gpsEvent.Lat = singlePacket.Lat
-	gpsEvent.Lng = singlePacket.Lng
+
+	gpsEvent.PosFlag = returnValueByCondition(singlePacket.PositioningModuleStatus, "0", "1").(string)
+
+	if gpsEvent.PosFlag == "1" {
+		if singlePacket.LatitudeNorthSouth == true {
+			// 南纬
+			gpsEvent.Lat = "-" + singlePacket.Lat
+		} else {
+			// 北纬
+			gpsEvent.Lat = singlePacket.Lat
+		}
+		if singlePacket.LongitudeEastWest == true {
+			// 西经
+			gpsEvent.Lng = "-" + singlePacket.Lng
+		} else {
+			// 东经
+			gpsEvent.Lng = singlePacket.Lng
+		}
+	} else {
+		gpsEvent.Lat = "0"
+		gpsEvent.Lng = "0"
+	}
+
 	gpsEvent.Speed = singlePacket.Speed
 	gpsEvent.Direction = singlePacket.Direction
 	gpsEvent.Hpt = returnValueByCondition(singlePacket.InfoItem.HptValid, singlePacket.InfoItem.Hpt, "").(string)
@@ -50,7 +71,7 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	gpsEvent.Usda2 = returnValueByCondition(singlePacket.InfoItem.Usda2Valid, singlePacket.InfoItem.Usda2, "").(string)
 	gpsEvent.Usda3 = returnValueByCondition(singlePacket.InfoItem.Usda3Valid, singlePacket.InfoItem.Usda3, "").(string)
 	gpsEvent.FaultCode = returnValueByCondition(singlePacket.InfoItem.FaultCodeValid, singlePacket.InfoItem.FaultCode, "").(string)
-	gpsEvent.PosFlag = returnValueByCondition(singlePacket.PositioningModuleStatus, "1", "0").(string)
+
 	gpsEvent.Ism = "0"
 	gpsEvent.GpsNum = singlePacket.NumberOfSatellitesItem.GpsSatelliteNumber
 	gpsEvent.BdNum = singlePacket.NumberOfSatellitesItem.BeidouSatelliteNumber
