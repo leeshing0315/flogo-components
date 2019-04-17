@@ -1,0 +1,46 @@
+{
+  "name": "upsertgpsevents",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/yourusername/yourrepository",
+  "author": "Your Name <you.name@example.org>",
+  "inputs":[
+    {
+      "name": "uri",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "dbName",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "gpsevents",
+      "type": "string"
+    },
+    {
+      "name": "operationmodechanges",
+      "type": "string"
+    },
+    {
+      "name": "deviceerrors",
+      "type": "string"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output",
+      "type": "any"
+    },
+    {
+      "name": "count",
+      "type": "integer"
+    },
+    {
+      "name": "resultArray",
+      "type": "string"
+    }
+  ]
+}
