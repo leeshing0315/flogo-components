@@ -64,7 +64,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 		valueMap := make(map[string]string)
 		valueMap["sendflag"] = "1"
-		now := time.Now().Format("2006-01-02 15:04:05")
+		now := time.Now().UTC().Format("2006-01-02 15:04:05")
 		valueMap["sendtime"] = now
 		valueMap["lastupdatetime"] = now
 

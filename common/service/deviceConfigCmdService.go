@@ -55,12 +55,45 @@ func GenSetConfigCommand(cmdVal map[string]string) (setConfigCommand []byte, err
 
 	sleepMode := make([]byte, 2)
 	sleepMode[0] = '0'
-	if val, found := cmdVal["05"]; found {
-		sleepMode[0] = '1'
-		if val == "1" {
-			sleepMode[1] = '1'
-		} else {
+	sleepModeVal, sleepModeFound := cmdVal["05"]
+	opModeFilterVal, opModeFilterFound := cmdVal["05-2"]
+	if sleepModeFound && !opModeFilterFound {
+		if sleepModeVal == "1" {
+			// SLEEP MODE ON
+			sleepMode[0] = '1'
 			sleepMode[1] = '0'
+		} else {
+			// SLEEP MODE OFF
+			sleepMode[0] = '1'
+			sleepMode[1] = '1'
+		}
+	} else if opModeFilterFound && !sleepModeFound {
+		if opModeFilterVal == "1" {
+			// OPMODE FILTER ON
+			sleepMode[0] = '1'
+			sleepMode[1] = '2'
+		} else {
+			// OPMODE FILTER OFF
+			sleepMode[0] = '1'
+			sleepMode[1] = '3'
+		}
+	} else if sleepModeFound && opModeFilterFound {
+		if sleepModeVal == "1" && opModeFilterVal == "1" {
+			// SLEEP MODE ON & OPMODE FILTER ON
+			sleepMode[0] = '1'
+			sleepMode[1] = '4'
+		} else if sleepModeVal == "1" && opModeFilterVal == "0" {
+			// SLEEP MODE ON & OPMODE FILTER OFF
+			sleepMode[0] = '1'
+			sleepMode[1] = '5'
+		} else if sleepModeVal == "0" && opModeFilterVal == "1" {
+			// SLEEP MODE OFF & OPMODE FILTER ON
+			sleepMode[0] = '1'
+			sleepMode[1] = '6'
+		} else if sleepModeVal == "0" && opModeFilterVal == "0" {
+			// SLEEP MODE OFF & OPMODE FILTER OFF
+			sleepMode[0] = '1'
+			sleepMode[1] = '7'
 		}
 	}
 

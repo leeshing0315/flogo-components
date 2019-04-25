@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -11,7 +12,7 @@ import (
 	"github.com/sigurn/crc16"
 )
 
-var serverUri string = "localhost:8035"
+var serverUri string = "nptcp.cargosmart.com:1024"
 
 // var serverUri string = "itciot-tcp.cargosmart.ai:8080"
 

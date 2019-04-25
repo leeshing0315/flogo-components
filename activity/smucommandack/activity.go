@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/leeshing0315/flogo-components/common/service"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -29,18 +28,20 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// do eval
-	reqDataSegment := context.GetInput("reqDataSegment").([]byte)
+	// reqDataSegment := context.GetInput("reqDataSegment").([]byte)
 	devid := context.GetInput("devid").(string)
 	seqNo := context.GetInput("seqNo").(int)
-	command := context.GetInput("command").(int)
+	// command := context.GetInput("command").(int)
 
 	condition := make(map[string]interface{})
 	condition["devid"] = devid
-	if command == 0x33 {
-		condition["subcmd"] = "FF"
-	} else {
-		condition["seqno"] = seqNo
-	}
+	// READ CONFIG ack saving is in the SMU Distribute File activity because read config ack command is 0x33
+	// if command == 0x33 {
+	// 	condition["subcmd"] = "FF"
+	// } else {
+	// 	condition["seqno"] = seqNo
+	// }
+	condition["sendflag"] = 1
 	conditionBytes, _ := json.Marshal(condition)
 	context.SetOutput("keyValue", string(conditionBytes))
 	println("**********CMDACK", strings.Join([]string{devid, strconv.FormatUint(uint64(seqNo), 10)}, ","), "**********")
@@ -49,10 +50,11 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	valueMap["sendflag"] = "2"
 	valueMap["lastupdatetime"] = time.Now().Format("2006-01-02 15:04:05")
 
-	if len(reqDataSegment) > 1 {
-		// read config
-		valueMap["value"] = service.DecodeReadConfigAck(reqDataSegment)
-	}
+	// READ CONFIG ack saving is in the SMU Distribute File activity because read config ack command is 0x33
+	// if len(reqDataSegment) > 1 {
+	// 	// read config
+	// 	valueMap["value"] = service.DecodeReadConfigAck(reqDataSegment)
+	// }
 
 	jsonBytes, _ := json.Marshal(valueMap)
 	context.SetOutput("updateVal", string(jsonBytes))
