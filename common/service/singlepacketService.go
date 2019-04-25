@@ -59,20 +59,34 @@ var BitMask = []byte{
 	Bit7Mask,
 }
 
-func ParseToSinglePacket(data []byte) *entity.SinglePacket {
+func ParseToSinglePacket(data []byte) (*entity.SinglePacket, error) {
 	singlePacket := &entity.SinglePacket{}
 
-	handleLocationBasicInformation(data[0:23], singlePacket)
-	handleAdditionalInformationItems(data[23:], singlePacket)
+	err := handleLocationBasicInformation(data[0:23], singlePacket)
+	if err != nil {
+		return nil, err
+	}
+	err = handleAdditionalInformationItems(data[23:], singlePacket)
+	if err != nil {
+		return nil, err
+	}
 
-	return singlePacket
+	return singlePacket, nil
 }
 
-func handleLocationBasicInformation(data []byte, singlePacket *entity.SinglePacket) {
+func handleLocationBasicInformation(data []byte, singlePacket *entity.SinglePacket) error {
 	handleTriggerEvent(data[0:2], singlePacket)
+
 	handleStatus(data[2:4], singlePacket)
-	handleDate(data[4:10], singlePacket)
+
+	err := handleDate(data[4:10], singlePacket)
+	if err != nil {
+		return err
+	}
+
 	handleRemainingInfo(data, singlePacket)
+
+	return nil
 }
 
 func handleTriggerEvent(data []byte, singlePacket *entity.SinglePacket) {
@@ -194,8 +208,13 @@ func handleStatus(data []byte, singlePacket *entity.SinglePacket) {
 	}
 }
 
-func handleDate(data []byte, singlePacket *entity.SinglePacket) {
-	singlePacket.Date = util.ParseDateStrFromBCD6(data)
+func handleDate(data []byte, singlePacket *entity.SinglePacket) error {
+	dateStr, err := util.ParseDateStrFromBCD6(data)
+	if err != nil {
+		return err
+	}
+	singlePacket.Date = dateStr
+	return nil
 }
 
 func handleRemainingInfo(data []byte, singlePacket *entity.SinglePacket) {
@@ -206,7 +225,7 @@ func handleRemainingInfo(data []byte, singlePacket *entity.SinglePacket) {
 	singlePacket.BatLevel = strconv.FormatUint(uint64(data[22]), 10)
 }
 
-func handleAdditionalInformationItems(data []byte, singlePacket *entity.SinglePacket) {
+func handleAdditionalInformationItems(data []byte, singlePacket *entity.SinglePacket) error {
 	items := splitItems(data)
 	for _, item := range items {
 		switch item[0] {
@@ -223,9 +242,13 @@ func handleAdditionalInformationItems(data []byte, singlePacket *entity.SinglePa
 		case 0x06:
 			handleFaultCodeItem(item, singlePacket)
 		case 0x07:
-			handleColdBoxTimeItem(item, singlePacket)
+			err := handleColdBoxTimeItem(item, singlePacket)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
 func splitItems(data []byte) [][]byte {
@@ -427,14 +450,24 @@ func handleFaultCodeItem(item []byte, singlePacket *entity.SinglePacket) {
 	singlePacket.FaultCodeItem = faultCodeItem
 }
 
-func handleColdBoxTimeItem(item []byte, singlePacket *entity.SinglePacket) {
+func handleColdBoxTimeItem(item []byte, singlePacket *entity.SinglePacket) error {
 	dataSegment := item[2:]
 	coldBoxTimeItem := entity.ColdBoxTimeItem{}
 
-	coldBoxTimeItem.CntrTime = util.ParseDateStrFromBCD6(dataSegment[0:6])
-	coldBoxTimeItem.CollectColdBoxTime = util.ParseDateStrFromBCD6(dataSegment[6:12])
+	cntrTime, err := util.ParseDateStrFromBCD6(dataSegment[0:6])
+	if err != nil {
+		return err
+	}
+	coldBoxTimeItem.CntrTime = cntrTime
+
+	collectColdBoxTime, err := util.ParseDateStrFromBCD6(dataSegment[6:12])
+	if err != nil {
+		return err
+	}
+	coldBoxTimeItem.CollectColdBoxTime = collectColdBoxTime
 
 	singlePacket.ColdBoxTimeItem = coldBoxTimeItem
+	return nil
 }
 
 func intervalFloat64(number float64, min float64, max float64) float64 {
