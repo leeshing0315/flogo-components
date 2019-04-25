@@ -41,7 +41,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	// } else {
 	// 	condition["seqno"] = seqNo
 	// }
-	condition["sendflag"] = 1
+	condition["sendflag"] = "1"
 	conditionBytes, _ := json.Marshal(condition)
 	context.SetOutput("keyValue", string(conditionBytes))
 	println("**********CMDACK", strings.Join([]string{devid, strconv.FormatUint(uint64(seqNo), 10)}, ","), "**********")
