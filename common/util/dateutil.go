@@ -1,8 +1,10 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 const (
@@ -16,17 +18,23 @@ func FormatBCD(b byte) string {
 	return strconv.FormatUint(uint64(firstHalf*10+secondHalf), 10)
 }
 
-func ParseDateStrFromBCD6(bcd []byte) string {
+func ParseDateStrFromBCD6(bcd []byte) (string, error) {
 	if len(bcd) < 6 {
-		return ""
+		return "", errors.New("BCD6 has no enough length")
 	}
-	return fmt.Sprintf("20%s-%s-%sT%s:%s:%s+08:00",
+	value := fmt.Sprintf("20%s-%s-%sT%s:%s:%s+08:00",
 		keepTwoDigits(FormatBCD(bcd[0])),
 		keepTwoDigits(FormatBCD(bcd[1])),
 		keepTwoDigits(FormatBCD(bcd[2])),
 		keepTwoDigits(FormatBCD(bcd[3])),
 		keepTwoDigits(FormatBCD(bcd[4])),
 		keepTwoDigits(FormatBCD(bcd[5])))
+
+	_, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return "", err
+	}
+	return value, nil
 }
 
 func keepTwoDigits(input string) string {
