@@ -35,7 +35,10 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	autoReg := "false"
 
-	singlePacket := service.ParseToSinglePacket(reqDataSegment)
+	singlePacket, err := service.ParseToSinglePacket(reqDataSegment)
+	if err != nil {
+		return false, err
+	}
 	if singlePacket.LoginItem.ContainerNumber != "" {
 		cntrNum = singlePacket.LoginItem.ContainerNumber
 		autoReg = "true"
