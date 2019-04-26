@@ -24,7 +24,6 @@ func ParseToEventLog(bytes []byte, now time.Time, cntrNum string, seqNo int) *en
 	eventLog.CntrNum = cntrNum
 	eventLog.Seq = strconv.FormatInt(int64(seqNo), 10)
 	eventLog.Source = "TCP_SERVER"
-	eventLog.IsTemperatureLog = false
 	return eventLog
 }
 
@@ -66,6 +65,7 @@ func parseSmodeLog(bytes []byte) *entity.EventLog {
 		smode = getSmodeByCal(bytes[4], bytes[5])
 	}
 	eventLog.Smode = smode
+	eventLog.IsTemperatureLog = false
 	return eventLog
 }
 
