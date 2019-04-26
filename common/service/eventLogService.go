@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/binary"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +24,7 @@ func ParseToEventLog(bytes []byte, now time.Time, cntrNum string, seqNo int) *en
 	eventLog.CntrNum = cntrNum
 	eventLog.Seq = strconv.FormatInt(int64(seqNo), 10)
 	eventLog.Source = "TCP_SERVER"
+	eventLog.IsTemperatureLog = false
 	return eventLog
 }
 
@@ -54,6 +54,7 @@ func parseTemperatureLog(bytes []byte) *entity.EventLog {
 	eventLog.Usda2 = strconv.FormatFloat(float64((int(bytes[18]&0x30)<<4)+int(bytes[15]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Usda3 = strconv.FormatFloat(float64((int(bytes[18]&0xc)<<6)+int(bytes[16]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Cts = strconv.FormatFloat(float64((int(bytes[18]&0x3)<<8)+int(bytes[17]))/10.0-40.0, 'f', 1, 64)
+	eventLog.IsTemperatureLog = true
 	return eventLog
 }
 
@@ -216,7 +217,7 @@ func ConvertEventLogToGPSEvent(eventLog *entity.EventLog) *entity.GpsEvent {
 	gpsEvent.Carrier = "COSU"
 	gpsEvent.IsEventLog = true
 	gpsEvent.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05Z")
-	if math.Abs(eventLog.Sp) < 0.0001 {
+	if eventLog.IsTemperatureLog {
 		gpsEvent.SetTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
 		gpsEvent.SupTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)
 		gpsEvent.RetTem = strconv.FormatFloat(eventLog.Rs, 'f', 1, 64)
