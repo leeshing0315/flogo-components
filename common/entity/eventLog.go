@@ -22,5 +22,6 @@ type EventLog struct {
 	Isa       int32   `json:"isa,omitempty"`
 	TableName string  `json:"tableName,omitempty"`
 
-	Source string `json:"source,omitempty"`
+	Source           string `json:"source,omitempty"`
+	IsTemperatureLog bool   `json:"-"`
 }
