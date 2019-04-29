@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"go.mongodb.org/mongo-driver/bson"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -70,7 +72,10 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	jsonMap := make(map[string]interface{})
-	json.Unmarshal(reqDataSegment, &jsonMap)
+	err = json.Unmarshal(reqDataSegment, &jsonMap)
+	if err != nil {
+		return true, nil
+	}
 	from := jsonMap["from"].(string)
 	to := jsonMap["to"].(string)
 
@@ -96,7 +101,9 @@ func loadAllCntrDeviceMappings(db *mongo.Database) error {
 
 	cursor, err := coll.Find(
 		context.Background(),
-		bson.M{},
+		bson.M{
+			"status": "active",
+		},
 	)
 	if err != nil {
 		return err
@@ -151,6 +158,18 @@ func handleOriginalPackets(db *mongo.Database, from string, to string) error {
 		if err != nil {
 			return err
 		}
+
+		coll.UpdateOne(
+			context.Background(),
+			bson.M{
+				"_id": originalPacket["_id"],
+			},
+			bson.M{
+				"$set": bson.M{
+					"replayVersion": 1,
+				},
+			},
+		)
 	}
 	if err := cursor.Err(); err != nil {
 		return err
@@ -165,9 +184,8 @@ func parseBytes(bytes []byte) (seqNo string, reqDataSegment []byte) {
 	reqDataSegment = bytes[5 : 5+dataSegmentLen]
 	return seqNo, reqDataSegment
 }
-
 func handleOneOriginalPacket(db *mongo.Database, originalPacket map[string]interface{}) (err error) {
-	bytes := originalPacket["bytes"].([]byte)
+	bytes := originalPacket["bytes"].(primitive.Binary).Data
 	if bytes[0] != 0x36 && bytes[0] != 0x37 {
 		return nil
 	}
@@ -248,6 +266,21 @@ func handleOneGpsEvent(db *mongo.Database, gpsEvent *entity.GpsEvent) (err error
 				"posFlag":  gpsEvent.PosFlag,
 				"lat":      gpsEvent.Lat,
 				"lng":      gpsEvent.Lng,
+				"address": bson.M{
+					"distance":        gpsEvent.Address.Distance,
+					"longitude":       gpsEvent.Address.Longitude,
+					"latitude":        gpsEvent.Address.Latitude,
+					"code":            gpsEvent.Address.Code,
+					"name":            gpsEvent.Address.Name,
+					"city":            gpsEvent.Address.City,
+					"region_code":     gpsEvent.Address.RegionCode,
+					"region":          gpsEvent.Address.Region,
+					"country_code":    gpsEvent.Address.CountryCode,
+					"country":         gpsEvent.Address.Country,
+					"ooclDisplayName": gpsEvent.Address.OoclDisplayName,
+					"ooclName":        gpsEvent.Address.OoclName,
+					"ooclCode":        gpsEvent.Address.OoclCode,
+				},
 			},
 		},
 	)
@@ -267,6 +300,21 @@ func handleOneGpsEvent(db *mongo.Database, gpsEvent *entity.GpsEvent) (err error
 				"posFlag":  gpsEvent.PosFlag,
 				"lat":      gpsEvent.Lat,
 				"lng":      gpsEvent.Lng,
+				"address": bson.M{
+					"distance":        gpsEvent.Address.Distance,
+					"longitude":       gpsEvent.Address.Longitude,
+					"latitude":        gpsEvent.Address.Latitude,
+					"code":            gpsEvent.Address.Code,
+					"name":            gpsEvent.Address.Name,
+					"city":            gpsEvent.Address.City,
+					"region_code":     gpsEvent.Address.RegionCode,
+					"region":          gpsEvent.Address.Region,
+					"country_code":    gpsEvent.Address.CountryCode,
+					"country":         gpsEvent.Address.Country,
+					"ooclDisplayName": gpsEvent.Address.OoclDisplayName,
+					"ooclName":        gpsEvent.Address.OoclName,
+					"ooclCode":        gpsEvent.Address.OoclCode,
+				},
 			},
 		},
 	)

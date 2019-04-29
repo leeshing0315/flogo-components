@@ -50,7 +50,7 @@ func TestEval(t *testing.T) {
 	//setup attrs
 	tc.SetInput("uri", "mongodb://lima-w10:27017")
 	tc.SetInput("dbName", "test")
-	tc.SetInput("reqDataSegment", `{from:"2019-03-01",to:"2019-05-01"}`)
+	tc.SetInput("reqDataSegment", []byte(`{"from":"2019-03-01","to":"2019-05-01"}`))
 
 	act.Eval(tc)
 
