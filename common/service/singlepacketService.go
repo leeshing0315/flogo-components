@@ -90,120 +90,143 @@ func handleLocationBasicInformation(data []byte, singlePacket *entity.SinglePack
 }
 
 func handleTriggerEvent(data []byte, singlePacket *entity.SinglePacket) {
-	positioningModuleFailure := data[0] & positioningModuleFailureMask
-	if positioningModuleFailure == positioningModuleFailureMask {
+	// positioningModuleFailure := data[0] & positioningModuleFailureMask
+	positioningModuleFailure := data[1] & Bit0Mask
+	if positioningModuleFailure == Bit0Mask {
 		singlePacket.PositioningModuleFailure = true
 	}
 
-	serialCommunicationFailure := data[0] & serialCommunicationFailureMask
-	if serialCommunicationFailure == serialCommunicationFailureMask {
+	// serialCommunicationFailure := data[0] & serialCommunicationFailureMask
+	serialCommunicationFailure := data[1] & Bit1Mask
+	if serialCommunicationFailure == Bit1Mask {
 		singlePacket.SerialCommunicationFailure = true
 	}
 
-	communicationModuleFailure := data[0] & communicationModuleFailureMask
-	if communicationModuleFailure == communicationModuleFailureMask {
+	// communicationModuleFailure := data[0] & communicationModuleFailureMask
+	communicationModuleFailure := data[1] & Bit2Mask
+	if communicationModuleFailure == Bit2Mask {
 		singlePacket.CommunicationModuleFailure = true
 	}
 
-	powerSupplyFailure := data[0] & powerSupplyFailureMask
-	if powerSupplyFailure == powerSupplyFailureMask {
+	// powerSupplyFailure := data[0] & powerSupplyFailureMask
+	powerSupplyFailure := data[1] & Bit3Mask
+	if powerSupplyFailure == Bit3Mask {
 		singlePacket.PowerSupplyFailure = true
 	}
 
-	batteryChargingFailure := data[0] & batteryChargingFailureMask
-	if batteryChargingFailure == batteryChargingFailureMask {
+	// batteryChargingFailure := data[0] & batteryChargingFailureMask
+	batteryChargingFailure := data[1] & Bit4Mask
+	if batteryChargingFailure == Bit4Mask {
 		singlePacket.BatteryChargingFailure = true
 	}
 
-	clockModuleFailure := data[0] & clockModuleFailureMask
-	if clockModuleFailure == clockModuleFailureMask {
+	// clockModuleFailure := data[0] & clockModuleFailureMask
+	clockModuleFailure := data[1] & Bit5Mask
+	if clockModuleFailure == Bit5Mask {
 		singlePacket.ClockModuleFailure = true
 	}
 
-	coldBoxFaultCodeChange := data[0] & coldBoxFaultCodeChangeMask
-	if coldBoxFaultCodeChange == coldBoxFaultCodeChangeMask {
+	// coldBoxFaultCodeChange := data[0] & coldBoxFaultCodeChangeMask
+	coldBoxFaultCodeChange := data[1] & Bit6Mask
+	if coldBoxFaultCodeChange == Bit6Mask {
 		singlePacket.ColdBoxFaultCodeChange = true
 	}
 
-	coldBoxOperationModeChange := data[0] & coldBoxOperationModeChangeMask
-	if coldBoxOperationModeChange == coldBoxOperationModeChangeMask {
+	// coldBoxOperationModeChange := data[0] & coldBoxOperationModeChangeMask
+	coldBoxOperationModeChange := data[1] & Bit7Mask
+	if coldBoxOperationModeChange == Bit7Mask {
 		singlePacket.ColdBoxOperationModeChange = true
 	}
 
-	powerSupplyStatusChange := data[1] & powerSupplyStatusChangeMask
-	if powerSupplyStatusChange == powerSupplyStatusChangeMask {
+	// powerSupplyStatusChange := data[1] & powerSupplyStatusChangeMask
+	powerSupplyStatusChange := data[0] & Bit0Mask
+	if powerSupplyStatusChange == Bit0Mask {
 		singlePacket.PowerSupplyStatusChange = true
 	}
 }
 
 func handleStatus(data []byte, singlePacket *entity.SinglePacket) {
-	positioning := data[0] & positioningMask
-	if positioning == positioningMask {
+	// positioning := data[0] & positioningMask
+	positioning := data[1] & Bit1Mask
+	if positioning == Bit1Mask {
 		singlePacket.Positioning = true
 	}
 
-	latitudeNorthSouth := data[0] & latitudeNorthSouthMask
-	if latitudeNorthSouth == latitudeNorthSouthMask {
+	// latitudeNorthSouth := data[0] & latitudeNorthSouthMask
+	latitudeNorthSouth := data[1] & Bit2Mask
+	if latitudeNorthSouth == Bit2Mask {
 		singlePacket.LatitudeNorthSouth = true
 	}
 
-	longitudeEastWest := data[0] & longitudeEastWestMask
-	if longitudeEastWest == longitudeEastWestMask {
+	// longitudeEastWest := data[0] & longitudeEastWestMask
+	longitudeEastWest := data[1] & Bit3Mask
+	if longitudeEastWest == Bit3Mask {
 		singlePacket.LongitudeEastWest = true
 	}
 
-	useGpsSatellitesForPositioning := data[0] & useGpsSatellitesForPositioningMask
-	if useGpsSatellitesForPositioning == useGpsSatellitesForPositioningMask {
+	// useGpsSatellitesForPositioning := data[0] & useGpsSatellitesForPositioningMask
+	useGpsSatellitesForPositioning := data[1] & Bit4Mask
+	if useGpsSatellitesForPositioning == Bit4Mask {
 		singlePacket.UseGpsSatellitesForPositioning = true
 	}
 
-	useBeidouSatelliteForPositioning := data[0] & useBeidouSatelliteForPositioningMask
-	if useBeidouSatelliteForPositioning == useBeidouSatelliteForPositioningMask {
+	// useBeidouSatelliteForPositioning := data[0] & useBeidouSatelliteForPositioningMask
+	useBeidouSatelliteForPositioning := data[1] & Bit5Mask
+	if useBeidouSatelliteForPositioning == Bit5Mask {
 		singlePacket.UseBeidouSatelliteForPositioning = true
 	}
 
-	supplyByBatteryOrPower := data[0] & supplyByBatteryOrPowerMask
-	if supplyByBatteryOrPower == supplyByBatteryOrPowerMask {
+	// supplyByBatteryOrPower := data[0] & supplyByBatteryOrPowerMask
+	supplyByBatteryOrPower := data[1] & Bit6Mask
+	if supplyByBatteryOrPower == Bit6Mask {
 		singlePacket.SupplyByBatteryOrPower = true
 	}
 
-	inThePolygonArea := data[0] & inThePolygonAreaMask
-	if inThePolygonArea == inThePolygonAreaMask {
+	// inThePolygonArea := data[0] & inThePolygonAreaMask
+	inThePolygonArea := data[1] & Bit7Mask
+	if inThePolygonArea == Bit7Mask {
 		singlePacket.InThePolygonArea = true
 	}
 
-	positioningModuleStatus := data[1] & positioningModuleStatusMask
-	if positioningModuleStatus == positioningModuleStatusMask {
+	// positioningModuleStatus := data[1] & positioningModuleStatusMask
+	positioningModuleStatus := data[0] & Bit0Mask
+	if positioningModuleStatus == Bit0Mask {
 		singlePacket.PositioningModuleStatus = true
 	}
 
-	serialCommunicationStatus := data[1] & serialCommunicationStatusMask
-	if serialCommunicationStatus == serialCommunicationStatusMask {
+	// serialCommunicationStatus := data[1] & serialCommunicationStatusMask
+	serialCommunicationStatus := data[0] & Bit1Mask
+	if serialCommunicationStatus == Bit1Mask {
 		singlePacket.SerialCommunicationStatus = true
 	}
 
-	communicationModuleStatus := data[1] & communicationModuleStatusMask
-	if communicationModuleStatus == communicationModuleStatusMask {
+	// communicationModuleStatus := data[1] & communicationModuleStatusMask
+	communicationModuleStatus := data[0] & Bit2Mask
+	if communicationModuleStatus == Bit2Mask {
 		singlePacket.CommunicationModuleStatus = true
 	}
 
-	powerSupplyStatus := data[1] & powerSupplyStatusMask
-	if powerSupplyStatus == powerSupplyStatusMask {
+	// powerSupplyStatus := data[1] & powerSupplyStatusMask
+	powerSupplyStatus := data[0] & Bit3Mask
+	if powerSupplyStatus == Bit3Mask {
 		singlePacket.PowerSupplyStatus = true
 	}
 
-	batteryChargingStatus := data[1] & batteryChargingStatusMask
-	if batteryChargingStatus == batteryChargingStatusMask {
+	// batteryChargingStatus := data[1] & batteryChargingStatusMask
+	batteryChargingStatus := data[0] & Bit4Mask
+	if batteryChargingStatus == Bit4Mask {
 		singlePacket.BatteryChargingStatus = true
 	}
 
-	clockModuleStatus := data[1] & clockModuleStatusMask
-	if clockModuleStatus == clockModuleStatusMask {
+	// clockModuleStatus := data[1] & clockModuleStatusMask
+	clockModuleStatus := data[0] & Bit5Mask
+	if clockModuleStatus == Bit5Mask {
 		singlePacket.ClockModuleStatus = true
 	}
 
-	timedUploadData := data[1] & timedUploadDataMask
-	if timedUploadData == timedUploadDataMask {
+	// timedUploadData := data[1] & timedUploadDataMask
+	timedUploadData := data[0] & Bit7Mask
+	if timedUploadData == Bit7Mask {
 		singlePacket.TimedUploadData = true
 	}
 }

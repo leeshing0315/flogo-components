@@ -43,7 +43,7 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	gpsEvent.Hum = returnValueByCondition(singlePacket.InfoItem.HumValid, singlePacket.InfoItem.Hum, "").(string)
 
 	// PosFlag
-	gpsEvent.PosFlag = returnValueByCondition(singlePacket.Positioning && !singlePacket.PositioningModuleStatus, "1", "0").(string)
+	gpsEvent.PosFlag = returnValueByCondition(singlePacket.Positioning, "1", "0").(string)
 
 	if gpsEvent.PosFlag == "1" {
 		if singlePacket.LatitudeNorthSouth == true {
