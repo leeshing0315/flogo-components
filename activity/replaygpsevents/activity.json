@@ -1,0 +1,37 @@
+{
+  "name": "replaygpsevents",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/replaygpsevents",
+  "author": "Your Name <you.name@example.org>",
+  "title": "Smu Replay Gpsevents",
+  "inputs":[
+    {
+      "name": "uri",
+      "type": "string"
+    },
+    {
+      "name": "dbName",
+      "type": "string"
+    },
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "reqDataSegment",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "resDataSegment",
+      "type": "array"
+    },
+    {
+      "name": "gpsEvents",
+      "type": "string"
+    }
+  ]
+}
