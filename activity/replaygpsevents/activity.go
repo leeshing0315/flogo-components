@@ -82,6 +82,8 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	from := jsonMap["from"].(string)
 	to := jsonMap["to"].(string)
 
+	activityLog.Infof("***** REPLAY GPSEVENT from %s to %s START *****", from, to)
+
 	db := client.Database(dbName)
 
 	err = loadAllCntrDeviceMappings(db)
@@ -97,6 +99,8 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		ctx.SetOutput("resDataSegment", []byte(err.Error()))
 		return true, nil
 	}
+
+	activityLog.Infof("***** REPLAY GPSEVENT from %s to %s DONE *****", from, to)
 
 	ctx.SetOutput("resDataSegment", []byte{})
 	return true, nil
@@ -214,6 +218,8 @@ func handleOneOriginalPacket(db *mongo.Database, originalPacket map[string]inter
 			return err
 		}
 	}
+
+	activityLog.Infof("***** REPLAY GPSEVENT by originalPacket %s *****", originalPacket["_id"].(primitive.ObjectID).Hex())
 
 	return nil
 }
