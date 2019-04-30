@@ -44,6 +44,7 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 }
 
 var cntrDeviceMappings map[string]map[string]interface{} = make(map[string]map[string]interface{})
+var cntrDeviceMappingsLock sync.Mutex
 
 // Eval implements activity.Activity.Eval
 func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
@@ -107,6 +108,11 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 }
 
 func loadAllCntrDeviceMappings(db *mongo.Database) error {
+	cntrDeviceMappingsLock.Lock()
+	defer cntrDeviceMappingsLock.Unlock()
+	if len(cntrDeviceMappings) != 0 {
+		return nil
+	}
 	coll := db.Collection("containerDeviceMappings")
 
 	cursor, err := coll.Find(
