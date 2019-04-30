@@ -253,6 +253,9 @@ func handleMultiPacket(db *mongo.Database, seqNo string, reqDataSegment []byte, 
 func handleOneGpsEvent(db *mongo.Database, gpsEvent *entity.GpsEvent) (err error) {
 	gpsEventsColl := db.Collection("gpsevents")
 	gpsEventMappingColl := db.Collection("gpseventMappings")
+
+	createdAt := time.Now().UTC().Format(time.RFC3339)
+
 	// update gpsevent
 	_, err = gpsEventsColl.UpdateOne(
 		context.Background(),
@@ -262,10 +265,11 @@ func handleOneGpsEvent(db *mongo.Database, gpsEvent *entity.GpsEvent) (err error
 		},
 		bson.M{
 			"$set": bson.M{
-				"eleState": gpsEvent.EleState,
-				"posFlag":  gpsEvent.PosFlag,
-				"lat":      gpsEvent.Lat,
-				"lng":      gpsEvent.Lng,
+				"eleState":  gpsEvent.EleState,
+				"posFlag":   gpsEvent.PosFlag,
+				"lat":       gpsEvent.Lat,
+				"lng":       gpsEvent.Lng,
+				"createdAt": createdAt,
 				"address": bson.M{
 					"distance":        gpsEvent.Address.Distance,
 					"longitude":       gpsEvent.Address.Longitude,
@@ -296,10 +300,11 @@ func handleOneGpsEvent(db *mongo.Database, gpsEvent *entity.GpsEvent) (err error
 		},
 		bson.M{
 			"$set": bson.M{
-				"eleState": gpsEvent.EleState,
-				"posFlag":  gpsEvent.PosFlag,
-				"lat":      gpsEvent.Lat,
-				"lng":      gpsEvent.Lng,
+				"eleState":  gpsEvent.EleState,
+				"posFlag":   gpsEvent.PosFlag,
+				"lat":       gpsEvent.Lat,
+				"lng":       gpsEvent.Lng,
+				"updatedAt": createdAt,
 				"address": bson.M{
 					"distance":        gpsEvent.Address.Distance,
 					"longitude":       gpsEvent.Address.Longitude,
