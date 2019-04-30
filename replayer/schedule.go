@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	gocron.Every(1).Hour().Do(scheduleTask)
+	gocron.Every(15).Minutes().Do(scheduleTask)
 	<-gocron.Start()
 }

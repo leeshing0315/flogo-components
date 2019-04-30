@@ -123,12 +123,12 @@ var jsonBodyArr []string = []string{
 	jsonBody29,
 }
 
-var scheduleSeq int = 1
+var scheduleSeq int = 5
 
-func main2() {
-	triggerReplay(jsonBody)
-	return
-}
+// func main2() {
+// 	triggerReplay(jsonBody)
+// 	return
+// }
 
 func scheduleTask() {
 	jsonBodyInput := jsonBodyArr[scheduleSeq]
@@ -142,7 +142,7 @@ func scheduleTask() {
 func triggerReplay(jsonBodyInput string) {
 	conn, err := net.Dial("tcp", serverUri)
 	if err != nil {
-		log.Println(err)
+		log.Println("A " + err.Error())
 		return
 	}
 	defer conn.Close()
@@ -154,44 +154,44 @@ func triggerReplay(jsonBodyInput string) {
 	log.Println(replayPacket)
 	_, err = bufWriter.Write(replayPacket)
 	if err != nil {
-		log.Println(err)
+		log.Println("B " + err.Error())
 		return
 	}
 	err = bufWriter.Flush()
 	if err != nil {
-		log.Println(err)
+		log.Println("C " + err.Error())
 		return
 	}
 
 	// ack cmd
 	_, err = bufReader.ReadByte()
 	if err != nil {
-		log.Println(err)
+		log.Println("D " + err.Error())
 		return
 	}
 	// ack seqno
 	_, err = readCount(bufReader, 2)
 	if err != nil {
-		log.Println(err)
+		log.Println("E " + err.Error())
 		return
 	}
 	// ack dataSegmentLength
 	dataSegmentLength, err := readCount(bufReader, 2)
 	if err != nil {
-		log.Println(err)
+		log.Println("F " + err.Error())
 		return
 	}
 	// ack dataSegment
 	dataSegment, err := readCount(bufReader, int(binary.BigEndian.Uint16(dataSegmentLength)))
 	if err != nil {
-		log.Println(err)
+		log.Println("G " + err.Error())
 		return
 	}
-	log.Println(string(dataSegment))
+	log.Println("RESPONSE " + string(dataSegment))
 	// ack crc16
 	_, err = readCount(bufReader, 2)
 	if err != nil {
-		log.Println(err)
+		log.Println("H " + err.Error())
 		return
 	}
 }
