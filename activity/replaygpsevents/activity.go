@@ -64,6 +64,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 			if err != nil {
 				activityLog.Errorf("Connection error: %v", err)
 				a.clientGetterLock.Unlock()
+				ctx.SetOutput("resDataSegment", []byte(err.Error()))
 				return false, err
 			}
 			a.mongoClient = client
@@ -74,6 +75,8 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	jsonMap := make(map[string]interface{})
 	err = json.Unmarshal(reqDataSegment, &jsonMap)
 	if err != nil {
+		activityLog.Errorf("%v", err)
+		ctx.SetOutput("resDataSegment", []byte(err.Error()))
 		return true, nil
 	}
 	from := jsonMap["from"].(string)
@@ -84,15 +87,18 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	err = loadAllCntrDeviceMappings(db)
 	if err != nil {
 		activityLog.Errorf("%v", err)
+		ctx.SetOutput("resDataSegment", []byte(err.Error()))
 		return true, nil
 	}
 
 	err = handleOriginalPackets(db, from, to)
 	if err != nil {
 		activityLog.Errorf("%v", err)
+		ctx.SetOutput("resDataSegment", []byte(err.Error()))
 		return true, nil
 	}
 
+	ctx.SetOutput("resDataSegment", []byte{})
 	return true, nil
 }
 
