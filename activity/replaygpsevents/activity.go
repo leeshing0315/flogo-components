@@ -170,9 +170,13 @@ func handleOriginalPackets(db *mongo.Database, from string, to string) error {
 			return err
 		}
 
+		// err = handleOneOriginalPacket(db, originalPacket)
+		// if err != nil {
+		// 	return err
+		// }
 		err = handleOneOriginalPacket(db, originalPacket)
 		if err != nil {
-			return err
+			continue
 		}
 
 		coll.UpdateOne(

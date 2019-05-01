@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"log"
 	"net"
+	"time"
 
 	"github.com/sigurn/crc16"
 )
@@ -20,91 +21,91 @@ var serverUri string = "ciot-tcp.cargosmart.ai:8080"
 
 // var jsonBody string = `
 // {
-// 	"from": "2019-04-17T16:32:41+08:00",
-// 	"to": "2019-04-30T18:00:00+08:00"
+//  "from": "2019-04-17T16:32:41+08:00",
+//  "to": "2019-04-30T18:00:00+08:00"
 // }
 // `
 
 var jsonBody string = `
 {
-	"from": "2019-04-17T16:32:41+08:00",
-	"to": "2019-04-19T00:00:00+08:00"
+    "from": "2019-04-17T16:32:41+08:00",
+    "to": "2019-04-19T00:00:00+08:00"
 }
 `
 
 var jsonBody19 string = `
 {
-	"from": "2019-04-19T00:00:00+08:00",
-	"to": "2019-04-20T00:00:00+08:00"
+    "from": "2019-04-19T00:00:00+08:00",
+    "to": "2019-04-20T00:00:00+08:00"
 }
 `
 
 var jsonBody20 string = `
 {
-	"from": "2019-04-20T00:00:00+08:00",
-	"to": "2019-04-21T00:00:00+08:00"
+    "from": "2019-04-20T00:00:00+08:00",
+    "to": "2019-04-21T00:00:00+08:00"
 }
 `
 
 var jsonBody21 string = `
 {
-	"from": "2019-04-21T00:00:00+08:00",
-	"to": "2019-04-22T00:00:00+08:00"
+    "from": "2019-04-21T00:00:00+08:00",
+    "to": "2019-04-22T00:00:00+08:00"
 }
 `
 var jsonBody22 string = `
 {
-	"from": "2019-04-22T00:00:00+08:00",
-	"to": "2019-04-23T00:00:00+08:00"
+    "from": "2019-04-22T00:00:00+08:00",
+    "to": "2019-04-23T00:00:00+08:00"
 }
 `
 
 var jsonBody23 string = `
 {
-	"from": "2019-04-23T00:00:00+08:00",
-	"to": "2019-04-24T00:00:00+08:00"
+    "from": "2019-04-23T00:00:00+08:00",
+    "to": "2019-04-24T00:00:00+08:00"
 }
 `
 
 var jsonBody24 string = `
 {
-	"from": "2019-04-24T00:00:00+08:00",
-	"to": "2019-04-25T00:00:00+08:00"
+    "from": "2019-04-24T00:00:00+08:00",
+    "to": "2019-04-25T00:00:00+08:00"
 }
 `
 
 var jsonBody25 string = `
 {
-	"from": "2019-04-25T00:00:00+08:00",
-	"to": "2019-04-26T00:00:00+08:00"
+    "from": "2019-04-25T00:00:00+08:00",
+    "to": "2019-04-26T00:00:00+08:00"
 }
 `
 
 var jsonBody26 string = `
 {
-	"from": "2019-04-26T00:00:00+08:00",
-	"to": "2019-04-27T00:00:00+08:00"
+    "from": "2019-04-26T00:00:00+08:00",
+    "to": "2019-04-27T00:00:00+08:00"
 }
 `
 
 var jsonBody27 string = `
 {
-	"from": "2019-04-27T00:00:00+08:00",
-	"to": "2019-04-28T00:00:00+08:00"
+    "from": "2019-04-27T00:00:00+08:00",
+    "to": "2019-04-28T00:00:00+08:00"
 }
 `
 
 var jsonBody28 string = `
 {
-	"from": "2019-04-28T00:00:00+08:00",
-	"to": "2019-04-29T00:00:00+08:00"
+    "from": "2019-04-28T00:00:00+08:00",
+    "to": "2019-04-29T00:00:00+08:00"
 }
 `
 
 var jsonBody29 string = `
 {
-	"from": "2019-04-29T00:00:00+08:00",
-	"to": "2019-04-30T00:00:00+08:00"
+    "from": "2019-04-29T00:00:00+08:00",
+    "to": "2019-04-30T00:00:00+08:00"
 }
 `
 
@@ -123,10 +124,10 @@ var jsonBodyArr []string = []string{
 	jsonBody29,
 }
 
-var scheduleSeq int = 5
+var scheduleSeq int = 3
 
-// func main2() {
-// 	triggerReplay(jsonBody)
+// func main() {
+// 	triggerReplay(jsonBody21)
 // 	return
 // }
 
@@ -163,37 +164,40 @@ func triggerReplay(jsonBodyInput string) {
 		return
 	}
 
+	time.Sleep(time.Duration(2) * time.Second)
+
 	// ack cmd
-	_, err = bufReader.ReadByte()
+	b, err := bufReader.ReadByte()
+	log.Println(b)
 	if err != nil {
 		log.Println("D " + err.Error())
 		return
 	}
-	// ack seqno
-	_, err = readCount(bufReader, 2)
-	if err != nil {
-		log.Println("E " + err.Error())
-		return
-	}
-	// ack dataSegmentLength
-	dataSegmentLength, err := readCount(bufReader, 2)
-	if err != nil {
-		log.Println("F " + err.Error())
-		return
-	}
-	// ack dataSegment
-	dataSegment, err := readCount(bufReader, int(binary.BigEndian.Uint16(dataSegmentLength)))
-	if err != nil {
-		log.Println("G " + err.Error())
-		return
-	}
-	log.Println("RESPONSE " + string(dataSegment))
-	// ack crc16
-	_, err = readCount(bufReader, 2)
-	if err != nil {
-		log.Println("H " + err.Error())
-		return
-	}
+	// // ack seqno
+	// _, err = readCount(bufReader, 2)
+	// if err != nil {
+	//  log.Println("E " + err.Error())
+	//  return
+	// }
+	// // ack dataSegmentLength
+	// dataSegmentLength, err := readCount(bufReader, 2)
+	// if err != nil {
+	//  log.Println("F " + err.Error())
+	//  return
+	// }
+	// // ack dataSegment
+	// dataSegment, err := readCount(bufReader, int(binary.BigEndian.Uint16(dataSegmentLength)))
+	// if err != nil {
+	//  log.Println("G " + err.Error())
+	//  return
+	// }
+	// log.Println("RESPONSE " + string(dataSegment))
+	// // ack crc16
+	// _, err = readCount(bufReader, 2)
+	// if err != nil {
+	//  log.Println("H " + err.Error())
+	//  return
+	// }
 }
 
 func readCount(reader *bufio.Reader, count int) ([]byte, error) {
@@ -217,12 +221,17 @@ func readCount(reader *bufio.Reader, count int) ([]byte, error) {
 func genReplayPacket(jsonBodyInput string) []byte {
 	var buf bytes.Buffer
 
+	// pass HTTP filter
+	httpLike := []byte{49, 69, 32, 0, 0, 0, 0}
+	buf.Write(httpLike)
 	// cmd
 	buf.WriteByte(0xFC) // 0xFC 252
 	// seqno
-	seqNo := make([]byte, 2)
-	binary.BigEndian.PutUint16(seqNo, uint16(12345))
-	buf.Write(seqNo)
+	// seqNo := make([]byte, 2)
+	// binary.BigEndian.PutUint16(seqNo, uint16(12345))
+	// buf.Write(seqNo)
+	buf.WriteByte(0xff)
+	buf.WriteByte(0x32)
 	// dataSegment length & dataSegment
 	dataSegment := []byte(jsonBodyInput)
 	dataSegmentLen := make([]byte, 2)
