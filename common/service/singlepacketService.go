@@ -288,15 +288,27 @@ func splitItems(data []byte) [][]byte {
 }
 
 func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
-	dataSegment := item[2:]
-	loginItem := entity.LoginItem{}
+	if len(item) == 33 {
+		dataSegment := item[2:]
+		loginItem := entity.LoginItem{}
 
-	loginItem.Pin = string(dataSegment[0:15])
-	loginItem.DeviceID = string(dataSegment[15:21])
-	loginItem.ContainerNumber = string(dataSegment[21:32])
-	loginItem.ReeferType = string(dataSegment[32])
+		loginItem.Pin = string(dataSegment[0:15])
+		loginItem.DeviceID = string(dataSegment[15:21])
+		loginItem.ContainerNumber = string(dataSegment[21:32])
+		loginItem.ReeferType = string(dataSegment[32])
 
-	singlePacket.LoginItem = loginItem
+		singlePacket.LoginItem = loginItem
+	} else if len(item) == 27 {
+		dataSegment := item[2:]
+		loginItem := entity.LoginItem{}
+
+		loginItem.Pin = string(dataSegment[0:15])
+		// loginItem.DeviceID = ""
+		loginItem.ContainerNumber = string(dataSegment[15:26])
+		loginItem.ReeferType = string(dataSegment[26])
+
+		singlePacket.LoginItem = loginItem
+	}
 }
 
 func handleInfoItem(item []byte, singlePacket *entity.SinglePacket) {
