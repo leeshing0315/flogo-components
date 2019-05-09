@@ -37,7 +37,12 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
 	singlePacket, err := service.ParseToSinglePacket(reqDataSegment)
 	if err != nil {
-		return false, err
+		// TODO save parsing error to DB
+		context.SetOutput("cntrNum", cntrNum)
+		context.SetOutput("devId", devId)
+		context.SetOutput("resDataSegment", []byte{})
+		context.SetOutput("autoReg", autoReg)
+		return true, nil
 	}
 	if singlePacket.LoginItem.ContainerNumber != "" {
 		cntrNum = singlePacket.LoginItem.ContainerNumber

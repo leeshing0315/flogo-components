@@ -43,7 +43,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	for _, dateSegment := range packets {
 		singlePacket, err := service.ParseToSinglePacket(dateSegment)
 		if err != nil {
-			return false, err
+			// TODO save parsing error to DB
+			continue
 		}
 		if singlePacket.LoginItem.ContainerNumber != "" {
 			cntrNum = singlePacket.LoginItem.ContainerNumber

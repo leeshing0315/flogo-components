@@ -1,6 +1,7 @@
 package replaygpsevents
 
 import (
+	"encoding/base64"
 	"io/ioutil"
 	"testing"
 
@@ -59,8 +60,11 @@ func TestEval(t *testing.T) {
 }
 
 func TestSth(t *testing.T) {
-	var a = []byte{55, 0, 14, 3, 73, 54, 0, 3, 0, 108, 0, 0, 0, 112, 25, 4, 17, 19, 57, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 1, 33, 52, 54, 48, 48, 49, 48, 54, 48, 52, 55, 48, 55, 50, 51, 51, 67, 48, 49, 51, 52, 57, 79, 69, 82, 85, 52, 48, 51, 57, 50, 48, 53, 68, 2, 44, 68, 1, 255, 255, 255, 195, 251, 131, 250, 55, 251, 131, 109, 102, 255, 255, 255, 39, 7, 17, 63, 0, 0, 0, 0, 201, 171, 254, 243, 249, 99, 3, 231, 255, 225, 1, 72, 0, 0, 255, 24, 255, 78, 75, 224, 105, 54, 0, 4, 0, 73, 0, 0, 0, 112, 25, 4, 17, 19, 71, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 2, 44, 68, 1, 255, 255, 255, 195, 251, 131, 250, 59, 251, 151, 109, 94, 255, 255, 255, 39, 8, 17, 51, 0, 0, 0, 0, 201, 183, 255, 3, 249, 187, 2, 255, 0, 13, 1, 72, 0, 0, 255, 26, 255, 81, 75, 133, 35, 54, 0, 5, 0, 73, 0, 0, 0, 112, 25, 4, 17, 20, 2, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 2, 44, 68, 1, 255, 255, 255, 195, 251, 131, 250, 67, 251, 163, 109, 88, 255, 255, 255, 39, 8, 17, 63, 0, 0, 0, 0, 201, 23, 255, 4, 249, 195, 2, 224, 0, 10, 1, 72, 0, 0, 255, 26, 255, 82, 75, 43, 193, 54, 0, 6, 0, 73, 0, 0, 0, 112, 25, 4, 17, 20, 23, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 2, 44, 68, 1, 255, 255, 255, 195, 251, 131, 250, 67, 251, 155, 109, 93, 255, 255, 255, 39, 8, 17, 56, 0, 0, 0, 0, 201, 151, 255, 3, 249, 203, 2, 233, 0, 23, 1, 72, 0, 0, 255, 26, 255, 82, 75, 88, 17, 54, 0, 7, 0, 73, 0, 0, 0, 112, 25, 4, 17, 20, 50, 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 7, 0, 2, 44, 68, 1, 255, 255, 255, 195, 251, 131, 250, 67, 251, 155, 109, 93, 255, 255, 255, 39, 8, 17, 48, 0, 0, 0, 0, 201, 187, 255, 5, 249, 195, 2, 217, 0, 19, 1, 72, 0, 0, 255, 26, 255, 82, 75, 50, 16, 54, 0, 8, 0, 102, 0, 0, 0, 112, 25, 4, 17, 20, 69, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 7, 0, 1, 27, 52, 54, 48, 48, 49, 48, 54, 48, 52, 55, 48, 55, 50, 51, 51, 79, 69, 82, 85, 52, 48, 51, 57, 50, 48, 53, 68, 2, 44, 68, 1, 255, 255, 255, 193, 251, 131, 250, 59, 251, 143, 109, 124, 255, 255, 255, 39, 5, 17, 28, 4, 119, 3, 62, 201, 131, 254, 225, 249, 183, 3, 254, 255, 194, 1, 72, 0, 51, 255, 26, 255, 79, 75, 239, 58, 54, 0, 9, 0, 27, 0, 2, 130, 112, 25, 4, 17, 20, 80, 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 12, 117, 54, 0, 10, 0, 27, 1, 0, 130, 112, 25, 4, 17, 20, 86, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 219, 204, 54, 0, 11, 0, 27, 0, 2, 128, 112, 25, 4, 17, 20, 87, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 7, 1, 246, 112, 54, 0, 12, 0, 108, 0, 0, 0, 112, 25, 4, 17, 20, 87, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 6, 3, 1, 33, 52, 54, 48, 48, 49, 48, 54, 48, 52, 55, 48, 55, 50, 51, 51, 67, 48, 49, 51, 52, 57, 79, 69, 82, 85, 52, 48, 51, 57, 50, 48, 53, 68, 2, 44, 68, 1, 129, 71, 255, 193, 251, 131, 250, 139, 251, 215, 107, 127, 255, 255, 255, 39, 6, 255, 255, 255, 255, 255, 255, 201, 131, 255, 255, 249, 203, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 75, 199, 30, 54, 0, 13, 0, 73, 0, 0, 0, 112, 25, 4, 17, 21, 18, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 4, 2, 5, 0, 2, 44, 68, 1, 255, 255, 255, 193, 251, 131, 250, 139, 251, 215, 107, 131, 255, 255, 255, 39, 6, 17, 26, 4, 184, 3, 123, 201, 183, 255, 10, 249, 207, 3, 27, 255, 125, 1, 72, 0, 51, 255, 38, 255, 90, 75, 78, 190, 187, 110}
-	_, reqDataSegment := parseBytes(a)
+	decoded, err := base64.StdEncoding.DecodeString(`NwAPAZg2AAMAGwAAADIZBQgSIwQB3ZPdB0CqhwAAAABkBAIOEcq3NgAEABsAAAAyGQUIEjgQAd2UQgdAqVsAAQAAZAQCDhE71jYABQAbAAAAMhkFCBJTEwHdk6oHQKmhAAAAAGQEAg0QeBo2AAYAGwAAADIZBQgTCBcB3ZOSB0CopwAAAABkBAIOEWwINgAHABsAAAAyGQUIEyMhAd2VWwdApgYAAwAAZAQCEBHK7TYACAAbAAAAMhkFCBM4IgHdkvgHQKiYAAAAAGQEAg0RrDs2AAkAGwAAADIZBQgTUycB3ZP/B0CpzQAHAABkBAINERQHNgAKABsAAAAyGQUIFAgpAd2WEgdAqZ4AAwAAZAQCDw/suTYACwAbAAAAMhkFCBQjNAHdlEYHQKerAAUAAGQEAg4O5Yk2AAwAGwAAADIZBQgUODgB3ZQjB0Cl7gAHAABkBAIMDrxsNgANABsAAAAyGQUIFFNDAd2WXAdAp5MAEAAAZAQCDQ7IQTYADgAbAAAAMhkFCBUQIgHdlDcHQKkeAAAAAGQEAg0Oo1WjAg==`)
+	if err != nil {
+		return
+	}
+	_, reqDataSegment := parseBytes(decoded)
 	packets := splitPackets(reqDataSegment)
 	for _, dateSegment := range packets {
 		singlePacket, err := service.ParseToSinglePacket(dateSegment)
@@ -70,4 +74,18 @@ func TestSth(t *testing.T) {
 
 		service.GenGpsEventFromSinglePacket(singlePacket, "seqNo", "cntrNum", "revTime")
 	}
+}
+
+func TestSinglePacketSth(t *testing.T) {
+	decoded, err := base64.StdEncoding.DecodeString(`NwAPAZg2AAMAGwAAADIZBQgSIwQB3ZPdB0CqhwAAAABkBAIOEcq3NgAEABsAAAAyGQUIEjgQAd2UQgdAqVsAAQAAZAQCDhE71jYABQAbAAAAMhkFCBJTEwHdk6oHQKmhAAAAAGQEAg0QeBo2AAYAGwAAADIZBQgTCBcB3ZOSB0CopwAAAABkBAIOEWwINgAHABsAAAAyGQUIEyMhAd2VWwdApgYAAwAAZAQCEBHK7TYACAAbAAAAMhkFCBM4IgHdkvgHQKiYAAAAAGQEAg0RrDs2AAkAGwAAADIZBQgTUycB3ZP/B0CpzQAHAABkBAINERQHNgAKABsAAAAyGQUIFAgpAd2WEgdAqZ4AAwAAZAQCDw/suTYACwAbAAAAMhkFCBQjNAHdlEYHQKerAAUAAGQEAg4O5Yk2AAwAGwAAADIZBQgUODgB3ZQjB0Cl7gAHAABkBAIMDrxsNgANABsAAAAyGQUIFFNDAd2WXAdAp5MAEAAAZAQCDQ7IQTYADgAbAAAAMhkFCBUQIgHdlDcHQKkeAAAAAGQEAg0Oo1WjAg==`)
+	if err != nil {
+		return
+	}
+	_, reqDataSegment := parseBytes(decoded)
+	singlePacket, err := service.ParseToSinglePacket(reqDataSegment)
+	if err != nil {
+		return
+	}
+
+	service.GenGpsEventFromSinglePacket(singlePacket, "seqNo", "cntrNum", "revTime")
 }
