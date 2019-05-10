@@ -39,12 +39,13 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	dbName := ctx.GetInput("dbName").(string)
 
 	originalPacket := &entity.OriginalPacket{
-		Protocol: "SMU",
-		Ip:       ip,
-		RevTime:  eventTime,
-		Bytes:    originalPacketBytes,
-		Pin:      pin,
-		Source:   "TCP_SERVER",
+		Protocol:    "SMU",
+		Ip:          ip,
+		RevTime:     eventTime,
+		Bytes:       originalPacketBytes,
+		BytesLength: len(originalPacketBytes),
+		Pin:         pin,
+		Source:      "TCP_SERVER",
 	}
 	if originalPacketBytes[0] == 0x32 {
 		pinLen := originalPacketBytes[6]
