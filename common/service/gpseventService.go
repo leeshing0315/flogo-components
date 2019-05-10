@@ -95,7 +95,9 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	// address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
 	// gpsEvent.Address = address
 	// gpsEvent.DisplayName = displayName.(string)
-	AttachLocation(gpsEvent)
+	if gpsEvent.PosFlag != "0" {
+		AttachLocation(gpsEvent)
+	}
 	gpsEvent.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05Z")
 
 	return gpsEvent
