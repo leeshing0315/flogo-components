@@ -218,8 +218,8 @@ func ConvertEventLogToGPSEvent(eventLog *entity.EventLog) *entity.GpsEvent {
 	gpsEvent.IsEventLog = true
 	gpsEvent.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05Z")
 	if eventLog.IsTemperatureLog {
-		gpsEvent.SetTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
-		gpsEvent.SupTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)
+		gpsEvent.SetTem = strconv.FormatFloat(eventLog.Ss, 'f', 1, 64)
+		gpsEvent.SupTem = strconv.FormatFloat(eventLog.Sp, 'f', 1, 64)
 		gpsEvent.RetTem = strconv.FormatFloat(eventLog.Rs, 'f', 1, 64)
 		gpsEvent.Hum = eventLog.Hus
 		gpsEvent.Ambs = strconv.FormatFloat(eventLog.Ambs, 'f', 1, 64)
