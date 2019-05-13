@@ -107,6 +107,7 @@ func (t *MyTrigger) Start() error {
 				pinAttr, _ := results["pin"]
 				firmwareVersionAttr, _ := results["firmwareVersion"]
 				devtypeAttr, _ := results["devtype"]
+				stopUpgradeSegmentAttr, _ := results["stopUpgradeSegment"]
 
 				cntrNum := cntrNumAttr.Value().(string)
 				if cntrNum != "" {
@@ -145,6 +146,16 @@ func (t *MyTrigger) Start() error {
 						commandSeqNo := commandSeqAttr.Value().(string)
 						commandSeqNoUint, _ := strconv.ParseUint(commandSeqNo, 10, 16)
 						err := sendCommandToDevice(0x34, uint16(commandSeqNoUint), writer, setCommand, false)
+						if err != nil {
+							return err
+						}
+					}
+				}
+
+				if stopUpgradeSegmentAttr.Value() != nil {
+					stopUpgradeSegment := stopUpgradeSegmentAttr.Value().([]byte)
+					if len(stopUpgradeSegment) != 0 && (setCommandAttr.Value() == nil || len(setCommandAttr.Value().([]byte)) == 0) {
+						err := sendCommandToDevice(0x34, uint16(0xFA), writer, stopUpgradeSegment, false)
 						if err != nil {
 							return err
 						}

@@ -91,6 +91,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 			},
 		)
 		ctx.SetOutput("upgradeSegment", []byte{})
+		ctx.SetOutput("stopUpgradeSegment", []byte{})
 		return true, nil
 	}
 
@@ -119,6 +120,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 			},
 		)
 		ctx.SetOutput("upgradeSegment", generateResponseContent(serialNumber, []byte{}))
+		ctx.SetOutput("stopUpgradeSegment", []byte{})
 		return true, nil
 	}
 
@@ -138,7 +140,9 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 		singleResult := coll.FindOne(context.Background(), bson.M{"identifier": identifier})
 		err = singleResult.Decode(&firmwareVersion)
 		if err != nil {
-			return false, nil
+			ctx.SetOutput("upgradeSegment", []byte{})
+			ctx.SetOutput("stopUpgradeSegment", []byte{'*', 'P', '@', 'S', 'T', 'O', 'P', 'L', '#'})
+			return true, nil
 		}
 		firmwareFileBytes = getBytesFromMap(firmwareVersion["fileContent"].(primitive.A)[0].(map[string]interface{}))
 		firmwareCacheLock.Lock()
@@ -158,6 +162,7 @@ func (a *MyActivity) Eval(ctx activity.Context) (done bool, err error) {
 	}
 
 	ctx.SetOutput("upgradeSegment", generateResponseContent(serialNumber, firmwareBuff))
+	ctx.SetOutput("stopUpgradeSegment", []byte{})
 	return true, nil
 }
 

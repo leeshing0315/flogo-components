@@ -28,6 +28,10 @@
     {
       "name": "upgradeSegment",
       "type": "array"
+    },
+    {
+      "name": "stopUpgradeSegment",
+      "type": "array"
     }
   ]
 }

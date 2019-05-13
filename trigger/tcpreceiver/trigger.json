@@ -112,6 +112,10 @@
     {
       "name": "devtype",
       "type": "string"
+    },
+    {
+      "name": "stopUpgradeSegment",
+      "type": "array"
     }
   ],
   "handler": {
