@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/leeshing0315/flogo-components/common/entity"
@@ -23,14 +24,14 @@ func init() {
 	coll = mongoDb.Collection("tcpServerExceptions")
 }
 
-func LogDownException(eventTime string, pin string, originalPacket []byte, err error) {
+func LogDownException(eventTime string, pin string, originalPacket []byte, err interface{}) {
 	exception := &entity.TcpServerException{
 		RevTime:      eventTime,
 		Pin:          pin,
 		ProtocolType: entity.PROTOCOL_TYPE_SMU,
 		Bytes:        originalPacket,
 		ErrorType:    entity.ERROR_TYPE_UNCHECKED,
-		ErrorReason:  err.Error(),
+		ErrorReason:  fmt.Sprint(err),
 	}
 	coll.InsertOne(context.Background(), exception)
 }
