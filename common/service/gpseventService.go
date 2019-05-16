@@ -34,7 +34,8 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	gpsEvent.RevTime = nowDateStr
 	gpsEvent.CltTime = singlePacket.Date
 	gpsEvent.LocateTime = singlePacket.Date
-	gpsEvent.EleState = returnValueByCondition(singlePacket.PowerSupplyStatus, "1", "0").(string)
+	// gpsEvent.EleState = returnValueByCondition(singlePacket.PowerSupplyStatus, "1", "0").(string)
+	gpsEvent.EleState = returnValueByCondition(singlePacket.SupplyByBatteryOrPower, "1", "0").(string)
 	gpsEvent.BatLevel = singlePacket.BatLevel
 	gpsEvent.OpMode = returnValueByCondition(singlePacket.InfoItem.OpModeValid, singlePacket.InfoItem.OpMode, "").(string)
 	gpsEvent.SetTem = returnValueByCondition(singlePacket.InfoItem.SetTemValid, singlePacket.InfoItem.SetTem, "").(string)
