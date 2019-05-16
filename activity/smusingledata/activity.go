@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"github.com/leeshing0315/flogo-components/common/util"
+
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/leeshing0315/flogo-components/common/service"
 )
@@ -32,12 +34,21 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	devId, _ := context.GetInput("devid").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 	eventTime := context.GetInput("eventTime").(string)
+	pin := context.GetInput("pin").(string)
+	originalPacket := context.GetInput("originalPacket").([]byte)
+
+	defer func() {
+		if r := recover(); r != nil {
+			util.LogDownException(eventTime, pin, originalPacket, r)
+		}
+	}()
 
 	autoReg := "false"
 
 	singlePacket, err := service.ParseToSinglePacket(reqDataSegment)
 	if err != nil {
-		// TODO save parsing error to DB
+		// save parsing error to DB
+		util.LogDownException(eventTime, pin, originalPacket, err)
 		context.SetOutput("cntrNum", cntrNum)
 		context.SetOutput("devId", devId)
 		context.SetOutput("resDataSegment", []byte{})

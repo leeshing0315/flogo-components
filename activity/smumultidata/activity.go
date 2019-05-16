@@ -7,6 +7,7 @@ import (
 
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/leeshing0315/flogo-components/common/service"
+	"github.com/leeshing0315/flogo-components/common/util"
 )
 
 // MyActivity is a stub for your Activity implementation
@@ -33,6 +34,14 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	devId, _ := context.GetInput("devid").(string)
 	reqDataSegment, _ := context.GetInput("reqDataSegment").([]byte)
 	eventTime, _ := context.GetInput("eventTime").(string)
+	pin := context.GetInput("pin").(string)
+	originalPacket := context.GetInput("originalPacket").([]byte)
+
+	defer func() {
+		if r := recover(); r != nil {
+			util.LogDownException(eventTime, pin, originalPacket, r)
+		}
+	}()
 
 	gpsEventStrs := []string{}
 	opModeChangeStrs := []string{}
@@ -43,7 +52,8 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	for _, dateSegment := range packets {
 		singlePacket, err := service.ParseToSinglePacket(dateSegment)
 		if err != nil {
-			// TODO save parsing error to DB
+			// save parsing error to DB
+			util.LogDownException(eventTime, pin, originalPacket, err)
 			continue
 		}
 		if singlePacket.LoginItem.ContainerNumber != "" {
