@@ -1,0 +1,29 @@
+{
+  "name": "smuquerycntrdevmapping",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "activity description",
+  "ref": "github.com/leeshing0315/flogo-components/activity/smuquerycntrdevmapping",
+  "author": "Your Name <you.name@example.org>",
+  "title": "SMU Query CntrDevMapping",
+  "inputs":[
+    {
+      "name": "pin",
+      "type": "string"
+    },
+    {
+      "name": "eventTime",
+      "type": "string"
+    },
+    {
+      "name": "originalPacket",
+      "type": "array"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output",
+      "type": "string"
+    }
+  ]
+}
