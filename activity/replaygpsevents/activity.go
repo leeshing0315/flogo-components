@@ -22,6 +22,8 @@ import (
 	"github.com/leeshing0315/flogo-components/common/service"
 )
 
+const REPLAY_VERSION int = 2
+
 var activityLog = logger.GetLogger("replay-gpsevents")
 
 var loc *time.Location
@@ -154,7 +156,7 @@ func handleOriginalPackets(db *mongo.Database, from string, to string) error {
 			},
 			"$or": bson.A{
 				bson.M{"replayVersion": bson.M{"$exists": false}},
-				bson.M{"replayVersion": bson.M{"$lt": 1}},
+				bson.M{"replayVersion": bson.M{"$lt": REPLAY_VERSION}},
 			},
 		},
 	)
@@ -186,7 +188,7 @@ func handleOriginalPackets(db *mongo.Database, from string, to string) error {
 			},
 			bson.M{
 				"$set": bson.M{
-					"replayVersion": 1,
+					"replayVersion": REPLAY_VERSION,
 				},
 			},
 		)
