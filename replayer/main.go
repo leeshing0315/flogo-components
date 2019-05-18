@@ -13,9 +13,9 @@ import (
 
 // var serverUri string = "nptcp.cargosmart.com:1024"
 
-// var serverUri string = "itciot-tcp.cargosmart.ai:8080"
+var serverUri string = "itciot-tcp.cargosmart.ai:8080"
 
-var serverUri string = "ciot-tcp.cargosmart.ai:8080"
+// var serverUri string = "ciot-tcp.cargosmart.ai:8080"
 
 // var serverUri string = "172.16.180.204:8033"
 
@@ -26,9 +26,107 @@ var serverUri string = "ciot-tcp.cargosmart.ai:8080"
 // }
 // `
 
-var jsonBody string = `
+var jsonBody4 string = `
 {
-    "from": "2019-04-17T16:32:41+08:00",
+    "from": "2019-04-04T00:00:00+08:00",
+    "to": "2019-04-05T00:00:00+08:00"
+}
+`
+
+var jsonBody5 string = `
+{
+    "from": "2019-04-05T00:00:00+08:00",
+    "to": "2019-04-06T00:00:00+08:00"
+}
+`
+
+var jsonBody6 string = `
+{
+    "from": "2019-04-06T00:00:00+08:00",
+    "to": "2019-04-07T00:00:00+08:00"
+}
+`
+
+var jsonBody7 string = `
+{
+    "from": "2019-04-07T00:00:00+08:00",
+    "to": "2019-04-08T00:00:00+08:00"
+}
+`
+
+var jsonBody8 string = `
+{
+    "from": "2019-04-08T00:00:00+08:00",
+    "to": "2019-04-09T00:00:00+08:00"
+}
+`
+
+var jsonBody9 string = `
+{
+    "from": "2019-04-09T00:00:00+08:00",
+    "to": "2019-04-10T00:00:00+08:00"
+}
+`
+
+var jsonBody10 string = `
+{
+    "from": "2019-04-10T00:00:00+08:00",
+    "to": "2019-04-11T00:00:00+08:00"
+}
+`
+
+var jsonBody11 string = `
+{
+    "from": "2019-04-11T00:00:00+08:00",
+    "to": "2019-04-12T00:00:00+08:00"
+}
+`
+
+var jsonBody12 string = `
+{
+    "from": "2019-04-12T00:00:00+08:00",
+    "to": "2019-04-13T00:00:00+08:00"
+}
+`
+
+var jsonBody13 string = `
+{
+    "from": "2019-04-13T00:00:00+08:00",
+    "to": "2019-04-14T00:00:00+08:00"
+}
+`
+
+var jsonBody14 string = `
+{
+    "from": "2019-04-14T00:00:00+08:00",
+    "to": "2019-04-15T00:00:00+08:00"
+}
+`
+
+var jsonBody15 string = `
+{
+    "from": "2019-04-15T00:00:00+08:00",
+    "to": "2019-04-16T00:00:00+08:00"
+}
+`
+
+var jsonBody16 string = `
+{
+    "from": "2019-04-16T00:00:00+08:00",
+    "to": "2019-04-17T00:00:00+08:00"
+}
+`
+
+var jsonBody17 string = `
+{
+    "from": "2019-04-17T00:00:00+08:00",
+    "to": "2019-04-18T00:00:00+08:00"
+}
+`
+
+var jsonBody18 string = `
+{
+    "from": "2019-04-18T00:00:00+08:00",
     "to": "2019-04-19T00:00:00+08:00"
 }
 `
@@ -110,7 +208,21 @@ var jsonBody29 string = `
 `
 
 var jsonBodyArr []string = []string{
-	jsonBody,
+	jsonBody4,
+	jsonBody5,
+	jsonBody6,
+	jsonBody7,
+	jsonBody8,
+	jsonBody9,
+	jsonBody10,
+	jsonBody11,
+	jsonBody12,
+	jsonBody13,
+	jsonBody14,
+	jsonBody15,
+	jsonBody16,
+	jsonBody17,
+	jsonBody18,
 	jsonBody19,
 	jsonBody20,
 	jsonBody21,

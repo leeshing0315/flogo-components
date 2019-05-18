@@ -154,6 +154,9 @@ func handleOriginalPackets(db *mongo.Database, from string, to string) error {
 				"$gte": from,
 				"$lt":  to,
 			},
+			"pin": bson.M{
+				"$ne": "460011710324088", // C00001
+			},
 			"$or": bson.A{
 				bson.M{"replayVersion": bson.M{"$exists": false}},
 				bson.M{"replayVersion": bson.M{"$lt": REPLAY_VERSION}},
