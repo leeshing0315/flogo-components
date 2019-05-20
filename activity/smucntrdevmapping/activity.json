@@ -40,6 +40,10 @@
     {
       "name": "deviceInfo",
       "type": "string"
+    },
+    {
+      "name": "company",
+      "type": "string"
     }
   ]
 }

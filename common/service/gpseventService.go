@@ -26,7 +26,7 @@ type GpsEventAddress struct {
 	Country     string `json:"country"`
 }
 
-func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string, cntrNum string, nowDateStr string) *entity.GpsEvent {
+func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string, cntrNum string, nowDateStr string, carrier string) *entity.GpsEvent {
 	gpsEvent := &entity.GpsEvent{}
 
 	gpsEvent.Seqno = seqNo
@@ -92,7 +92,11 @@ func GenGpsEventFromSinglePacket(singlePacket *entity.SinglePacket, seqNo string
 	gpsEvent.Drs = returnValueByCondition(singlePacket.InfoItem.DrsValid, singlePacket.InfoItem.Drs, "").(string)
 	gpsEvent.Hs = returnValueByCondition(singlePacket.InfoItem.HsValid, singlePacket.InfoItem.Hs, "").(string)
 	gpsEvent.Source = GPSEVENT_SOURCE_TCPSERVER
-	gpsEvent.Carrier = GPSEVENT_CARRIER_COSU
+	if carrier != "" {
+		gpsEvent.Carrier = carrier
+	} else {
+		gpsEvent.Carrier = GPSEVENT_CARRIER_COSU
+	}
 	// address, displayName := getAddress(singlePacket.Lat, singlePacket.Lng)
 	// gpsEvent.Address = address
 	// gpsEvent.DisplayName = displayName.(string)

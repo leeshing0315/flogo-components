@@ -36,6 +36,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	eventTime, _ := context.GetInput("eventTime").(string)
 	pin := context.GetInput("pin").(string)
 	originalPacket := context.GetInput("originalPacket").([]byte)
+	carrier := context.GetInput("carrier").(string)
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -65,7 +66,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 			autoReg = "true"
 		}
 
-		gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime)
+		gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, eventTime, carrier)
 		gpsEventBytes, _ := json.Marshal(gpsEvent)
 		gpsEventStrs = append(gpsEventStrs, string(gpsEventBytes))
 

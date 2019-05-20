@@ -56,6 +56,11 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("sim", cntrDevMapping["simno"])
 	context.SetOutput("devId", cntrDevMapping["carno"])
 	context.SetOutput("cntrNum", cntrDevMapping["carid"])
+	if cntrDevMapping["company"] != nil && cntrDevMapping["company"].(string) != "" {
+		context.SetOutput("company", cntrDevMapping["company"].(string)) // OOLU/COSU
+	} else {
+		context.SetOutput("company", "COSU")
+	}
 
 	println("**********login*sim", cntrDevMapping["simno"].(string), "**********")
 	println("**********login*devId", cntrDevMapping["carno"].(string), "**********")

@@ -38,6 +38,10 @@
     {
       "name": "originalPacket",
       "type": "array"
+    },
+    {
+      "name": "carrier",
+      "type": "string"
     }
   ],
   "outputs": [

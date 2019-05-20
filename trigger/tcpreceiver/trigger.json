@@ -62,6 +62,10 @@
     {
       "name": "originalPacket",
       "type": "array"
+    },
+    {
+      "name": "company",
+      "type": "string"
     }
   ],
   "reply": [
@@ -116,6 +120,10 @@
     {
       "name": "stopUpgradeSegment",
       "type": "array"
+    },
+    {
+      "name": "company",
+      "type": "string"
     }
   ],
   "handler": {

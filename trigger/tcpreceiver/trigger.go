@@ -83,6 +83,7 @@ func (t *MyTrigger) Start() error {
 		triggerData["pin"] = s.Pin
 		triggerData["firmwareVersion"] = s.HardwareVer
 		triggerData["devtype"] = s.Type
+		triggerData["company"] = s.Company
 
 		var originalPacket bytes.Buffer
 		originalPacket.WriteByte(packet.Command)
@@ -108,6 +109,7 @@ func (t *MyTrigger) Start() error {
 				firmwareVersionAttr, _ := results["firmwareVersion"]
 				devtypeAttr, _ := results["devtype"]
 				stopUpgradeSegmentAttr, _ := results["stopUpgradeSegment"]
+				companyAttr, _ := results["company"]
 
 				cntrNum := cntrNumAttr.Value().(string)
 				if cntrNum != "" {
@@ -129,6 +131,10 @@ func (t *MyTrigger) Start() error {
 				if devtype != "" {
 					devtypeStr, _ := strconv.ParseInt(devtype, 10, 64)
 					s.Type = byte(devtypeStr)
+				}
+				company := companyAttr.Value().(string)
+				if company != "" {
+					s.Company = company
 				}
 
 				if ok && (packet.Command != 0x34 && !(packet.Command == 0x33 && packet.DataSegment[1] == 'L')) {

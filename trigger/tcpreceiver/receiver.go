@@ -33,6 +33,7 @@ type Socket struct {
 	CntrNum       string
 	DevId         string
 	CommandSeq    uint16
+	Company       string
 }
 
 // ServerSocket TCP server

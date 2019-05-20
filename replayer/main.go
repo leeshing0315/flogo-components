@@ -236,10 +236,10 @@ var jsonBodyArr []string = []string{
 	jsonBody29,
 }
 
-var scheduleSeq int = 8
+var scheduleSeq int = 20
 
 // func main() {
-// 	triggerReplay(jsonBody20)
+// 	triggerReplay(jsonBody4)
 // 	return
 // }
 
