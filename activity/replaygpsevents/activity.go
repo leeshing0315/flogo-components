@@ -218,17 +218,25 @@ func handleOneOriginalPacket(db *mongo.Database, originalPacket map[string]inter
 	revTime := time.Now().In(loc).Format("2006-01-02T15:04:05+08:00")
 	pin := originalPacket["pin"].(string)
 	cntrNum := cntrDeviceMappings[pin]["carid"].(string)
+	var company string
+	if cntrDeviceMappings[pin]["company"] == nil || cntrDeviceMappings[pin]["company"].(string) == "" {
+		company = "COSU"
+	} else if cntrDeviceMappings[pin]["company"].(string) == "OOCL" {
+		company = "OOLU"
+	} else {
+		company = cntrDeviceMappings[pin]["company"].(string)
+	}
 
 	seqNo, reqDataSegment := parseBytes(bytes)
 
 	switch bytes[0] {
 	case 0x36:
-		err = handleSinglePacket(db, seqNo, reqDataSegment, revTime, cntrNum)
+		err = handleSinglePacket(db, seqNo, reqDataSegment, revTime, cntrNum, company)
 		if err != nil {
 			return err
 		}
 	case 0x37:
-		err = handleMultiPacket(db, seqNo, reqDataSegment, revTime, cntrNum)
+		err = handleMultiPacket(db, seqNo, reqDataSegment, revTime, cntrNum, company)
 		if err != nil {
 			return err
 		}
@@ -239,13 +247,13 @@ func handleOneOriginalPacket(db *mongo.Database, originalPacket map[string]inter
 	return nil
 }
 
-func handleSinglePacket(db *mongo.Database, seqNo string, reqDataSegment []byte, revTime string, cntrNum string) error {
+func handleSinglePacket(db *mongo.Database, seqNo string, reqDataSegment []byte, revTime string, cntrNum string, company string) error {
 	singlePacket, err := service.ParseToSinglePacket(reqDataSegment)
 	if err != nil {
 		return err
 	}
 
-	gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, revTime, "COSU")
+	gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, revTime, company)
 	err = handleOneGpsEvent(db, gpsEvent)
 	if err != nil {
 		return err
@@ -265,10 +273,10 @@ func splitPackets(data []byte) [][]byte {
 	}
 	return result
 }
-func handleMultiPacket(db *mongo.Database, seqNo string, reqDataSegment []byte, revTime string, cntrNum string) (err error) {
+func handleMultiPacket(db *mongo.Database, seqNo string, reqDataSegment []byte, revTime string, cntrNum string, company string) (err error) {
 	packets := splitPackets(reqDataSegment)
 	for _, dateSegment := range packets {
-		err = handleSinglePacket(db, seqNo, dateSegment, revTime, cntrNum)
+		err = handleSinglePacket(db, seqNo, dateSegment, revTime, cntrNum, company)
 		if err != nil {
 			return err
 		}
