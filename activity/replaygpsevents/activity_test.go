@@ -60,7 +60,7 @@ func TestEval(t *testing.T) {
 }
 
 func TestSth(t *testing.T) {
-	decoded, err := base64.StdEncoding.DecodeString(`NwDqA2k2AOEAWgCAAHIZBRUJNCQCHwa3BzbmnwEmAIZkBAIQEgIsRAH////DwzfDI8NX7D3///8nJhDXBOkC/sSPAHfC6wJD/+0AKgBqAH4Ag/8IAkRdCQj96v3q/er96gUBw/GONgDiAFoAgAByGQUVCTcTAh7kEgc3EHIBJgCGZAQCEBICLEQB////wsM3w0vDV+xG////JwcQ7gB0AADEdwB8wyMBUAB2ABwAAACDAIP/CAIAJAkI/er96v3q/eoFAcL/pzYA4wBaAIAAchkFFQk4NwIe0vEHNyV3ASgAh2QEAhASAixEAf///8PDN8Mjw1fsSP///ycPENoE3QLtxIsAesL3Ajz/+QAoAGoAfwCD/wgCRF0JCP3q/er96v3qBQHDE8Y2AOQAWgCAAHIZBRUJQScCHrALBzdQzAEoAIZkBAIPEgIsRAH////CwzfDS8NX7DD///8nKRDsAHMAAMRrAHvDNwFUAHgAHQAAAIIAg/8IAgAkCQj96v3q/er96gUBwg+kNgDlAFoAgAByGQUVCUQRAh6OEgc3ecMBKACGZAQCDhICLEQB////w8M3w0PDV+w3////JygQ2QTiAvXEjwB6ww8COf/2ACgAagB/AIP/CAJEXQkI/er96v3q/eoFAcO6WjYA5gBaAIAAchkFFQlGFwIedFYHN5nWASYAg2QEAg4SAixEAf///8LDN8NLw1fsRv///ycHEOwAdAAAxGsAe8MjAUAAdgAdAAAAgwCD/wgCACQJCP3q/er96v3qBQHC3Kc2AOcAWgCAAHIZBRUJSAICHmBuBze2JAEmAIFkBAIOEgIsRAH////DwzfDI8NX7Dz///8nKBDXBNkC6sSPAHfC2wI+/+8AKwBqAH0Ag/8IAkRdCQj96v3q/er96gUBw1KqNgDoAFoAgAByGQUVCVBQAh5ByAc35EsBKACBZAQCDhICLEQB////wsM3w0vDV+xH////JwcQ6wB0AADEdwB7wysBQQB4AB0AAACDAIP/CAIAJAkI/er96v3q/eoFAcKhojYA6QBaAIAAchkFFQlSNQIeLj4HOAFVASoAgWQEAg4SAixEAf///8PDN8Mjw1fsPP///ycoENkE0gLhxJcAd8LbAj3/7gArAGoAfQCD/wgCRF0JCP3q/er96v3qBQHDPMkfdQ==`)
+	decoded, err := base64.StdEncoding.DecodeString(`NwAHAIg2AAMAGwAAIDKZCSgZEjUDMMlVAJe8MAAFAABkBAIODNWyNgAEABsAACAymQkoGScxAzDFQQCXuh0ACQAAZAQCDgyF5zYABQAbAAAgMpkJKBlCMQMwzZsAl7lEAAUAAGMEAg4LLRI2AAYAGwAAADIZBRQZV0gDMMErAJfBgwAbAUNiBAIQCzovulQ=`)
 	if err != nil {
 		return
 	}
@@ -72,7 +72,7 @@ func TestSth(t *testing.T) {
 			return
 		}
 
-		service.GenGpsEventFromSinglePacket(singlePacket, "seqNo", "cntrNum", "revTime")
+		service.GenGpsEventFromSinglePacket(singlePacket, "seqNo", "cntrNum", "revTime", "COSU")
 	}
 }
 
@@ -87,5 +87,5 @@ func TestSinglePacketSth(t *testing.T) {
 		return
 	}
 
-	service.GenGpsEventFromSinglePacket(singlePacket, "seqNo", "cntrNum", "revTime")
+	service.GenGpsEventFromSinglePacket(singlePacket, "seqNo", "cntrNum", "revTime", "COSU")
 }

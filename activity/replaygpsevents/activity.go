@@ -245,7 +245,7 @@ func handleSinglePacket(db *mongo.Database, seqNo string, reqDataSegment []byte,
 		return err
 	}
 
-	gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, revTime)
+	gpsEvent := service.GenGpsEventFromSinglePacket(singlePacket, seqNo, cntrNum, revTime, "COSU")
 	err = handleOneGpsEvent(db, gpsEvent)
 	if err != nil {
 		return err
