@@ -56,10 +56,12 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("sim", cntrDevMapping["simno"])
 	context.SetOutput("devId", cntrDevMapping["carno"])
 	context.SetOutput("cntrNum", cntrDevMapping["carid"])
-	if cntrDevMapping["company"] != nil && cntrDevMapping["company"].(string) != "" {
-		context.SetOutput("company", cntrDevMapping["company"].(string)) // OOLU/COSU
-	} else {
+	if cntrDevMapping["company"] == nil || cntrDevMapping["company"].(string) == "" {
 		context.SetOutput("company", "COSU")
+	} else if cntrDevMapping["company"].(string) == "OOCL" {
+		context.SetOutput("company", "OOLU")
+	} else {
+		context.SetOutput("company", cntrDevMapping["company"].(string))
 	}
 
 	println("**********login*sim", cntrDevMapping["simno"].(string), "**********")
