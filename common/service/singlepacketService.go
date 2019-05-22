@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/binary"
+	"errors"
 	"math"
 	"strconv"
 	"strings"
@@ -288,7 +289,7 @@ func splitItems(data []byte) [][]byte {
 }
 
 func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
-	if len(item) == 33 {
+	if len(item) == 35 { // 33 + 2
 		dataSegment := item[2:]
 		loginItem := entity.LoginItem{}
 
@@ -298,7 +299,7 @@ func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
 		loginItem.ReeferType = string(dataSegment[32])
 
 		singlePacket.LoginItem = loginItem
-	} else if len(item) == 27 {
+	} else if len(item) == 29 { // 27 + 2
 		dataSegment := item[2:]
 		loginItem := entity.LoginItem{}
 
@@ -308,6 +309,8 @@ func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
 		loginItem.ReeferType = string(dataSegment[26])
 
 		singlePacket.LoginItem = loginItem
+	} else {
+		panic(errors.New("loginItem length wrong"))
 	}
 }
 
