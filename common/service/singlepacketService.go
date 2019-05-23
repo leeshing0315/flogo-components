@@ -254,7 +254,10 @@ func handleAdditionalInformationItems(data []byte, singlePacket *entity.SinglePa
 	for _, item := range items {
 		switch item[0] {
 		case 0x01:
-			handleLoginItem(item, singlePacket)
+			err := handleLoginItem(item, singlePacket)
+			if err != nil {
+				return err
+			}
 		case 0x02:
 			handleInfoItem(item, singlePacket)
 		case 0x03:
@@ -288,7 +291,7 @@ func splitItems(data []byte) [][]byte {
 	return items
 }
 
-func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
+func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) error {
 	if len(item) == 35 { // 33 + 2
 		dataSegment := item[2:]
 		loginItem := entity.LoginItem{}
@@ -299,6 +302,7 @@ func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
 		loginItem.ReeferType = string(dataSegment[32])
 
 		singlePacket.LoginItem = loginItem
+		return nil
 	} else if len(item) == 29 { // 27 + 2
 		dataSegment := item[2:]
 		loginItem := entity.LoginItem{}
@@ -309,8 +313,9 @@ func handleLoginItem(item []byte, singlePacket *entity.SinglePacket) {
 		loginItem.ReeferType = string(dataSegment[26])
 
 		singlePacket.LoginItem = loginItem
+		return nil
 	} else {
-		panic(errors.New("loginItem length wrong"))
+		return errors.New("loginItem length wrong")
 	}
 }
 
