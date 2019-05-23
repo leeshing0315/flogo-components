@@ -256,7 +256,7 @@ func handleAdditionalInformationItems(data []byte, singlePacket *entity.SinglePa
 		case 0x01:
 			err := handleLoginItem(item, singlePacket)
 			if err != nil {
-				return err
+				continue
 			}
 		case 0x02:
 			handleInfoItem(item, singlePacket)
