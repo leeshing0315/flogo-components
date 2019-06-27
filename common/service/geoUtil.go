@@ -112,7 +112,7 @@ func isPointInPolygon(point []float64, polyCornersTmp []interface{}) bool {
 	return oddNodes
 }
 
-func convertNumberToFloat (inputArray []interface{}) []float64 {
+func convertNumberToFloat(inputArray []interface{}) []float64 {
 	convertArray := []float64{}
 	if reflect.TypeOf(inputArray[0]).Name() == "int32" {
 		convertArray = append(convertArray, float64(inputArray[0].(int32)))
@@ -192,7 +192,7 @@ func getLocationByLatLon(lat float64, lon float64, carrier string, onlyQueryGeof
 	var location, error = crg.GetNearestCities(lat, lon, 1, "mi")
 	if location[0].Distance > DISTANCE_FROM_CITY || error != nil {
 		var oceanResult = searchFromOceanPolygon(lat, lon)
-		if reflect.ValueOf(oceanResult).IsValid() && oceanResult["geoName"] != nil && oceanResult["geoName"] != ""{
+		if reflect.ValueOf(oceanResult).IsValid() && oceanResult["geoName"] != nil && oceanResult["geoName"] != "" {
 			result = oceanResult
 		} else {
 			result = location[0]
@@ -242,22 +242,22 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 				CountryCode: tmpLocation.Country_code,
 				Country:     tmpLocation.Country,
 			}
-			gpsevent.DisplayName = "";
-			if (tmpLocation.City != "") {
-				gpsevent.DisplayName = tmpLocation.City;
+			gpsevent.DisplayName = ""
+			if tmpLocation.City != "" {
+				gpsevent.DisplayName = tmpLocation.City
 			}
-			if (tmpLocation.Region != "") {
-				if (gpsevent.DisplayName != "") {
-					gpsevent.DisplayName = gpsevent.DisplayName + " ," + tmpLocation.Region;
+			if tmpLocation.Region != "" {
+				if gpsevent.DisplayName != "" {
+					gpsevent.DisplayName = gpsevent.DisplayName + " ," + tmpLocation.Region
 				} else {
-					gpsevent.DisplayName = tmpLocation.Region;
+					gpsevent.DisplayName = tmpLocation.Region
 				}
 			}
-			if (tmpLocation.Country != "") {
-				if (gpsevent.DisplayName != "") {
-					gpsevent.DisplayName = gpsevent.DisplayName + " ," + tmpLocation.Country;
+			if tmpLocation.Country != "" {
+				if gpsevent.DisplayName != "" {
+					gpsevent.DisplayName = gpsevent.DisplayName + " ," + tmpLocation.Country
 				} else {
-					gpsevent.DisplayName = tmpLocation.Country;
+					gpsevent.DisplayName = tmpLocation.Country
 				}
 			}
 		}
@@ -294,6 +294,12 @@ func AttachLocation(gpsevent *entity.GpsEvent) *entity.GpsEvent {
 			if tmpLocation["geoName"] != nil {
 				gpsevent.Address.OoclName = tmpLocation["geoName"].(string)
 				gpsevent.Address.OoclDisplayName = tmpLocation["geoName"].(string)
+			}
+			if gpsevent.Address.City == "" && tmpLocation["geoCity"] != nil {
+				gpsevent.Address.City = tmpLocation["geoCity"].(string)
+			}
+			if gpsevent.Address.Country == "" && tmpLocation["geoCountry"] != nil {
+				gpsevent.Address.Country = tmpLocation["geoCountry"].(string)
 			}
 			if tmpLocation["geoCode"] != nil {
 				gpsevent.Address.OoclCode = tmpLocation["geoCode"].(string)
