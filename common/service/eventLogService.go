@@ -43,12 +43,13 @@ func parseTemperatureLog(bytes []byte) *entity.EventLog {
 	eventLog.Drs = roundFloat(float64(((int(bytes[9]&0x3)<<8)+int(bytes[10])))/10.0 - 40.0)
 	eventLog.Ambs = roundFloat(float64(bytes[11]&0x7f) - 40.0)
 	if (bytes[13] & 0x80) == 0x80 {
-		eventLog.Isa = 1
+		// eventLog.Isa = 1
 		eventLog.Hus = strconv.FormatInt(int64(bytes[12]&0x7f), 10)
 		eventLog.Sh = strconv.FormatInt(int64(bytes[13]&0x7f), 10)
 	} else {
-		eventLog.Isa = 0
+		// eventLog.Isa = 0
 	}
+	eventLog.Isa = 1
 	eventLog.Usda1 = strconv.FormatFloat(float64((int(bytes[18]>>6)<<8)+int(bytes[14]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Usda2 = strconv.FormatFloat(float64((int(bytes[18]&0x30)<<4)+int(bytes[15]))/10.0-40.0, 'f', 1, 64)
 	eventLog.Usda3 = strconv.FormatFloat(float64((int(bytes[18]&0xc)<<6)+int(bytes[16]))/10.0-40.0, 'f', 1, 64)
@@ -62,14 +63,22 @@ func parseSmodeLog(bytes []byte) *entity.EventLog {
 	eventLog.LogTime = parseDateTime(bytes[0:4])
 	smode := smodeMapping[int(binary.BigEndian.Uint16(bytes[4:6]))]
 	if smode == "" {
-		smode = getSmodeByCal(bytes[4], bytes[5])
+		var isSmodeParsingFail bool
+		smode, isSmodeParsingFail = getSmodeByCal(bytes[4], bytes[5])
+		if isSmodeParsingFail {
+			eventLog.Isa = 0
+		} else {
+			eventLog.Isa = 1
+		}
+	} else {
+		eventLog.Isa = 1
 	}
 	eventLog.Smode = smode
 	eventLog.IsTemperatureLog = false
 	return eventLog
 }
 
-func getSmodeByCal(hiByte, loByte byte) string {
+func getSmodeByCal(hiByte, loByte byte) (opMode string, isSmodeParsingFail bool) {
 	// Change set point
 	if hiByte>>4 == 0 {
 		var sp string = strconv.FormatFloat(float64((int(hiByte&0x3)<<8)+int(loByte))/10.0-40.0, 'f', 1, 64)
@@ -82,7 +91,7 @@ func getSmodeByCal(hiByte, loByte byte) string {
 		} else {
 			mode = "PC"
 		}
-		return fmt.Sprintf("Set Point %s by %s", sp, mode)
+		return fmt.Sprintf("Set Point %s by %s", sp, mode), false
 	}
 	// Change Defrost Interval
 	if ((hiByte >> 4) == 3) && (hiByte != 0x31) {
@@ -98,7 +107,7 @@ func getSmodeByCal(hiByte, loByte byte) string {
 			mode = "PANEL"
 		}
 		var value string = strconv.FormatInt(int64((loByte&0xf)*3+3), 10)
-		return fmt.Sprintf("Change Defrost Interval %s hour by %s", value, mode)
+		return fmt.Sprintf("Change Defrost Interval %s hour by %s", value, mode), false
 	}
 	// Change Set Humidity
 	if (hiByte >> 4) == 0x8 {
@@ -112,26 +121,26 @@ func getSmodeByCal(hiByte, loByte byte) string {
 			mode = "PC"
 		}
 		var value string = strconv.FormatInt(int64(loByte&0x7f), 10)
-		return fmt.Sprintf("Change Set Humidity %s%%RH by %s", value, mode)
+		return fmt.Sprintf("Change Set Humidity %s%%RH by %s", value, mode), false
 	}
 	// Change Set Time
 	if hiByte == 0x65 {
 		var value string = strconv.FormatInt(int64(loByte)+2000, 10)
-		return fmt.Sprintf("Change Time Setting to %s (YEAR)", value)
+		return fmt.Sprintf("Change Time Setting to %s (YEAR)", value), false
 	} else if hiByte == 0x66 {
 		var value string = strconv.FormatInt(int64(loByte), 10)
-		return fmt.Sprintf("Change Time Setting to %s (MONTH)", value)
+		return fmt.Sprintf("Change Time Setting to %s (MONTH)", value), false
 	} else if hiByte == 0x67 {
 		var value string = strconv.FormatInt(int64(loByte), 10)
-		return fmt.Sprintf("Change Time Setting to %s (DAY)", value)
+		return fmt.Sprintf("Change Time Setting to %s (DAY)", value), false
 	} else if hiByte == 0x68 {
 		var value string = strconv.FormatInt(int64(loByte), 10)
-		return fmt.Sprintf("Change Time Setting to %s (HOUR)", value)
+		return fmt.Sprintf("Change Time Setting to %s (HOUR)", value), false
 	} else if hiByte == 0x69 {
 		var value string = strconv.FormatInt(int64(loByte), 10)
-		return fmt.Sprintf("Change Time Setting to %s (MINUTE)", value)
+		return fmt.Sprintf("Change Time Setting to %s (MINUTE)", value), false
 	}
-	return strings.ToUpper(strconv.FormatUint((uint64(hiByte)<<8)+uint64(loByte), 16))
+	return strings.ToUpper(strconv.FormatUint((uint64(hiByte)<<8)+uint64(loByte), 16)), true
 }
 
 func parseDateTime(bytes []byte) string {
@@ -231,8 +240,8 @@ func ConvertEventLogToGPSEvent(eventLog *entity.EventLog) *entity.GpsEvent {
 		gpsEvent.Dss = strconv.FormatFloat(eventLog.Dss, 'f', 1, 64)
 		gpsEvent.Cts = eventLog.Cts
 		gpsEvent.Isc = strconv.FormatInt(int64(eventLog.Isc), 10)
-		gpsEvent.Isa = strconv.FormatInt(int64(eventLog.Isa), 10)
 	}
+	gpsEvent.Isa = strconv.FormatInt(int64(eventLog.Isa), 10)
 
 	return gpsEvent
 }
