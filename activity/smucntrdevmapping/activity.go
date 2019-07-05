@@ -56,7 +56,7 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	context.SetOutput("sim", cntrDevMapping["simno"])
 	context.SetOutput("devId", cntrDevMapping["carno"])
 	context.SetOutput("cntrNum", cntrDevMapping["carid"])
-	if cntrDevMapping["company"] == nil || cntrDevMapping["company"].(string) == "" {
+	if cntrDevMapping["company"] == nil || cntrDevMapping["company"].(string) == "" || cntrDevMapping["company"].(string) == "COSCO" {
 		context.SetOutput("company", "COSU")
 	} else if cntrDevMapping["company"].(string) == "OOCL" {
 		context.SetOutput("company", "OOLU")
