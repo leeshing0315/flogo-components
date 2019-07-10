@@ -50,12 +50,22 @@ func GenDeviceErrorsFromSinglePacket(singlePacket *entity.SinglePacket, seqNo st
 	return deviceErrors
 }
 
+var UTC8 *time.Location = getUTC8()
+
+func getUTC8() *time.Location {
+	location, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		panic(err)
+	}
+	return location
+}
+
 func genCommonDeviceError(singlePacket *entity.SinglePacket, seqNo string, devId string) *entity.DeviceError {
 	deviceError := &entity.DeviceError{}
 
 	deviceError.Devid = devId
 	deviceError.Logtime = changeDateFormatFromECMA(singlePacket.Date)
-	deviceError.Revtime = time.Now().Format("2006-01-02 15:04:05.0")
+	deviceError.Revtime = time.Now().In(UTC8).Format("2006-01-02 15:04:05.0")
 	deviceError.Seqno = seqNo
 	deviceError.TableName = "Tbldevicefault"
 

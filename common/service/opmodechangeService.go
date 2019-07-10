@@ -12,7 +12,7 @@ func GenOpModeChangeFromSinglePacket(singlePacket *entity.SinglePacket, seqNo st
 
 		operationModeChange.Seqno = seqNo
 		operationModeChange.Logtime = changeDateFormatFromECMA(singlePacket.Date)
-		operationModeChange.Revtime = time.Now().Format("2006-01-02 15:04:05.0")
+		operationModeChange.Revtime = time.Now().In(UTC8).Format("2006-01-02 15:04:05.0")
 		operationModeChange.Cntrnum = cntrNum
 		operationModeChange.Opmode = singlePacket.InfoItem.OpMode
 		operationModeChange.TableName = "Tblopmoderec"
